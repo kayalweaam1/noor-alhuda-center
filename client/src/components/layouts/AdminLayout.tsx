@@ -12,9 +12,11 @@ import {
   X,
   Bell,
   BarChart3,
+  Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "../ui/button";
 
 interface AdminLayoutProps {
@@ -25,6 +27,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [location] = useLocation();
   const { data: user } = trpc.auth.me.useQuery();
+  const { isSuperAdmin } = useAuth();
   const logoutMutation = trpc.auth.logout.useMutation();
 
   const handleLogout = async () => {
@@ -68,6 +71,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: BarChart3,
       path: "/admin/analytics",
     },
+    ...(isSuperAdmin ? [{
+      title: "إدارة المدراء",
+      icon: Shield,
+      path: "/admin/admins",
+    }] : []),
     {
       title: "الإعدادات",
       icon: Settings,

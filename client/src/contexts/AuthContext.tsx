@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   phoneNumber: string | null;
   role: 'admin' | 'teacher' | 'student' | null;
+  isSuperAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -14,6 +15,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   phoneNumber: null,
   role: null,
+  isSuperAdmin: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -27,6 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [role, setRole] = useState<'admin' | 'teacher' | 'student' | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -37,19 +40,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setPhoneNumber(phone);
         
         // Determine role based on phone number
-        // Admin phones
+        const superAdminPhone = '+972542632557';
         const adminPhones = ['+972542632557', '+972506381455'];
         
-        if (adminPhones.includes(phone || '')) {
+        if (phone === superAdminPhone) {
           setRole('admin');
+          setIsSuperAdmin(true);
+        } else if (adminPhones.includes(phone || '')) {
+          setRole('admin');
+          setIsSuperAdmin(false);
         } else {
           // For now, default to student
           // Later we'll check from database
           setRole('student');
+          setIsSuperAdmin(false);
         }
       } else {
         setPhoneNumber(null);
         setRole(null);
+        setIsSuperAdmin(false);
       }
       
       setLoading(false);
@@ -59,7 +68,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, phoneNumber, role }}>
+    <AuthContext.Provider value={{ user, loading, phoneNumber, role, isSuperAdmin }}>
       {children}
     </AuthContext.Provider>
   );
