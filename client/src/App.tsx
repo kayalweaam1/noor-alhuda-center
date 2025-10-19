@@ -9,7 +9,12 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminStudents from "./pages/admin/Students";
 import AdminTeachers from "./pages/admin/Teachers";
+import AdminReports from "./pages/admin/Reports";
 import AdminLayout from "./components/layouts/AdminLayout";
+import TeacherDashboard from "./pages/teacher/Dashboard";
+import TeacherLayout from "./components/layouts/TeacherLayout";
+import StudentDashboard from "./pages/student/Dashboard";
+import StudentLayout from "./components/layouts/StudentLayout";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -35,6 +40,21 @@ function Router() {
         <AdminLayout>
           <AdminTeachers />
         </AdminLayout>
+      </Route>
+      <Route path="/admin/reports">
+        <AdminLayout>
+          <AdminReports />
+        </AdminLayout>
+      </Route>
+      <Route path="/teacher/dashboard">
+        <TeacherLayout>
+          <TeacherDashboard />
+        </TeacherLayout>
+      </Route>
+      <Route path="/student/dashboard">
+        <StudentLayout>
+          <StudentDashboard />
+        </StudentLayout>
       </Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
