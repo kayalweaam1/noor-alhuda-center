@@ -4,7 +4,9 @@ export const APP_TITLE = import.meta.env.VITE_APP_TITLE || "نور الهدى";
 
 export const APP_LOGO =
   import.meta.env.VITE_APP_LOGO ||
-  "https://placehold.co/128x128/10b981/ffffff?text=نور";
+  "/logo.jpeg?v=1";
+
+export const APP_LOGO_BG = "/logo-bg.png?v=1";
 
 // Generate login URL at runtime so redirect URI reflects the current origin.
 export const getLoginUrl = () => {
