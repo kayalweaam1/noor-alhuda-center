@@ -1,54 +1,77 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Sparkles, Zap, Globe, Heart } from "lucide-react";
-import { useState } from "react";
+import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
+import { BookOpen, Users, Award, BarChart3 } from "lucide-react";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 
 export default function Home() {
-  const [isHovered, setIsHovered] = useState(false);
+  const { user, loading, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (!loading && isAuthenticated && user) {
+      if (user.role === 'admin') {
+        setLocation('/admin/dashboard');
+      } else if (user.role === 'teacher') {
+        setLocation('/teacher/dashboard');
+      } else if (user.role === 'student') {
+        setLocation('/student/dashboard');
+      }
+    }
+  }, [loading, isAuthenticated, user, setLocation]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-emerald-700">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
 
   const features = [
     {
-      icon: Sparkles,
-      title: "تصميم عصري",
-      description: "واجهة مستخدم جميلة وحديثة تجذب الانتباه",
+      icon: BookOpen,
+      title: "إدارة الدروس",
+      description: "تنظيم الدروس والحلقات القرآنية بكل سهولة",
     },
     {
-      icon: Zap,
-      title: "أداء سريع",
-      description: "تحميل فوري وتجربة سلسة وسريعة",
+      icon: Users,
+      title: "متابعة الطلاب",
+      description: "تتبع تقدم الطلاب وحضورهم وغيابهم",
     },
     {
-      icon: Globe,
-      title: "متعدد اللغات",
-      description: "دعم كامل للغة العربية والإنجليزية",
+      icon: Award,
+      title: "التقييمات",
+      description: "نظام تقييم شامل لقياس مستوى الطلاب",
     },
     {
-      icon: Heart,
-      title: "تجربة رائعة",
-      description: "مصمم بعناية لراحة المستخدم",
+      icon: BarChart3,
+      title: "التقارير",
+      description: "تقارير مفصلة لمتابعة أداء المركز",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100" dir="rtl">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 border-b border-emerald-200">
         <nav className="container max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">W</span>
-            </div>
-            <span className="font-bold text-lg text-slate-900 dark:text-white">مرحباً</span>
+          <div className="flex items-center gap-3">
+            <img src={APP_LOGO} alt={APP_TITLE} className="w-10 h-10 rounded-lg" />
+            <span className="font-bold text-xl text-emerald-900">{APP_TITLE}</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              الرئيسية
-            </Button>
-            <Button variant="ghost" size="sm">
-              عن الموقع
-            </Button>
-            <Button size="sm" className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
-              ابدأ الآن
+            <Button
+              onClick={() => window.location.href = getLoginUrl()}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+            >
+              تسجيل الدخول
             </Button>
           </div>
         </nav>
@@ -56,71 +79,50 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="container max-w-6xl mx-auto px-4 py-20 md:py-32">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="inline-block px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
-                <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                  ✨ مرحباً بك في عالم جديد
-                </span>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white leading-tight">
-                موقع استقبالي
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
-                  احترافي وعصري
-                </span>
-              </h1>
-              <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
-                اكتشف تجربة ويب فريدة مصممة بعناية لتقديم أفضل خدمة لك. موقع حديث يجمع بين الجمال والأداء.
-              </p>
+        <div className="text-center space-y-8">
+          <div className="space-y-4">
+            <div className="inline-block px-6 py-2 rounded-full bg-emerald-100 border border-emerald-300">
+              <span className="text-sm font-semibold text-emerald-800">
+                ✨ منظومة متكاملة لإدارة المراكز القرآنية
+              </span>
             </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-              >
-                استكشف المزيد
-                <ArrowRight className={`ml-2 w-5 h-5 transition-transform ${isHovered ? 'translate-x-1' : ''}`} />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900"
-              >
-                تعرف على المزيد
-              </Button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-8">
-              <div>
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">100%</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">مستجيب</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">⚡</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">سريع جداً</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">🎨</p>
-                <p className="text-sm text-slate-600 dark:text-slate-400">جميل التصميم</p>
-              </div>
-            </div>
+            <h1 className="text-5xl md:text-7xl font-bold text-emerald-900 leading-tight">
+              {APP_TITLE}
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mt-2">
+                نور يضيء طريق العلم
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-emerald-700 leading-relaxed max-w-3xl mx-auto">
+              نظام شامل لإدارة المراكز القرآنية يساعد المربين والطلاب والإدارة على متابعة التقدم وتحقيق الأهداف
+            </p>
           </div>
 
-          {/* Right Visual */}
-          <div className="relative h-96 md:h-full">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-3xl blur-3xl"></div>
-            <div className="relative h-full rounded-3xl bg-gradient-to-br from-blue-500/10 to-indigo-600/10 border border-blue-200/50 dark:border-blue-800/50 backdrop-blur-sm flex items-center justify-center">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              onClick={() => window.location.href = getLoginUrl()}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-lg"
+            >
+              ابدأ الآن
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-lg"
+            >
+              تعرف على المزيد
+            </Button>
+          </div>
+
+          {/* Decorative Element */}
+          <div className="mt-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-teal-600/20 rounded-3xl blur-3xl"></div>
+            <div className="relative bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-emerald-200 p-12">
               <div className="text-center space-y-4">
-                <div className="text-6xl">🌟</div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">مرحباً</p>
-                <p className="text-slate-600 dark:text-slate-400">أهلاً وسهلاً بك</p>
+                <div className="text-7xl">📖</div>
+                <p className="text-2xl font-bold text-emerald-900">القرآن الكريم</p>
+                <p className="text-emerald-700">منهج حياة ونور هداية</p>
               </div>
             </div>
           </div>
@@ -128,14 +130,14 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white dark:bg-slate-900 py-20">
+      <section className="bg-white py-20">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="text-center space-y-4 mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
+            <h2 className="text-4xl md:text-5xl font-bold text-emerald-900">
               المميزات الرئيسية
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              اكتشف ما يجعل هذا الموقع مميزاً وفريداً من نوعه
+            <p className="text-xl text-emerald-700 max-w-2xl mx-auto">
+              نظام متكامل يوفر كل ما تحتاجه لإدارة مركزك القرآني بكفاءة
             </p>
           </div>
 
@@ -145,18 +147,18 @@ export default function Home() {
               return (
                 <Card
                   key={index}
-                  className="border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow duration-300 hover:border-blue-300 dark:hover:border-blue-700"
+                  className="border-emerald-200 hover:shadow-xl transition-all duration-300 hover:border-emerald-400 hover:-translate-y-1"
                 >
                   <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
+                      <Icon className="w-7 h-7 text-emerald-600" />
                     </div>
-                    <CardTitle className="text-slate-900 dark:text-white">
+                    <CardTitle className="text-emerald-900 text-xl">
                       {feature.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-slate-600 dark:text-slate-400">
+                    <CardDescription className="text-emerald-700 text-base">
                       {feature.description}
                     </CardDescription>
                   </CardContent>
@@ -169,70 +171,55 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="container max-w-6xl mx-auto px-4 py-20">
-        <div className="rounded-3xl bg-gradient-to-r from-blue-500 to-indigo-600 p-12 md:p-16 text-center text-white space-y-8">
+        <div className="rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-600 p-12 md:p-16 text-center text-white space-y-8 shadow-2xl">
           <h2 className="text-4xl md:text-5xl font-bold">
-            هل أنت مستعد للبدء؟
+            هل أنت مستعد للانضمام؟
           </h2>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto">
-            انضم إلينا اليوم واستمتع بتجربة ويب لا تُنسى مليئة بالإمكانيات والمميزات
+          <p className="text-xl opacity-95 max-w-2xl mx-auto">
+            انضم إلى نور الهدى اليوم وابدأ رحلتك في تعليم وتعلم القرآن الكريم بطريقة منظمة وفعالة
           </p>
           <Button
             size="lg"
-            className="bg-white text-blue-600 hover:bg-slate-100 font-semibold"
+            onClick={() => window.location.href = getLoginUrl()}
+            className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold text-lg"
           >
-            ابدأ الآن مجاناً
-            <ArrowRight className="ml-2 w-5 h-5" />
+            سجل الدخول الآن
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 dark:bg-slate-950 text-white border-t border-slate-800 py-12">
+      <footer className="bg-emerald-900 text-white border-t border-emerald-800 py-12">
         <div className="container max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">W</span>
-                </div>
-                <span className="font-bold">مرحباً</span>
+              <div className="flex items-center gap-3 mb-4">
+                <img src={APP_LOGO} alt={APP_TITLE} className="w-10 h-10 rounded-lg" />
+                <span className="font-bold text-lg">{APP_TITLE}</span>
               </div>
-              <p className="text-slate-400 text-sm">
-                موقع استقبالي احترافي وعصري
+              <p className="text-emerald-200 text-sm">
+                منظومة متكاملة لإدارة المراكز القرآنية
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">الروابط</h4>
-              <ul className="space-y-2 text-slate-400 text-sm">
+              <h4 className="font-semibold mb-4">روابط سريعة</h4>
+              <ul className="space-y-2 text-emerald-200 text-sm">
                 <li><a href="#" className="hover:text-white transition">الرئيسية</a></li>
-                <li><a href="#" className="hover:text-white transition">عن الموقع</a></li>
-                <li><a href="#" className="hover:text-white transition">الخدمات</a></li>
+                <li><a href="#" className="hover:text-white transition">عن المنظومة</a></li>
+                <li><a href="#" className="hover:text-white transition">المميزات</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">المساعدة</h4>
-              <ul className="space-y-2 text-slate-400 text-sm">
-                <li><a href="#" className="hover:text-white transition">الدعم</a></li>
+              <h4 className="font-semibold mb-4">تواصل معنا</h4>
+              <ul className="space-y-2 text-emerald-200 text-sm">
+                <li><a href="#" className="hover:text-white transition">الدعم الفني</a></li>
                 <li><a href="#" className="hover:text-white transition">الأسئلة الشائعة</a></li>
-                <li><a href="#" className="hover:text-white transition">التواصل</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">قانوني</h4>
-              <ul className="space-y-2 text-slate-400 text-sm">
-                <li><a href="#" className="hover:text-white transition">الخصوصية</a></li>
-                <li><a href="#" className="hover:text-white transition">الشروط</a></li>
-                <li><a href="#" className="hover:text-white transition">الملفات</a></li>
+                <li><a href="#" className="hover:text-white transition">اتصل بنا</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm">
-            <p>&copy; 2025 مرحباً. جميع الحقوق محفوظة.</p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <a href="#" className="hover:text-white transition">تويتر</a>
-              <a href="#" className="hover:text-white transition">فيسبوك</a>
-              <a href="#" className="hover:text-white transition">إنستجرام</a>
-            </div>
+          <div className="border-t border-emerald-800 pt-8 text-center text-emerald-300 text-sm">
+            <p>&copy; 2025 {APP_TITLE}. جميع الحقوق محفوظة.</p>
           </div>
         </div>
       </footer>

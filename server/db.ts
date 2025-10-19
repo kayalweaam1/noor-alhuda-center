@@ -1,0 +1,612 @@
+import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
+import { 
+  InsertUser, users, 
+  teachers, InsertTeacher, Teacher,
+  students, InsertStudent, Student,
+  attendance, InsertAttendance, Attendance,
+  lessons, InsertLesson, Lesson,
+  evaluations, InsertEvaluation, Evaluation,
+  notifications, InsertNotification, Notification,
+  otpCodes, InsertOtpCode, OtpCode
+} from "../drizzle/schema";
+import { ENV } from './_core/env';
+
+let _db: ReturnType<typeof drizzle> | null = null;
+
+// Lazily create the drizzle instance so local tooling can run without a DB.
+export async function getDb() {
+  if (!_db && process.env.DATABASE_URL) {
+    try {
+      _db = drizzle(process.env.DATABASE_URL);
+    } catch (error) {
+      console.warn("[Database] Failed to connect:", error);
+      _db = null;
+    }
+  }
+  return _db;
+}
+
+// ============= USER FUNCTIONS =============
+
+export async function upsertUser(user: InsertUser): Promise<void> {
+  if (!user.id) {
+    throw new Error("User ID is required for upsert");
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot upsert user: database not available");
+    return;
+  }
+
+  try {
+    const values: InsertUser = {
+      id: user.id,
+    };
+    const updateSet: Record<string, unknown> = {};
+
+    const textFields = ["name", "email", "loginMethod", "profileImage", "phone"] as const;
+    type TextField = (typeof textFields)[number];
+
+    const assignNullable = (field: TextField) => {
+      const value = user[field];
+      if (value === undefined) return;
+      const normalized = value ?? null;
+      values[field] = normalized;
+      updateSet[field] = normalized;
+    };
+
+    textFields.forEach(assignNullable);
+
+    if (user.lastSignedIn !== undefined) {
+      values.lastSignedIn = user.lastSignedIn;
+      updateSet.lastSignedIn = user.lastSignedIn;
+    }
+    if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
+    } else if (user.id === ENV.ownerId) {
+      values.role = 'admin';
+      updateSet.role = 'admin';
+    }
+
+    if (Object.keys(updateSet).length === 0) {
+      updateSet.lastSignedIn = new Date();
+    }
+
+    await db.insert(users).values(values).onDuplicateKeyUpdate({
+      set: updateSet,
+    });
+  } catch (error) {
+    console.error("[Database] Failed to upsert user:", error);
+    throw error;
+  }
+}
+
+export async function getUser(id: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByPhone(phone: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(users).orderBy(desc(users.createdAt));
+}
+
+export async function updateUserRole(userId: string, role: "admin" | "teacher" | "student") {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
+export async function deleteUser(userId: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(users).where(eq(users.id, userId));
+}
+
+// ============= TEACHER FUNCTIONS =============
+
+export async function createTeacher(teacher: InsertTeacher) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(teachers).values(teacher);
+}
+
+export async function getTeacher(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(teachers).where(eq(teachers.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getTeacherByUserId(userId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(teachers).where(eq(teachers.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllTeachers() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: teachers.id,
+    userId: teachers.userId,
+    halaqaName: teachers.halaqaName,
+    specialization: teachers.specialization,
+    createdAt: teachers.createdAt,
+    userName: users.name,
+    userPhone: users.phone,
+    userEmail: users.email,
+  })
+  .from(teachers)
+  .leftJoin(users, eq(teachers.userId, users.id))
+  .orderBy(desc(teachers.createdAt));
+}
+
+export async function updateTeacher(id: string, data: Partial<InsertTeacher>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(teachers).set(data).where(eq(teachers.id, id));
+}
+
+export async function deleteTeacher(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(teachers).where(eq(teachers.id, id));
+}
+
+// ============= STUDENT FUNCTIONS =============
+
+export async function createStudent(student: InsertStudent) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(students).values(student);
+}
+
+export async function getStudent(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(students).where(eq(students.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getStudentByUserId(userId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(students).where(eq(students.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllStudents() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: students.id,
+    userId: students.userId,
+    teacherId: students.teacherId,
+    grade: students.grade,
+    enrollmentDate: students.enrollmentDate,
+    createdAt: students.createdAt,
+    userName: users.name,
+    userPhone: users.phone,
+    userEmail: users.email,
+  })
+  .from(students)
+  .leftJoin(users, eq(students.userId, users.id))
+  .orderBy(desc(students.createdAt));
+}
+
+export async function getStudentsByTeacher(teacherId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: students.id,
+    userId: students.userId,
+    teacherId: students.teacherId,
+    grade: students.grade,
+    enrollmentDate: students.enrollmentDate,
+    createdAt: students.createdAt,
+    userName: users.name,
+    userPhone: users.phone,
+    userEmail: users.email,
+    userProfileImage: users.profileImage,
+  })
+  .from(students)
+  .leftJoin(users, eq(students.userId, users.id))
+  .where(eq(students.teacherId, teacherId))
+  .orderBy(desc(students.createdAt));
+}
+
+export async function updateStudent(id: string, data: Partial<InsertStudent>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(students).set(data).where(eq(students.id, id));
+}
+
+export async function deleteStudent(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(students).where(eq(students.id, id));
+}
+
+// ============= ATTENDANCE FUNCTIONS =============
+
+export async function createAttendance(record: InsertAttendance) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(attendance).values(record);
+}
+
+export async function getAttendanceByStudent(studentId: string, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (startDate && endDate) {
+    return await db.select().from(attendance)
+      .where(and(
+        eq(attendance.studentId, studentId),
+        gte(attendance.date, startDate),
+        lte(attendance.date, endDate)
+      ) as any)
+      .orderBy(desc(attendance.date));
+  }
+
+  return await db.select().from(attendance)
+    .where(eq(attendance.studentId, studentId))
+    .orderBy(desc(attendance.date));
+}
+
+export async function getAttendanceByTeacher(teacherId: string, date?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (date) {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    return await db.select({
+      id: attendance.id,
+      studentId: attendance.studentId,
+      teacherId: attendance.teacherId,
+      date: attendance.date,
+      status: attendance.status,
+      notes: attendance.notes,
+      createdAt: attendance.createdAt,
+      studentName: users.name,
+    })
+    .from(attendance)
+    .leftJoin(students, eq(attendance.studentId, students.id))
+    .leftJoin(users, eq(students.userId, users.id))
+    .where(and(
+      eq(attendance.teacherId, teacherId),
+      gte(attendance.date, startOfDay),
+      lte(attendance.date, endOfDay)
+    ) as any)
+    .orderBy(desc(attendance.date));
+  }
+
+  return await db.select({
+    id: attendance.id,
+    studentId: attendance.studentId,
+    teacherId: attendance.teacherId,
+    date: attendance.date,
+    status: attendance.status,
+    notes: attendance.notes,
+    createdAt: attendance.createdAt,
+    studentName: users.name,
+  })
+  .from(attendance)
+  .leftJoin(students, eq(attendance.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .where(eq(attendance.teacherId, teacherId))
+  .orderBy(desc(attendance.date));
+}
+
+export async function getAllAttendance(startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (startDate && endDate) {
+    return await db.select({
+      id: attendance.id,
+      studentId: attendance.studentId,
+      teacherId: attendance.teacherId,
+      date: attendance.date,
+      status: attendance.status,
+      notes: attendance.notes,
+      createdAt: attendance.createdAt,
+      studentName: users.name,
+    })
+    .from(attendance)
+    .leftJoin(students, eq(attendance.studentId, students.id))
+    .leftJoin(users, eq(students.userId, users.id))
+    .where(and(
+      gte(attendance.date, startDate),
+      lte(attendance.date, endDate)
+    ) as any)
+    .orderBy(desc(attendance.date));
+  }
+
+  return await db.select({
+    id: attendance.id,
+    studentId: attendance.studentId,
+    teacherId: attendance.teacherId,
+    date: attendance.date,
+    status: attendance.status,
+    notes: attendance.notes,
+    createdAt: attendance.createdAt,
+    studentName: users.name,
+  })
+  .from(attendance)
+  .leftJoin(students, eq(attendance.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .orderBy(desc(attendance.date));
+}
+
+export async function updateAttendance(id: string, data: Partial<InsertAttendance>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(attendance).set(data).where(eq(attendance.id, id));
+}
+
+export async function deleteAttendance(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(attendance).where(eq(attendance.id, id));
+}
+
+// ============= LESSON FUNCTIONS =============
+
+export async function createLesson(lesson: InsertLesson) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(lessons).values(lesson);
+}
+
+export async function getLesson(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(lessons).where(eq(lessons.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getLessonsByTeacher(teacherId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(lessons)
+    .where(eq(lessons.teacherId, teacherId))
+    .orderBy(desc(lessons.date));
+}
+
+export async function getAllLessons() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(lessons).orderBy(desc(lessons.date));
+}
+
+export async function updateLesson(id: string, data: Partial<InsertLesson>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(lessons).set(data).where(eq(lessons.id, id));
+}
+
+export async function deleteLesson(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(lessons).where(eq(lessons.id, id));
+}
+
+// ============= EVALUATION FUNCTIONS =============
+
+export async function createEvaluation(evaluation: InsertEvaluation) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(evaluations).values(evaluation);
+}
+
+export async function getEvaluation(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(evaluations).where(eq(evaluations.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getEvaluationsByStudent(studentId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(evaluations)
+    .where(eq(evaluations.studentId, studentId))
+    .orderBy(desc(evaluations.date));
+}
+
+export async function getEvaluationsByTeacher(teacherId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: evaluations.id,
+    studentId: evaluations.studentId,
+    teacherId: evaluations.teacherId,
+    lessonId: evaluations.lessonId,
+    score: evaluations.score,
+    feedback: evaluations.feedback,
+    evaluationType: evaluations.evaluationType,
+    date: evaluations.date,
+    createdAt: evaluations.createdAt,
+    studentName: users.name,
+  })
+  .from(evaluations)
+  .leftJoin(students, eq(evaluations.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .where(eq(evaluations.teacherId, teacherId))
+  .orderBy(desc(evaluations.date));
+}
+
+export async function getAllEvaluations() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: evaluations.id,
+    studentId: evaluations.studentId,
+    teacherId: evaluations.teacherId,
+    lessonId: evaluations.lessonId,
+    score: evaluations.score,
+    feedback: evaluations.feedback,
+    evaluationType: evaluations.evaluationType,
+    date: evaluations.date,
+    createdAt: evaluations.createdAt,
+    studentName: users.name,
+  })
+  .from(evaluations)
+  .leftJoin(students, eq(evaluations.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .orderBy(desc(evaluations.date));
+}
+
+export async function updateEvaluation(id: string, data: Partial<InsertEvaluation>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(evaluations).set(data).where(eq(evaluations.id, id));
+}
+
+export async function deleteEvaluation(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(evaluations).where(eq(evaluations.id, id));
+}
+
+// ============= NOTIFICATION FUNCTIONS =============
+
+export async function createNotification(notification: InsertNotification) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(notifications).values(notification);
+}
+
+export async function getNotificationsByUser(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt));
+}
+
+export async function markNotificationAsRead(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, id));
+}
+
+export async function deleteNotification(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(notifications).where(eq(notifications.id, id));
+}
+
+// ============= OTP FUNCTIONS =============
+
+export async function createOtpCode(otp: InsertOtpCode) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(otpCodes).values(otp);
+}
+
+export async function getValidOtpCode(phone: string, code: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const now = new Date();
+  const result = await db.select().from(otpCodes)
+    .where(and(
+      eq(otpCodes.phone, phone),
+      eq(otpCodes.code, code),
+      eq(otpCodes.verified, false),
+      gte(otpCodes.expiresAt, now)
+    ) as any)
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function markOtpAsVerified(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(otpCodes).set({ verified: true }).where(eq(otpCodes.id, id));
+}
+
+// ============= STATISTICS FUNCTIONS =============
+
+export async function getStatistics() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(users);
+  const [totalTeachers] = await db.select({ count: sql<number>`count(*)` }).from(teachers);
+  const [totalStudents] = await db.select({ count: sql<number>`count(*)` }).from(students);
+  const [totalLessons] = await db.select({ count: sql<number>`count(*)` }).from(lessons);
+
+  return {
+    totalUsers: totalUsers.count,
+    totalTeachers: totalTeachers.count,
+    totalStudents: totalStudents.count,
+    totalLessons: totalLessons.count,
+  };
+}
+
