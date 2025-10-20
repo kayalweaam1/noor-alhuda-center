@@ -10,6 +10,13 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // Parse JSON bodies
+  app.use(express.json());
+
+  // Setup admin route (temporary)
+  const setupAdminRouter = (await import("./routes/setup-admin.js")).default;
+  app.use("/api", setupAdminRouter);
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
