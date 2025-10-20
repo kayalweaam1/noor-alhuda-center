@@ -59,7 +59,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="min-h-screen bg-white" dir="rtl">
       {/* Sidebar */}
       <aside
         className={`fixed top-0 right-0 h-full bg-white border-l border-emerald-200 shadow-xl transition-all duration-300 z-50 ${

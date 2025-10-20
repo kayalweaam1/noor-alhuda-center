@@ -718,3 +718,225 @@ export async function updateUserPassword(userId: string, password: string) {
   await db.update(users).set({ password }).where(eq(users.id, userId));
 }
 
+
+
+// ============= ADDITIONAL QUERY FUNCTIONS =============
+
+export async function getAllAttendance(startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  if (startDate && endDate) {
+    return await db.select({
+      id: attendance.id,
+      studentId: attendance.studentId,
+      teacherId: attendance.teacherId,
+      date: attendance.date,
+      status: attendance.status,
+      notes: attendance.notes,
+      createdAt: attendance.createdAt,
+      studentName: users.name,
+      teacherName: teachers.halaqaName,
+    })
+    .from(attendance)
+    .leftJoin(students, eq(attendance.studentId, students.id))
+    .leftJoin(users, eq(students.userId, users.id))
+    .leftJoin(teachers, eq(attendance.teacherId, teachers.id))
+    .where(and(
+      gte(attendance.date, startDate),
+      lte(attendance.date, endDate)
+    ) as any)
+    .orderBy(desc(attendance.date));
+  }
+
+  return await db.select({
+    id: attendance.id,
+    studentId: attendance.studentId,
+    teacherId: attendance.teacherId,
+    date: attendance.date,
+    status: attendance.status,
+    notes: attendance.notes,
+    createdAt: attendance.createdAt,
+    studentName: users.name,
+    teacherName: teachers.halaqaName,
+  })
+  .from(attendance)
+  .leftJoin(students, eq(attendance.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .leftJoin(teachers, eq(attendance.teacherId, teachers.id))
+  .orderBy(desc(attendance.date));
+}
+
+export async function getAllLessons() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: lessons.id,
+    teacherId: lessons.teacherId,
+    title: lessons.title,
+    description: lessons.description,
+    date: lessons.date,
+    createdAt: lessons.createdAt,
+    teacherName: users.name,
+    halaqaName: teachers.halaqaName,
+  })
+  .from(lessons)
+  .leftJoin(teachers, eq(lessons.teacherId, teachers.id))
+  .leftJoin(users, eq(teachers.userId, users.id))
+  .orderBy(desc(lessons.date));
+}
+
+export async function getAllEvaluations() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: evaluations.id,
+    studentId: evaluations.studentId,
+    teacherId: evaluations.teacherId,
+    lessonId: evaluations.lessonId,
+    score: evaluations.score,
+    feedback: evaluations.feedback,
+    evaluationType: evaluations.evaluationType,
+    date: evaluations.date,
+    createdAt: evaluations.createdAt,
+    studentName: users.name,
+  })
+  .from(evaluations)
+  .leftJoin(students, eq(evaluations.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .orderBy(desc(evaluations.date));
+}
+
+export async function getAssistantsByHalaqa(halaqaName: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: assistants.id,
+    userId: assistants.userId,
+    halaqaName: assistants.halaqaName,
+    createdAt: assistants.createdAt,
+    userName: users.name,
+    userPhone: users.phone,
+    userEmail: users.email,
+  })
+  .from(assistants)
+  .leftJoin(users, eq(assistants.userId, users.id))
+  .where(eq(assistants.halaqaName, halaqaName))
+  .orderBy(desc(assistants.createdAt));
+}
+
+export async function getAssistantNotesByTeacher(teacherId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: assistantNotes.id,
+    assistantId: assistantNotes.assistantId,
+    teacherId: assistantNotes.teacherId,
+    title: assistantNotes.title,
+    content: assistantNotes.content,
+    rating: assistantNotes.rating,
+    isRead: assistantNotes.isRead,
+    createdAt: assistantNotes.createdAt,
+    assistantName: users.name,
+  })
+  .from(assistantNotes)
+  .leftJoin(users, eq(assistantNotes.assistantId, users.id))
+  .where(eq(assistantNotes.teacherId, teacherId))
+  .orderBy(desc(assistantNotes.createdAt));
+}
+
+export async function getAssistantById(assistantId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select({
+    id: assistants.id,
+    userId: assistants.userId,
+    halaqaName: assistants.halaqaName,
+    createdAt: assistants.createdAt,
+    userName: users.name,
+    userPhone: users.phone,
+    userEmail: users.email,
+  })
+  .from(assistants)
+  .leftJoin(users, eq(assistants.userId, users.id))
+  .where(eq(assistants.id, assistantId))
+  .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+
+
+// ============= ASSISTANT NOTES FUNCTIONS =============
+
+export async function markAssistantNoteAsRead(noteId: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(assistantNotes)
+    .set({ isRead: true })
+    .where(eq(assistantNotes.id, noteId));
+}
+
+// ============= STATISTICS FUNCTIONS =============
+
+export async function getStatistics() {
+  const db = await getDb();
+  if (!db) return {
+    totalUsers: 0,
+    totalStudents: 0,
+    totalTeachers: 0,
+    totalAdmins: 0,
+    totalLessons: 0,
+    totalAttendance: 0,
+    totalEvaluations: 0,
+    recentActivity: []
+  };
+
+  // Get user counts
+  const allUsers = await db.select().from(users);
+  const totalUsers = allUsers.length;
+  const totalStudents = allUsers.filter(u => u.role === 'student').length;
+  const totalTeachers = allUsers.filter(u => u.role === 'teacher').length;
+  const totalAdmins = allUsers.filter(u => u.role === 'admin').length;
+
+  // Get lesson count
+  const allLessons = await db.select().from(lessons);
+  const totalLessons = allLessons.length;
+
+  // Get attendance count
+  const allAttendance = await db.select().from(attendance);
+  const totalAttendance = allAttendance.length;
+
+  // Get evaluation count
+  const allEvaluations = await db.select().from(evaluations);
+  const totalEvaluations = allEvaluations.length;
+
+  // Get recent activity (last 10 users)
+  const recentUsers = await db.select({
+    id: users.id,
+    name: users.name,
+    role: users.role,
+    createdAt: users.createdAt,
+  })
+  .from(users)
+  .orderBy(desc(users.createdAt))
+  .limit(10);
+
+  return {
+    totalUsers,
+    totalStudents,
+    totalTeachers,
+    totalAdmins,
+    totalLessons,
+    totalAttendance,
+    totalEvaluations,
+    recentActivity: recentUsers
+  };
+}
+

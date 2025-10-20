@@ -30,15 +30,9 @@ export default function AdminDirectLogin() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        backgroundImage: 'url(/logo-bg.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
+      className="min-h-screen flex items-center justify-center p-4 bg-white"
       dir="rtl"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/90 via-teal-900/90 to-cyan-900/90"></div>
       
       <Card className="w-full max-w-md relative z-10 border-emerald-200 shadow-2xl">
         <CardHeader className="text-center space-y-4">

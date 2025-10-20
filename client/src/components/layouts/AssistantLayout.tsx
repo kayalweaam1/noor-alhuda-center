@@ -25,7 +25,7 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="min-h-screen bg-white" dir="rtl">
       {/* Header */}
       <header className="bg-white border-b border-emerald-200 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4">

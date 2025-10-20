@@ -117,7 +117,7 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* Universal background for ALL pages */
+  /* White background for ALL pages - NO IMAGES */
   html,
   body,
   #root,
@@ -126,52 +126,33 @@
   main,
   .main-content,
   [role="main"] {
-    background-image: url('/background.png') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-attachment: fixed !important;
-    background-repeat: no-repeat !important;
-  }
-  /* Remove white backgrounds from all dashboard elements */
-  [data-sidebar-inset],
-  .sidebar-inset,
-  [class*="sidebar"],
-  [class*="content"],
-  [class*="main"],
-  div[class*="bg-"],
-  section,
-  article {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
   }
   body {
     @apply bg-background text-foreground;
-    background-image: url('/background.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
   }
   #root {
-    background-image: url('/background.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
     min-height: 100vh;
   }
   main {
-    background: transparent !important;
+    background: white !important;
+    background-image: none !important;
   }
-  /* Add background to all dialogs and modals */
+  /* White background for all dialogs and modals */
   [role="dialog"],
   .dialog-content,
   [data-radix-dialog-content] {
-    background-image: url('/background.png') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-attachment: fixed !important;
-    background-repeat: no-repeat !important;
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
