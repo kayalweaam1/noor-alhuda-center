@@ -32,6 +32,36 @@ export const appRouter = router({
       return { success: true, message: 'Admin created successfully' };
     }),
     
+    resetAdminPassword: publicProcedure.mutation(async () => {
+      const { hashPassword } = await import('./_core/password');
+      const hashedPassword = await hashPassword('admin123');
+      
+      // Update password for default admin
+      const adminUser = await db.getUserByPhone('+972542632557');
+      if (adminUser) {
+        await db.updateUserPassword(adminUser.id, hashedPassword);
+        return { success: true, message: 'Admin password reset successfully', phone: '+972542632557', password: 'admin123' };
+      }
+      return { success: false, message: 'Admin user not found' };
+    }),
+    
+    resetAllPasswords: publicProcedure.mutation(async () => {
+      const { hashPassword } = await import('./_core/password');
+      const users = await db.getAllUsers();
+      const defaultPassword = '1234567';
+      const hashedPassword = await hashPassword(defaultPassword);
+      
+      for (const user of users) {
+        await db.updateUserPassword(user.id, hashedPassword);
+      }
+      
+      return { 
+        success: true, 
+        message: `Reset passwords for ${users.length} users`,
+        defaultPassword: defaultPassword
+      };
+    }),
+    
     checkDatabase: publicProcedure.query(async () => {
       const users = await db.getAllUsers();
       return { 
