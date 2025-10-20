@@ -132,6 +132,18 @@
     background-attachment: fixed !important;
     background-repeat: no-repeat !important;
   }
+  /* Remove white backgrounds from all dashboard elements */
+  [data-sidebar-inset],
+  .sidebar-inset,
+  [class*="sidebar"],
+  [class*="content"],
+  [class*="main"],
+  div[class*="bg-"],
+  section,
+  article {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
   body {
     @apply bg-background text-foreground;
     background-image: url('/background.png');
