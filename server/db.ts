@@ -43,28 +43,45 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 
   try {
-    const values: InsertUser = {
+    // Build the values object for insert
+    const values: any = {
       id: user.id,
     };
+    
+    // Build the update set for duplicate key update
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod", "profileImage", "phone", "password"] as const;
-    type TextField = (typeof textFields)[number];
-
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
-
+    // Handle text fields
+    if (user.name !== undefined) {
+      values.name = user.name;
+      updateSet.name = user.name;
+    }
+    if (user.email !== undefined) {
+      values.email = user.email;
+      updateSet.email = user.email;
+    }
+    if (user.phone !== undefined) {
+      values.phone = user.phone;
+      updateSet.phone = user.phone;
+    }
+    if (user.password !== undefined) {
+      values.password = user.password;
+      updateSet.password = user.password;
+    }
+    if (user.loginMethod !== undefined) {
+      values.loginMethod = user.loginMethod;
+      updateSet.loginMethod = user.loginMethod;
+    }
+    if (user.profileImage !== undefined) {
+      values.profileImage = user.profileImage;
+      updateSet.profileImage = user.profileImage;
+    }
     if (user.lastSignedIn !== undefined) {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
     }
+
+    // Handle role - MUST be set for insert (required field)
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
@@ -77,16 +94,30 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       if (userCount[0]?.count === 0) {
         values.role = 'admin';
         updateSet.role = 'admin';
+      } else {
+        // Default role for new users
+        values.role = 'student';
+        updateSet.role = 'student';
       }
     }
 
+    // Ensure we have something to update if duplicate key
     if (Object.keys(updateSet).length === 0) {
       updateSet.lastSignedIn = new Date();
     }
 
+    console.log('[Database] Upserting user with values:', { 
+      id: values.id, 
+      phone: values.phone, 
+      role: values.role,
+      hasPassword: !!values.password 
+    });
+
     await db.insert(users).values(values).onDuplicateKeyUpdate({
       set: updateSet,
     });
+    
+    console.log('[Database] User upserted successfully');
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
@@ -355,47 +386,6 @@ export async function getAttendanceByTeacher(teacherId: string, date?: Date) {
   .orderBy(desc(attendance.date));
 }
 
-export async function getAllAttendance(startDate?: Date, endDate?: Date) {
-  const db = await getDb();
-  if (!db) return [];
-
-  if (startDate && endDate) {
-    return await db.select({
-      id: attendance.id,
-      studentId: attendance.studentId,
-      teacherId: attendance.teacherId,
-      date: attendance.date,
-      status: attendance.status,
-      notes: attendance.notes,
-      createdAt: attendance.createdAt,
-      studentName: users.name,
-    })
-    .from(attendance)
-    .leftJoin(students, eq(attendance.studentId, students.id))
-    .leftJoin(users, eq(students.userId, users.id))
-    .where(and(
-      gte(attendance.date, startDate),
-      lte(attendance.date, endDate)
-    ) as any)
-    .orderBy(desc(attendance.date));
-  }
-
-  return await db.select({
-    id: attendance.id,
-    studentId: attendance.studentId,
-    teacherId: attendance.teacherId,
-    date: attendance.date,
-    status: attendance.status,
-    notes: attendance.notes,
-    createdAt: attendance.createdAt,
-    studentName: users.name,
-  })
-  .from(attendance)
-  .leftJoin(students, eq(attendance.studentId, students.id))
-  .leftJoin(users, eq(students.userId, users.id))
-  .orderBy(desc(attendance.date));
-}
-
 export async function updateAttendance(id: string, data: Partial<InsertAttendance>) {
   const db = await getDb();
   if (!db) return;
@@ -434,13 +424,6 @@ export async function getLessonsByTeacher(teacherId: string) {
   return await db.select().from(lessons)
     .where(eq(lessons.teacherId, teacherId))
     .orderBy(desc(lessons.date));
-}
-
-export async function getAllLessons() {
-  const db = await getDb();
-  if (!db) return [];
-
-  return await db.select().from(lessons).orderBy(desc(lessons.date));
 }
 
 export async function updateLesson(id: string, data: Partial<InsertLesson>) {
@@ -491,10 +474,10 @@ export async function getEvaluationsByTeacher(teacherId: string) {
     id: evaluations.id,
     studentId: evaluations.studentId,
     teacherId: evaluations.teacherId,
-    lessonId: evaluations.lessonId,
+    type: evaluations.type,
     score: evaluations.score,
-    feedback: evaluations.feedback,
-    evaluationType: evaluations.evaluationType,
+    maxScore: evaluations.maxScore,
+    notes: evaluations.notes,
     date: evaluations.date,
     createdAt: evaluations.createdAt,
     studentName: users.name,
@@ -503,28 +486,6 @@ export async function getEvaluationsByTeacher(teacherId: string) {
   .leftJoin(students, eq(evaluations.studentId, students.id))
   .leftJoin(users, eq(students.userId, users.id))
   .where(eq(evaluations.teacherId, teacherId))
-  .orderBy(desc(evaluations.date));
-}
-
-export async function getAllEvaluations() {
-  const db = await getDb();
-  if (!db) return [];
-
-  return await db.select({
-    id: evaluations.id,
-    studentId: evaluations.studentId,
-    teacherId: evaluations.teacherId,
-    lessonId: evaluations.lessonId,
-    score: evaluations.score,
-    feedback: evaluations.feedback,
-    evaluationType: evaluations.evaluationType,
-    date: evaluations.date,
-    createdAt: evaluations.createdAt,
-    studentName: users.name,
-  })
-  .from(evaluations)
-  .leftJoin(students, eq(evaluations.studentId, students.id))
-  .leftJoin(users, eq(students.userId, users.id))
   .orderBy(desc(evaluations.date));
 }
 
@@ -564,7 +525,7 @@ export async function markNotificationAsRead(id: string) {
   const db = await getDb();
   if (!db) return;
 
-  await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, id));
+  await db.update(notifications).set({ read: true }).where(eq(notifications.id, id));
 }
 
 export async function deleteNotification(id: string) {
@@ -587,13 +548,12 @@ export async function getValidOtpCode(phone: string, code: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const now = new Date();
   const result = await db.select().from(otpCodes)
     .where(and(
       eq(otpCodes.phone, phone),
       eq(otpCodes.code, code),
       eq(otpCodes.verified, false),
-      gte(otpCodes.expiresAt, now)
+      gte(otpCodes.expiresAt, new Date())
     ) as any)
     .limit(1);
 
@@ -607,116 +567,20 @@ export async function markOtpAsVerified(id: string) {
   await db.update(otpCodes).set({ verified: true }).where(eq(otpCodes.id, id));
 }
 
-// ============= STATISTICS FUNCTIONS =============
+// ============= ASSISTANT FUNCTIONS =============
 
-export async function getStatistics() {
-  const db = await getDb();
-  if (!db) return null;
-
-  const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(users);
-  const [totalTeachers] = await db.select({ count: sql<number>`count(*)` }).from(teachers);
-  const [totalStudents] = await db.select({ count: sql<number>`count(*)` }).from(students);
-  const [totalLessons] = await db.select({ count: sql<number>`count(*)` }).from(lessons);
-
-  return {
-    totalUsers: totalUsers.count,
-    totalTeachers: totalTeachers.count,
-    totalStudents: totalStudents.count,
-    totalLessons: totalLessons.count,
-  };
-}
-
-
-// ============= ASSISTANT NOTES FUNCTIONS =============
-
-export async function createAssistantNote(note: InsertAssistantNote): Promise<void> {
-  const db = await getDb();
-  if (!db) return;
-
-  await db.insert(assistantNotes).values(note);
-}
-
-export async function getAssistantNotesByAssistant(assistantId: string) {
-  const db = await getDb();
-  if (!db) return [];
-
-  const result = await db
-    .select({
-      id: assistantNotes.id,
-      assistantId: assistantNotes.assistantId,
-      teacherId: assistantNotes.teacherId,
-      teacherName: users.name,
-      teacherPhone: users.phone,
-      title: assistantNotes.title,
-      content: assistantNotes.content,
-      rating: assistantNotes.rating,
-      isRead: assistantNotes.isRead,
-      createdAt: assistantNotes.createdAt,
-    })
-    .from(assistantNotes)
-    .leftJoin(teachers, eq(assistantNotes.teacherId, teachers.id))
-    .leftJoin(users, eq(teachers.userId, users.id))
-    .where(eq(assistantNotes.assistantId, assistantId))
-    .orderBy(desc(assistantNotes.createdAt));
-
-  return result;
-}
-
-export async function getAssistantNotesByTeacher(teacherId: string) {
-  const db = await getDb();
-  if (!db) return [];
-
-  const result = await db
-    .select()
-    .from(assistantNotes)
-    .where(eq(assistantNotes.teacherId, teacherId))
-    .orderBy(desc(assistantNotes.createdAt));
-
-  return result;
-}
-
-export async function markAssistantNoteAsRead(noteId: string): Promise<void> {
-  const db = await getDb();
-  if (!db) return;
-
-  await db.update(assistantNotes).set({ isRead: true }).where(eq(assistantNotes.id, noteId));
-}
-
-export async function deleteAssistantNote(noteId: string): Promise<void> {
-  const db = await getDb();
-  if (!db) return;
-
-  await db.delete(assistantNotes).where(eq(assistantNotes.id, noteId));
-}
-
-// ============= ASSISTANT MANAGEMENT FUNCTIONS =============
-
-export async function createAssistant(assistant: InsertAssistant): Promise<void> {
+export async function createAssistant(assistant: InsertAssistant) {
   const db = await getDb();
   if (!db) return;
 
   await db.insert(assistants).values(assistant);
 }
 
-export async function getAssistantById(assistantId: string) {
+export async function getAssistant(id: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db
-    .select({
-      id: assistants.id,
-      userId: assistants.userId,
-      userName: users.name,
-      userPhone: users.phone,
-      userEmail: users.email,
-      halaqaName: assistants.halaqaName,
-      createdAt: assistants.createdAt,
-    })
-    .from(assistants)
-    .leftJoin(users, eq(assistants.userId, users.id))
-    .where(eq(assistants.id, assistantId))
-    .limit(1);
-
+  const result = await db.select().from(assistants).where(eq(assistants.id, id)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -724,21 +588,7 @@ export async function getAssistantByUserId(userId: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db
-    .select({
-      id: assistants.id,
-      userId: assistants.userId,
-      userName: users.name,
-      userPhone: users.phone,
-      userEmail: users.email,
-      halaqaName: assistants.halaqaName,
-      createdAt: assistants.createdAt,
-    })
-    .from(assistants)
-    .leftJoin(users, eq(assistants.userId, users.id))
-    .where(eq(assistants.userId, userId))
-    .limit(1);
-
+  const result = await db.select().from(assistants).where(eq(assistants.userId, userId)).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -746,106 +596,120 @@ export async function getAllAssistants() {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
-    .select({
-      id: assistants.id,
-      userId: assistants.userId,
-      userName: users.name,
-      userPhone: users.phone,
-      userEmail: users.email,
-      halaqaName: assistants.halaqaName,
-      createdAt: assistants.createdAt,
-    })
-    .from(assistants)
-    .leftJoin(users, eq(assistants.userId, users.id))
-    .orderBy(desc(assistants.createdAt));
+  return await db.select({
+    id: assistants.id,
+    userId: assistants.userId,
+    halaqaName: assistants.halaqaName,
+    createdAt: assistants.createdAt,
+    userName: users.name,
+    userPhone: users.phone,
+    userEmail: users.email,
+  })
+  .from(assistants)
+  .leftJoin(users, eq(assistants.userId, users.id))
+  .orderBy(desc(assistants.createdAt));
 }
 
-export async function getAssistantsByHalaqa(halaqaName: string) {
-  const db = await getDb();
-  if (!db) return [];
-
-  return await db
-    .select({
-      id: assistants.id,
-      userId: assistants.userId,
-      userName: users.name,
-      userPhone: users.phone,
-      halaqaName: assistants.halaqaName,
-    })
-    .from(assistants)
-    .leftJoin(users, eq(assistants.userId, users.id))
-    .where(eq(assistants.halaqaName, halaqaName))
-    .orderBy(desc(assistants.createdAt));
-}
-
-export async function updateAssistant(id: string, data: Partial<InsertAssistant>): Promise<void> {
+export async function updateAssistant(id: string, data: Partial<InsertAssistant>) {
   const db = await getDb();
   if (!db) return;
 
   await db.update(assistants).set(data).where(eq(assistants.id, id));
 }
 
-export async function deleteAssistant(id: string): Promise<void> {
+export async function deleteAssistant(id: string) {
   const db = await getDb();
   if (!db) return;
 
   await db.delete(assistants).where(eq(assistants.id, id));
 }
 
+// ============= ASSISTANT NOTE FUNCTIONS =============
 
-
-// ============= INITIALIZATION =============
-
-export async function createDefaultAdmin(): Promise<void> {
+export async function createAssistantNote(note: InsertAssistantNote) {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot create default admin: database not available");
-    return;
-  }
+  if (!db) return;
 
-  try {
-    // Check if admin already exists
-    const existingAdmin = await db
-      .select()
-      .from(users)
-      .where(eq(users.phone, '+972542632557'))
-      .limit(1);
+  await db.insert(assistantNotes).values(note);
+}
 
-    if (existingAdmin.length > 0) {
-      // Check if admin has password
-      if (existingAdmin[0].password) {
-        console.log("[Database] Default admin already exists with password");
-        return;
-      }
-      // Delete old admin without password
-      console.log("[Database] Deleting old admin without password...");
-      await db.delete(users).where(eq(users.phone, '+972542632557'));
-    }
+export async function getAssistantNotesByStudent(studentId: string) {
+  const db = await getDb();
+  if (!db) return [];
 
-    // Hash the password
+  return await db.select({
+    id: assistantNotes.id,
+    studentId: assistantNotes.studentId,
+    assistantId: assistantNotes.assistantId,
+    note: assistantNotes.note,
+    date: assistantNotes.date,
+    createdAt: assistantNotes.createdAt,
+    assistantName: users.name,
+  })
+  .from(assistantNotes)
+  .leftJoin(assistants, eq(assistantNotes.assistantId, assistants.id))
+  .leftJoin(users, eq(assistants.userId, users.id))
+  .where(eq(assistantNotes.studentId, studentId))
+  .orderBy(desc(assistantNotes.date));
+}
+
+export async function getAssistantNotesByAssistant(assistantId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select({
+    id: assistantNotes.id,
+    studentId: assistantNotes.studentId,
+    assistantId: assistantNotes.assistantId,
+    note: assistantNotes.note,
+    date: assistantNotes.date,
+    createdAt: assistantNotes.createdAt,
+    studentName: users.name,
+  })
+  .from(assistantNotes)
+  .leftJoin(students, eq(assistantNotes.studentId, students.id))
+  .leftJoin(users, eq(students.userId, users.id))
+  .where(eq(assistantNotes.assistantId, assistantId))
+  .orderBy(desc(assistantNotes.date));
+}
+
+export async function updateAssistantNote(id: string, data: Partial<InsertAssistantNote>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(assistantNotes).set(data).where(eq(assistantNotes.id, id));
+}
+
+export async function deleteAssistantNote(id: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(assistantNotes).where(eq(assistantNotes.id, id));
+}
+
+// ============= ADMIN SETUP =============
+
+export async function createDefaultAdmin() {
+  const adminPhone = '+972542632557';
+  const adminUser = await getUserByPhone(adminPhone);
+  
+  if (!adminUser) {
     const { hashPassword } = await import('./_core/password');
-    const hashedPassword = await hashPassword('123456');
-
-    // Create default admin
-    await db.insert(users).values({
-      id: 'admin_1',
-      phone: '+972542632557',
-      password: hashedPassword,
+    const hashedPassword = await hashPassword('admin123');
+    
+    await upsertUser({
+      id: `user_admin_${Date.now()}`,
       name: 'المدير العام',
+      phone: adminPhone,
+      password: hashedPassword,
       role: 'admin',
       loginMethod: 'password',
     });
-
-    console.log("✅ Default admin created successfully!");
-    console.log("Phone: +972542632557 or 0542632557");
-    console.log("Password: 123456");
-  } catch (error) {
-    console.error("[Database] Error creating default admin:", error);
+    console.log('[Database] Default admin created successfully');
+  } else {
+    console.log('[Database] Default admin already exists');
   }
 }
-
-
 
 export async function updateUserPassword(userId: string, password: string) {
   const db = await getDb();
