@@ -123,6 +123,14 @@ export const appRouter = router({
         };
       }),
 
+    // Create default admin (for debugging)
+    createAdmin: publicProcedure
+      .mutation(async () => {
+        const { createDefaultAdmin } = await import('./db');
+        await createDefaultAdmin();
+        return { success: true, message: 'Admin created successfully' };
+      }),
+
     // Send OTP code
     sendOTP: publicProcedure
       .input(z.object({ phone: z.string() }))
