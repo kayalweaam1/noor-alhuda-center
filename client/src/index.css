@@ -117,6 +117,21 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Universal background for ALL pages */
+  html,
+  body,
+  #root,
+  [data-sidebar],
+  [data-sidebar-content],
+  main,
+  .main-content,
+  [role="main"] {
+    background-image: url('/background.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+  }
   body {
     @apply bg-background text-foreground;
     background-image: url('/background.png');
