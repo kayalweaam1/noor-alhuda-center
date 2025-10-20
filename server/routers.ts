@@ -135,16 +135,34 @@ export const appRouter = router({
           throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid phone or password' });
         }
 
+        // Check if user has a password
+        if (!user.password) {
+          console.log('[Login] User has no password set');
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid phone or password' });
+        }
+
         // Check password using bcrypt
         const { comparePassword, isHashed } = await import('./_core/password');
         
+        console.log('[Login] Password check:', {
+          hasPassword: !!user.password,
+          isHashed: isHashed(user.password),
+          passwordLength: user.password.length
+        });
+        
         // If password is not hashed yet (old data), do simple comparison
         // Otherwise use bcrypt compare
-        const passwordMatch = user.password && isHashed(user.password)
-          ? await comparePassword(input.password, user.password)
-          : user.password === input.password;
+        let passwordMatch = false;
+        if (isHashed(user.password)) {
+          passwordMatch = await comparePassword(input.password, user.password);
+          console.log('[Login] Bcrypt comparison result:', passwordMatch);
+        } else {
+          passwordMatch = user.password === input.password;
+          console.log('[Login] Plain text comparison result:', passwordMatch);
+        }
         
         if (!passwordMatch) {
+          console.log('[Login] Password mismatch');
           throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid phone or password' });
         }
 
