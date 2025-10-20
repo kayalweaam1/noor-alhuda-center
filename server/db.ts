@@ -823,18 +823,22 @@ export async function createDefaultAdmin(): Promise<void> {
       await db.delete(users).where(eq(users.phone, '+972542632557'));
     }
 
+    // Hash the password
+    const { hashPassword } = await import('./_core/password');
+    const hashedPassword = await hashPassword('123456');
+
     // Create default admin
     await db.insert(users).values({
       id: 'admin_1',
       phone: '+972542632557',
-      password: '123456',
+      password: hashedPassword,
       name: 'المدير العام',
       role: 'admin',
       loginMethod: 'password',
     });
 
     console.log("✅ Default admin created successfully!");
-    console.log("Phone: +972542632557");
+    console.log("Phone: +972542632557 or 0542632557");
     console.log("Password: 123456");
   } catch (error) {
     console.error("[Database] Error creating default admin:", error);

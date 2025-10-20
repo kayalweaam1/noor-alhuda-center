@@ -9,7 +9,7 @@ import { trpc } from "@/lib/trpc";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const [phoneNumber, setPhoneNumber] = useState("+972");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -101,7 +101,7 @@ export default function Login() {
                   type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="+972542632557"
+                  placeholder="0542632557"
                   className="pr-12 text-lg border-emerald-200 focus:border-emerald-500"
                   required
                   dir="ltr"

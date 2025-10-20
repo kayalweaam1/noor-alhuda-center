@@ -1,6 +1,5 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { sdk } from "./sdk";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -24,9 +23,13 @@ export async function createContext(
       }
     }
     
-    // Fallback to OAuth if no phone session
-    if (!user) {
-      user = await sdk.authenticateRequest(opts.req);
+    // Also try userId-based session
+    if (!user && opts.req.session?.userId) {
+      const users = await import("../db");
+      const dbUser = await users.getUser(opts.req.session.userId);
+      if (dbUser) {
+        user = dbUser;
+      }
     }
   } catch (error) {
     // Authentication is optional for public procedures.
