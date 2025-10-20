@@ -21,9 +21,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import AddUserModal from "@/components/modals/AddUserModal";
+import EditUserModal from "@/components/modals/EditUserModal";
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const { data: users, refetch } = trpc.users.getAll.useQuery();
   const updateRoleMutation = trpc.users.updateRole.useMutation();
   const deleteUserMutation = trpc.users.delete.useMutation();
@@ -78,7 +83,10 @@ export default function UsersPage() {
               <CardTitle className="text-2xl text-emerald-900">إدارة المستخدمين</CardTitle>
               <CardDescription>إدارة جميع مستخدمي النظام</CardDescription>
             </div>
-            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+            <Button 
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              onClick={() => setShowAddModal(true)}
+            >
               <UserPlus className="w-4 h-4 ml-2" />
               إضافة مستخدم
             </Button>
@@ -150,6 +158,10 @@ export default function UsersPage() {
                           size="sm"
                           variant="outline"
                           className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowEditModal(true);
+                          }}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -207,6 +219,19 @@ export default function UsersPage() {
           </div>
         </CardContent>
       </Card>
+
+      <AddUserModal 
+        open={showAddModal} 
+        onOpenChange={setShowAddModal}
+        onSuccess={refetch}
+      />
+      
+      <EditUserModal 
+        open={showEditModal} 
+        onOpenChange={setShowEditModal}
+        user={selectedUser}
+        onSuccess={refetch}
+      />
     </div>
   );
 }

@@ -15,6 +15,27 @@
       "when": 1760903111817,
       "tag": "0001_ancient_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1760908277323,
+      "tag": "0002_busy_christian_walker",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1760908340525,
+      "tag": "0003_striped_grey_gargoyle",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1760913211503,
+      "tag": "0004_dusty_scarlet_spider",
+      "breakpoints": true
     }
   ]
 }

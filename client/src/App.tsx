@@ -11,6 +11,8 @@ import AdminUsers from "./pages/admin/Users";
 import AdminStudents from "./pages/admin/Students";
 import AdminTeachers from "./pages/admin/Teachers";
 import AdminReports from "./pages/admin/Reports";
+import AdminLessons from "./pages/admin/Lessons";
+import AdminAnalytics from "./pages/admin/Analytics";
 import AdminAdmins from "./pages/admin/Admins";
 import AdminLayout from "./components/layouts/AdminLayout";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -19,7 +21,11 @@ import TeacherLessons from "./pages/teacher/Lessons";
 import TeacherLayout from "./components/layouts/TeacherLayout";
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentLayout from "./components/layouts/StudentLayout";
+import AssistantDashboard from "./pages/assistant/Dashboard";
+import AssistantLayout from "./components/layouts/AssistantLayout";
 import Login from "./pages/Login";
+import AdminDirectLogin from "./pages/AdminDirectLogin";
+import Settings from "./pages/Settings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -27,6 +33,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
+      <Route path={"/admin-direct"} component={AdminDirectLogin} />
       <Route path="/admin/dashboard">
         <AdminLayout>
           <AdminDashboard />
@@ -52,9 +59,24 @@ function Router() {
           <AdminReports />
         </AdminLayout>
       </Route>
+      <Route path="/admin/lessons">
+        <AdminLayout>
+          <AdminLessons />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/analytics">
+        <AdminLayout>
+          <AdminAnalytics />
+        </AdminLayout>
+      </Route>
       <Route path="/admin/admins">
         <AdminLayout>
           <AdminAdmins />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/settings">
+        <AdminLayout>
+          <Settings />
         </AdminLayout>
       </Route>
       <Route path="/teacher/dashboard">
@@ -72,10 +94,30 @@ function Router() {
           <TeacherLessons />
         </TeacherLayout>
       </Route>
+      <Route path="/teacher/settings">
+        <TeacherLayout>
+          <Settings />
+        </TeacherLayout>
+      </Route>
       <Route path="/student/dashboard">
         <StudentLayout>
           <StudentDashboard />
         </StudentLayout>
+      </Route>
+      <Route path="/student/settings">
+        <StudentLayout>
+          <Settings />
+        </StudentLayout>
+      </Route>
+      <Route path="/assistant/dashboard">
+        <AssistantLayout>
+          <AssistantDashboard />
+        </AssistantLayout>
+      </Route>
+      <Route path="/assistant/settings">
+        <AssistantLayout>
+          <Settings />
+        </AssistantLayout>
       </Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

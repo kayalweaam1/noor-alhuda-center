@@ -8,8 +8,9 @@ export const users = mysqlTable("users", {
   name: text("name"),
   email: varchar("email", { length: 320 }),
   phone: varchar("phone", { length: 20 }), // Phone number for OTP login
+  password: varchar("password", { length: 255 }), // Password for login
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["admin", "teacher", "student"]).default("student").notNull(),
+  role: mysqlEnum("role", ["admin", "teacher", "student", "assistant"]).default("student").notNull(),
   profileImage: text("profileImage"), // URL to profile image
   createdAt: timestamp("createdAt").defaultNow(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow(),
@@ -46,6 +47,19 @@ export const students = mysqlTable("students", {
 
 export type Student = typeof students.$inferSelect;
 export type InsertStudent = typeof students.$inferInsert;
+
+/**
+ * Assistant-specific information
+ */
+export const assistants = mysqlTable("assistants", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  halaqaName: varchar("halaqaName", { length: 255 }), // e.g., "حلقة الصف الثالث"
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type Assistant = typeof assistants.$inferSelect;
+export type InsertAssistant = typeof assistants.$inferInsert;
 
 /**
  * Attendance records
@@ -126,4 +140,21 @@ export const otpCodes = mysqlTable("otpCodes", {
 
 export type OtpCode = typeof otpCodes.$inferSelect;
 export type InsertOtpCode = typeof otpCodes.$inferInsert;
+
+/**
+ * Assistant notes from teachers
+ */
+export const assistantNotes = mysqlTable("assistantNotes", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  assistantId: varchar("assistantId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+  teacherId: varchar("teacherId", { length: 64 }).notNull().references(() => teachers.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  rating: int("rating"), // Rating from 1-5
+  isRead: boolean("isRead").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AssistantNote = typeof assistantNotes.$inferSelect;
+export type InsertAssistantNote = typeof assistantNotes.$inferInsert;
 

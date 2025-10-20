@@ -1,12 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { createContext, useContext, ReactNode } from 'react';
+import { trpc } from '@/lib/trpc';
 
 interface AuthContextType {
-  user: User | null;
+  user: any | null;
   loading: boolean;
   phoneNumber: string | null;
-  role: 'admin' | 'teacher' | 'student' | null;
+  role: 'admin' | 'teacher' | 'student' | 'assistant' | null;
   isSuperAdmin: boolean;
 }
 
@@ -25,50 +24,20 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
-  const [role, setRole] = useState<'admin' | 'teacher' | 'student' | null>(null);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const { data: user, isLoading } = trpc.auth.me.useQuery();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      
-      if (firebaseUser) {
-        const phone = firebaseUser.phoneNumber;
-        setPhoneNumber(phone);
-        
-        // Determine role based on phone number
-        const superAdminPhone = '+972542632557';
-        const adminPhones = ['+972542632557', '+972506381455'];
-        
-        if (phone === superAdminPhone) {
-          setRole('admin');
-          setIsSuperAdmin(true);
-        } else if (adminPhones.includes(phone || '')) {
-          setRole('admin');
-          setIsSuperAdmin(false);
-        } else {
-          // For now, default to student
-          // Later we'll check from database
-          setRole('student');
-          setIsSuperAdmin(false);
-        }
-      } else {
-        setPhoneNumber(null);
-        setRole(null);
-        setIsSuperAdmin(false);
-      }
-      
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const phoneNumber = user?.phone || null;
+  const role = user?.role || null;
+  const isSuperAdmin = user?.phone === '+972542632557';
 
   return (
-    <AuthContext.Provider value={{ user, loading, phoneNumber, role, isSuperAdmin }}>
+    <AuthContext.Provider value={{ 
+      user: user || null, 
+      loading: isLoading, 
+      phoneNumber, 
+      role, 
+      isSuperAdmin 
+    }}>
       {children}
     </AuthContext.Provider>
   );

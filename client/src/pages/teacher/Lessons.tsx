@@ -1,20 +1,19 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { BookOpen, Plus, Edit, Trash2, Calendar } from "lucide-react";
+import { BookOpen, Plus, Trash2, Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function TeacherLessons() {
   const { data: user } = trpc.auth.me.useQuery();
@@ -24,34 +23,83 @@ export default function TeacherLessons() {
   );
   const { data: lessons, refetch } = trpc.lessons.getAll.useQuery();
   
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    date: new Date().toISOString().split('T')[0],
+    time: '09:00',
   });
 
   const createLessonMutation = trpc.lessons.create.useMutation();
   const deleteLessonMutation = trpc.lessons.delete.useMutation();
 
+  // Get calendar data
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startingDayOfWeek = firstDay.getDay();
+
+  const monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+  ];
+
+  const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+  // Get lessons for a specific date
+  const getLessonsForDate = (day: number) => {
+    if (!lessons || !teacher) return [];
+    const date = new Date(year, month, day);
+    return lessons.filter(lesson => {
+      const lessonDate = new Date(lesson.date);
+      return lesson.teacherId === teacher.id &&
+             lessonDate.getDate() === day &&
+             lessonDate.getMonth() === month &&
+             lessonDate.getFullYear() === year;
+    });
+  };
+
+  const previousMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
+
+  const handleDayClick = (day: number) => {
+    const date = new Date(year, month, day);
+    setSelectedDate(date);
+    setShowAddDialog(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teacher?.id) {
+    if (!teacher?.id || !selectedDate) {
       toast.error("لم يتم العثور على بيانات المربي");
       return;
     }
 
     try {
+      // Combine date and time
+      const [hours, minutes] = formData.time.split(':');
+      const lessonDate = new Date(selectedDate);
+      lessonDate.setHours(parseInt(hours), parseInt(minutes));
+
       await createLessonMutation.mutateAsync({
-        id: `${teacher.id}-${Date.now()}`,
         title: formData.title,
         description: formData.description,
-        date: new Date(formData.date),
+        date: lessonDate,
+        teacherId: teacher.id,
       });
       
       toast.success("تم إضافة الدرس بنجاح");
-      setFormData({ title: '', description: '', date: new Date().toISOString().split('T')[0] });
-      setShowAddForm(false);
+      setShowAddDialog(false);
+      setFormData({ title: '', description: '', time: '09:00' });
       refetch();
     } catch (error) {
       toast.error("فشل إضافة الدرس");
@@ -70,103 +118,29 @@ export default function TeacherLessons() {
     }
   };
 
+  // Generate calendar days
+  const calendarDays = [];
+  for (let i = 0; i < startingDayOfWeek; i++) {
+    calendarDays.push(null);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarDays.push(day);
+  }
+
   const myLessons = lessons?.filter(l => l.teacherId === teacher?.id) || [];
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-emerald-900">الدروس</h1>
-          <p className="text-gray-600 mt-1">إدارة دروس الحلقة</p>
-        </div>
-        <Button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-        >
-          <Plus className="w-4 h-4 ml-2" />
-          {showAddForm ? 'إلغاء' : 'إضافة درس'}
-        </Button>
-      </div>
-
-      {/* Add Lesson Form */}
-      {showAddForm && (
-        <Card className="border-emerald-200">
-          <CardHeader>
-            <CardTitle className="text-emerald-900">إضافة درس جديد</CardTitle>
-            <CardDescription>أدخل تفاصيل الدرس</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  عنوان الدرس
-                </label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="مثال: سورة البقرة - الآيات 1-10"
-                  required
-                  className="border-emerald-200 focus:border-emerald-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  وصف الدرس
-                </label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="اكتب وصف الدرس والموضوعات المغطاة..."
-                  rows={4}
-                  className="border-emerald-200 focus:border-emerald-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  تاريخ الدرس
-                </label>
-                <Input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  required
-                  className="border-emerald-200 focus:border-emerald-500"
-                />
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  type="submit"
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
-                >
-                  <BookOpen className="w-4 h-4 ml-2" />
-                  حفظ الدرس
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowAddForm(false)}
-                  className="border-gray-300"
-                >
-                  إلغاء
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Statistics */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-emerald-200">
+        <Card className="border-orange-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <BookOpen className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-              <p className="text-sm text-emerald-700 mb-2">إجمالي الدروس</p>
-              <p className="text-3xl font-bold text-emerald-900">{myLessons.length}</p>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <BookOpen className="w-5 h-5 text-orange-600" />
+                <p className="text-sm text-orange-700">إجمالي دروسي</p>
+              </div>
+              <p className="text-4xl font-bold text-orange-900">{myLessons.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -174,109 +148,186 @@ export default function TeacherLessons() {
         <Card className="border-blue-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <Calendar className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-              <p className="text-sm text-blue-700 mb-2">هذا الشهر</p>
-              <p className="text-3xl font-bold text-blue-900">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Calendar className="w-5 h-5 text-blue-600" />
+                <p className="text-sm text-blue-700">دروس هذا الشهر</p>
+              </div>
+              <p className="text-4xl font-bold text-blue-900">
                 {myLessons.filter(l => {
                   const lessonDate = new Date(l.date);
-                  const now = new Date();
-                  return lessonDate.getMonth() === now.getMonth() && 
-                         lessonDate.getFullYear() === now.getFullYear();
+                  return lessonDate.getMonth() === month && lessonDate.getFullYear() === year;
                 }).length}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-amber-200">
+        <Card className="border-emerald-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <Calendar className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-              <p className="text-sm text-amber-700 mb-2">هذا الأسبوع</p>
-              <p className="text-3xl font-bold text-amber-900">
-                {myLessons.filter(l => {
-                  const lessonDate = new Date(l.date);
-                  const now = new Date();
-                  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                  return lessonDate >= weekAgo && lessonDate <= now;
-                }).length}
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Clock className="w-5 h-5 text-emerald-600" />
+                <p className="text-sm text-emerald-700">الدروس القادمة</p>
+              </div>
+              <p className="text-4xl font-bold text-emerald-900">
+                {myLessons.filter(l => new Date(l.date) > new Date()).length}
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Lessons List */}
-      <Card className="border-emerald-200">
+      {/* Calendar */}
+      <Card className="border-orange-200">
         <CardHeader>
-          <CardTitle className="text-emerald-900">قائمة الدروس</CardTitle>
-          <CardDescription>جميع دروس الحلقة</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl text-orange-900">تقويم الدروس</CardTitle>
+              <CardDescription>انقر على أي يوم لإضافة درس جديد</CardDescription>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={previousMonth}
+                className="border-orange-300"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <h3 className="text-lg font-bold text-orange-900">
+                {monthNames[month]} {year}
+              </h3>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={nextMonth}
+                className="border-orange-300"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          {myLessons.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">لا توجد دروس مسجلة</p>
-              <p className="text-sm text-gray-400 mt-2">اضغط على "إضافة درس" لبدء التسجيل</p>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-emerald-200 overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-emerald-50">
-                    <TableHead className="text-right font-bold text-emerald-900">عنوان الدرس</TableHead>
-                    <TableHead className="text-right font-bold text-emerald-900">الوصف</TableHead>
-                    <TableHead className="text-right font-bold text-emerald-900">التاريخ</TableHead>
-                    <TableHead className="text-right font-bold text-emerald-900">الحالة</TableHead>
-                    <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {myLessons.map((lesson) => {
-                    const lessonDate = new Date(lesson.date);
-                    const isPast = lessonDate < new Date();
-                    return (
-                      <TableRow key={lesson.id} className="hover:bg-emerald-50/50">
-                        <TableCell className="font-semibold">{lesson.title}</TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {lesson.description || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {lessonDate.toLocaleDateString('ar-SA')}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={isPast ? 'bg-gray-500' : 'bg-emerald-500'}>
-                            {isPast ? 'منتهي' : 'قادم'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-red-200 text-red-600 hover:bg-red-50"
-                              onClick={() => handleDelete(lesson.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-2">
+            {/* Day names header */}
+            {dayNames.map((day) => (
+              <div
+                key={day}
+                className="text-center font-bold text-sm text-orange-900 p-2 bg-orange-50 rounded"
+              >
+                {day}
+              </div>
+            ))}
+
+            {/* Calendar days */}
+            {calendarDays.map((day, index) => {
+              if (day === null) {
+                return <div key={`empty-${index}`} className="p-2"></div>;
+              }
+
+              const dayLessons = getLessonsForDate(day);
+              const isToday = 
+                day === new Date().getDate() &&
+                month === new Date().getMonth() &&
+                year === new Date().getFullYear();
+
+              return (
+                <div
+                  key={day}
+                  onClick={() => handleDayClick(day)}
+                  className={`min-h-24 p-2 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                    isToday ? 'border-orange-500 bg-orange-50' : 'border-gray-200'
+                  } ${dayLessons.length > 0 ? 'bg-blue-50/30' : 'hover:bg-gray-50'}`}
+                >
+                  <div className={`text-sm font-semibold mb-1 ${
+                    isToday ? 'text-orange-600' : 'text-gray-700'
+                  }`}>
+                    {day}
+                  </div>
+                  <div className="space-y-1">
+                    {dayLessons.map((lesson) => (
+                      <div
+                        key={lesson.id}
+                        className="text-xs p-1 bg-emerald-100 border border-emerald-300 rounded group relative"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="font-semibold text-emerald-900 truncate">
+                          {lesson.title}
+                        </div>
+                        <div className="text-emerald-600 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(lesson.date).toLocaleTimeString('ar', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                        <button
+                          onClick={() => handleDelete(lesson.id)}
+                          className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 bg-red-500 text-white p-1 rounded text-xs"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
+
+      {/* Add Lesson Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent dir="rtl">
+          <DialogHeader>
+            <DialogTitle>إضافة درس جديد</DialogTitle>
+            <DialogDescription>
+              {selectedDate && `التاريخ: ${selectedDate.toLocaleDateString('ar-SA')}`}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label>عنوان الدرس</Label>
+              <Input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="مثال: حفظ سورة البقرة"
+                required
+              />
+            </div>
+            <div>
+              <Label>الوصف</Label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="وصف الدرس..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label>الوقت</Label>
+              <Input
+                type="time"
+                value={formData.time}
+                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                required
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+                إلغاء
+              </Button>
+              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="w-4 h-4 ml-2" />
+                إضافة الدرس
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -14,9 +14,11 @@ import { UserPlus, Search, Edit, Trash2, Users, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import AddTeacherModal from "@/components/modals/AddTeacherModal";
 
 export default function TeachersPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
   const { data: teachers, refetch } = trpc.teachers.getAll.useQuery();
   const deleteTeacherMutation = trpc.teachers.delete.useMutation();
 
@@ -86,7 +88,10 @@ export default function TeachersPage() {
               <CardTitle className="text-2xl text-emerald-900">إدارة المربين</CardTitle>
               <CardDescription>إدارة جميع مربي المركز</CardDescription>
             </div>
-            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+            <Button 
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              onClick={() => setShowAddModal(true)}
+            >
               <UserPlus className="w-4 h-4 ml-2" />
               إضافة مربي
             </Button>
@@ -182,6 +187,12 @@ export default function TeachersPage() {
           )}
         </CardContent>
       </Card>
+
+      <AddTeacherModal 
+        open={showAddModal} 
+        onOpenChange={setShowAddModal}
+        onSuccess={refetch}
+      />
     </div>
   );
 }

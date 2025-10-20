@@ -18,6 +18,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "../ui/button";
+import NotificationBell from "../NotificationBell";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -107,8 +108,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             const isActive = location === item.path;
             return (
               <Link key={item.path} href={item.path}>
-                <a
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                <div
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
                       : "text-gray-700 hover:bg-emerald-50"
@@ -116,7 +117,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.title}</span>
-                </a>
+                </div>
               </Link>
             );
           })}
@@ -173,10 +174,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <button className="relative p-2 rounded-lg hover:bg-emerald-50 transition-colors">
-                <Bell className="w-6 h-6 text-emerald-700" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              <NotificationBell />
             </div>
           </div>
         </header>

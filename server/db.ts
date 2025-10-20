@@ -4,11 +4,13 @@ import {
   InsertUser, users, 
   teachers, InsertTeacher, Teacher,
   students, InsertStudent, Student,
+  assistants, InsertAssistant, Assistant,
   attendance, InsertAttendance, Attendance,
   lessons, InsertLesson, Lesson,
   evaluations, InsertEvaluation, Evaluation,
   notifications, InsertNotification, Notification,
-  otpCodes, InsertOtpCode, OtpCode
+  otpCodes, InsertOtpCode, OtpCode,
+  assistantNotes, InsertAssistantNote, AssistantNote
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -115,6 +117,13 @@ export async function updateUserRole(userId: string, role: "admin" | "teacher" |
   if (!db) return;
 
   await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
+export async function updateUserLastSignedIn(userId: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
 }
 
 export async function deleteUser(userId: string) {
@@ -608,5 +617,229 @@ export async function getStatistics() {
     totalStudents: totalStudents.count,
     totalLessons: totalLessons.count,
   };
+}
+
+
+// ============= ASSISTANT NOTES FUNCTIONS =============
+
+export async function createAssistantNote(note: InsertAssistantNote): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(assistantNotes).values(note);
+}
+
+export async function getAssistantNotesByAssistant(assistantId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      id: assistantNotes.id,
+      assistantId: assistantNotes.assistantId,
+      teacherId: assistantNotes.teacherId,
+      teacherName: users.name,
+      teacherPhone: users.phone,
+      title: assistantNotes.title,
+      content: assistantNotes.content,
+      rating: assistantNotes.rating,
+      isRead: assistantNotes.isRead,
+      createdAt: assistantNotes.createdAt,
+    })
+    .from(assistantNotes)
+    .leftJoin(teachers, eq(assistantNotes.teacherId, teachers.id))
+    .leftJoin(users, eq(teachers.userId, users.id))
+    .where(eq(assistantNotes.assistantId, assistantId))
+    .orderBy(desc(assistantNotes.createdAt));
+
+  return result;
+}
+
+export async function getAssistantNotesByTeacher(teacherId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select()
+    .from(assistantNotes)
+    .where(eq(assistantNotes.teacherId, teacherId))
+    .orderBy(desc(assistantNotes.createdAt));
+
+  return result;
+}
+
+export async function markAssistantNoteAsRead(noteId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(assistantNotes).set({ isRead: true }).where(eq(assistantNotes.id, noteId));
+}
+
+export async function deleteAssistantNote(noteId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(assistantNotes).where(eq(assistantNotes.id, noteId));
+}
+
+// ============= ASSISTANT MANAGEMENT FUNCTIONS =============
+
+export async function createAssistant(assistant: InsertAssistant): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.insert(assistants).values(assistant);
+}
+
+export async function getAssistantById(assistantId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select({
+      id: assistants.id,
+      userId: assistants.userId,
+      userName: users.name,
+      userPhone: users.phone,
+      userEmail: users.email,
+      halaqaName: assistants.halaqaName,
+      createdAt: assistants.createdAt,
+    })
+    .from(assistants)
+    .leftJoin(users, eq(assistants.userId, users.id))
+    .where(eq(assistants.id, assistantId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAssistantByUserId(userId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select({
+      id: assistants.id,
+      userId: assistants.userId,
+      userName: users.name,
+      userPhone: users.phone,
+      userEmail: users.email,
+      halaqaName: assistants.halaqaName,
+      createdAt: assistants.createdAt,
+    })
+    .from(assistants)
+    .leftJoin(users, eq(assistants.userId, users.id))
+    .where(eq(assistants.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllAssistants() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      id: assistants.id,
+      userId: assistants.userId,
+      userName: users.name,
+      userPhone: users.phone,
+      userEmail: users.email,
+      halaqaName: assistants.halaqaName,
+      createdAt: assistants.createdAt,
+    })
+    .from(assistants)
+    .leftJoin(users, eq(assistants.userId, users.id))
+    .orderBy(desc(assistants.createdAt));
+}
+
+export async function getAssistantsByHalaqa(halaqaName: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      id: assistants.id,
+      userId: assistants.userId,
+      userName: users.name,
+      userPhone: users.phone,
+      halaqaName: assistants.halaqaName,
+    })
+    .from(assistants)
+    .leftJoin(users, eq(assistants.userId, users.id))
+    .where(eq(assistants.halaqaName, halaqaName))
+    .orderBy(desc(assistants.createdAt));
+}
+
+export async function updateAssistant(id: string, data: Partial<InsertAssistant>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(assistants).set(data).where(eq(assistants.id, id));
+}
+
+export async function deleteAssistant(id: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(assistants).where(eq(assistants.id, id));
+}
+
+
+
+// ============= INITIALIZATION =============
+
+export async function createDefaultAdmin(): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create default admin: database not available");
+    return;
+  }
+
+  try {
+    // Check if admin already exists
+    const existingAdmin = await db
+      .select()
+      .from(users)
+      .where(eq(users.phone, '+972542632557'))
+      .limit(1);
+
+    if (existingAdmin.length > 0) {
+      // Check if admin has password
+      if (existingAdmin[0].password) {
+        console.log("[Database] Default admin already exists with password");
+        return;
+      }
+      // Delete old admin without password
+      console.log("[Database] Deleting old admin without password...");
+      await db.delete(users).where(eq(users.phone, '+972542632557'));
+    }
+
+    // Create default admin
+    await db.insert(users).values({
+      id: 'admin_1',
+      phone: '+972542632557',
+      password: '123456',
+      name: 'المدير العام',
+      role: 'admin',
+      loginMethod: 'password',
+    });
+
+    console.log("✅ Default admin created successfully!");
+    console.log("Phone: +972542632557");
+    console.log("Password: 123456");
+  } catch (error) {
+    console.error("[Database] Error creating default admin:", error);
+  }
+}
+
+
+
+export async function updateUserPassword(userId: string, password: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(users).set({ password }).where(eq(users.id, userId));
 }
 

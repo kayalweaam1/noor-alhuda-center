@@ -14,7 +14,20 @@ export async function createContext(
   let user: User | null = null;
 
   try {
-    user = await sdk.authenticateRequest(opts.req);
+    // Try phone-based session first
+    const phoneSession = opts.req.session?.phone;
+    if (phoneSession) {
+      const users = await import("../db");
+      const dbUser = await users.getUserByPhone(phoneSession);
+      if (dbUser) {
+        user = dbUser;
+      }
+    }
+    
+    // Fallback to OAuth if no phone session
+    if (!user) {
+      user = await sdk.authenticateRequest(opts.req);
+    }
   } catch (error) {
     // Authentication is optional for public procedures.
     user = null;

@@ -15,9 +15,19 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import AddStudentModal from "@/components/modals/AddStudentModal";
+import EditStudentModal from "@/components/modals/EditStudentModal";
+import ImportStudentsModal from "@/components/modals/ImportStudentsModal";
+import { exportStudents } from "@/lib/export";
+import { Download, Upload } from "lucide-react";
+import BehaviorBar from "@/components/BehaviorBar";
 
 export default function StudentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [, setLocation] = useLocation();
   const { data: students, refetch } = trpc.students.getAll.useQuery();
   const deleteStudentMutation = trpc.students.delete.useMutation();
@@ -111,10 +121,31 @@ export default function StudentsPage() {
               <CardTitle className="text-2xl text-emerald-900">إدارة الطلاب</CardTitle>
               <CardDescription>إدارة جميع طلاب المركز</CardDescription>
             </div>
-            <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
-              <UserPlus className="w-4 h-4 ml-2" />
-              إضافة طالب
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                onClick={() => exportStudents(students || [])}
+              >
+                <Download className="w-4 h-4 ml-2" />
+                تصدير
+              </Button>
+              <Button 
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                onClick={() => setShowImportModal(true)}
+              >
+                <Upload className="w-4 h-4 ml-2" />
+                استيراد
+              </Button>
+              <Button 
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                onClick={() => setShowAddModal(true)}
+              >
+                <UserPlus className="w-4 h-4 ml-2" />
+                إضافة طالب
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -170,19 +201,7 @@ export default function StudentsPage() {
                       </TableCell>
                       <TableCell>{'غير محدد'}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-gray-200 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full ${
-                                attendanceRate >= 90 ? 'bg-emerald-500' :
-                                attendanceRate >= 75 ? 'bg-blue-500' :
-                                attendanceRate >= 60 ? 'bg-amber-500' : 'bg-red-500'
-                              }`}
-                              style={{ width: `${attendanceRate}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm font-semibold">{attendanceRate}%</span>
-                        </div>
+                        <BehaviorBar score={attendanceRate} size="sm" showLabel={false} />
                       </TableCell>
                       <TableCell>{getPerformanceBadge(attendanceRate)}</TableCell>
                       <TableCell>
@@ -202,6 +221,10 @@ export default function StudentsPage() {
                             size="sm"
                             variant="outline"
                             className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setShowEditModal(true);
+                            }}
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -229,6 +252,25 @@ export default function StudentsPage() {
           )}
         </CardContent>
       </Card>
+
+      <AddStudentModal 
+        open={showAddModal} 
+        onOpenChange={setShowAddModal}
+        onSuccess={() => refetch()}
+      />
+      
+      <EditStudentModal 
+        open={showEditModal} 
+        onOpenChange={setShowEditModal}
+        student={selectedStudent}
+        onSuccess={() => refetch()}
+      />
+      
+      <ImportStudentsModal 
+        open={showImportModal} 
+        onOpenChange={setShowImportModal}
+        onSuccess={() => refetch()}
+      />
     </div>
   );
 }

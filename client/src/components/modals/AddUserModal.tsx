@@ -1,0 +1,157 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+
+interface AddUserModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+}
+
+export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserModalProps) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("+972");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"admin" | "teacher" | "student">("student");
+
+  const createUser = trpc.users.create.useMutation({
+    onSuccess: () => {
+      toast.success("تم إضافة المستخدم بنجاح");
+      resetForm();
+      onOpenChange(false);
+      onSuccess?.();
+    },
+    onError: (error: any) => {
+      toast.error("فشل في إضافة المستخدم: " + error.message);
+    },
+  });
+
+  const resetForm = () => {
+    setName("");
+    setPhone("+972");
+    setEmail("");
+    setPassword("");
+    setRole("student");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name || !phone || !password) {
+      toast.error("يرجى ملء جميع الحقول المطلوبة");
+      return;
+    }
+
+    createUser.mutate({
+      name,
+      phone,
+      email: email || undefined,
+      password,
+      role,
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]" dir="rtl">
+        <DialogHeader>
+          <DialogTitle>إضافة مستخدم جديد</DialogTitle>
+          <DialogDescription>
+            أدخل بيانات المستخدم الجديد
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">الاسم *</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="أدخل اسم المستخدم"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">رقم الهاتف *</Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+972501234567"
+              dir="ltr"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">البريد الإلكتروني</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+              dir="ltr"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">كلمة المرور *</Label>
+            <Input
+              id="password"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="أدخل كلمة المرور"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="role">الدور *</Label>
+            <Select value={role} onValueChange={(value: any) => setRole(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الدور" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="student">طالب</SelectItem>
+                <SelectItem value="teacher">مربي</SelectItem>
+                <SelectItem value="admin">مدير</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                resetForm();
+                onOpenChange(false);
+              }}
+            >
+              إلغاء
+            </Button>
+            <Button
+              type="submit"
+              className="bg-emerald-600 hover:bg-emerald-700"
+              disabled={createUser.isPending}
+            >
+              {createUser.isPending ? "جاري الإضافة..." : "إضافة المستخدم"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
