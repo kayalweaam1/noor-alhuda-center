@@ -17,6 +17,10 @@ async function startServer() {
   const setupAdminRouter = (await import("./routes/setup-admin.js")).default;
   app.use("/api", setupAdminRouter);
 
+  // Create first admin route
+  const createFirstAdminRouter = (await import("./routes/create-first-admin.js")).default;
+  app.use(createFirstAdminRouter);
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
