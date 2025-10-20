@@ -269,13 +269,17 @@ export const appRouter = router({
         role: z.enum(["admin", "teacher", "student"]),
       }))
       .mutation(async ({ input }) => {
+        // Hash password before saving
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password);
+        
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
           email: input.email,
-          password: input.password,
+          password: hashedPassword,
           role: input.role,
           loginMethod: 'firebase',
         });
