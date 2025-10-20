@@ -61,7 +61,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6">

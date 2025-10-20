@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50" dir="rtl">
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       {/* Sidebar */}
       <aside
         className={`fixed top-0 right-0 h-full bg-white border-l border-emerald-200 shadow-xl transition-all duration-300 z-50 ${

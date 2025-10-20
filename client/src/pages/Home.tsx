@@ -7,7 +7,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center" dir="rtl">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
       <div className="text-center space-y-8 p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
