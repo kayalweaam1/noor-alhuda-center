@@ -381,7 +381,14 @@ export const appRouter = router({
 
     delete: adminProcedure
       .input(z.object({ userId: z.string() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Prevent deleting current user
+        if (input.userId === ctx.user.id) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'لا يمكنك حذف حسابك الخاص',
+          });
+        }
         await db.deleteUser(input.userId);
         return { success: true };
       }),

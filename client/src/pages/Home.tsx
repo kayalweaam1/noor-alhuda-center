@@ -9,14 +9,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
       <div className="text-center space-y-8 p-8">
-        {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img 
-            src="/logo.jpeg" 
-            alt="نور الهدى" 
-            className="w-48 h-48 object-contain rounded-2xl shadow-2xl"
-          />
-        </div>
+
 
         {/* Title */}
         <div className="space-y-3">

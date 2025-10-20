@@ -68,13 +68,7 @@ export default function Login() {
       
       <Card className="w-full max-w-md relative z-10 border-emerald-200 shadow-2xl">
         <CardHeader className="text-center space-y-4">
-          <div className="w-32 h-32 mx-auto mb-4">
-            <img 
-              src="/logo.jpeg" 
-              alt="مركز نور الهدى" 
-              className="w-full h-full object-contain rounded-full border-4 border-emerald-500 shadow-lg"
-            />
-          </div>
+
           <CardTitle className="text-3xl font-bold text-emerald-900">
             مركز نور الهدى
           </CardTitle>
