@@ -125,6 +125,17 @@
     background-attachment: fixed;
     background-repeat: no-repeat;
   }
+  #root {
+    background-image: url('/background.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+  }
+  main {
+    background: transparent !important;
+  }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [type="button"]:not(:disabled),
