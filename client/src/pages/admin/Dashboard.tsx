@@ -3,10 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, GraduationCap, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
-  const { data: user } = trpc.auth.me.useQuery();
+  const { user, loading } = useAuth();
   const { data: stats } = trpc.statistics.getOverview.useQuery();
 
   // Redirect if not admin

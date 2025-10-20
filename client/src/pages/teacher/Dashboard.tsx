@@ -3,10 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, BookOpen, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function TeacherDashboard() {
   const [, setLocation] = useLocation();
-  const { data: user } = trpc.auth.me.useQuery();
+  const { user, loading } = useAuth();
   const { data: teacher } = trpc.teachers.getMyProfile.useQuery(
     undefined,
     { enabled: !!user?.id && user?.role === 'teacher' }

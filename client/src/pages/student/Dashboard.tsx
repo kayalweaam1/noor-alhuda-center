@@ -4,10 +4,11 @@ import { Calendar, BookOpen, TrendingUp, Award, AlertCircle, CheckCircle } from 
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function StudentDashboard() {
   const [, setLocation] = useLocation();
-  const { data: user } = trpc.auth.me.useQuery();
+  const { user, loading } = useAuth();
   const { data: student } = trpc.students.getMyProfile.useQuery(
     undefined,
     { enabled: !!user?.id && user?.role === 'student' }
