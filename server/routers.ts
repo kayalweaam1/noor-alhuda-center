@@ -37,9 +37,37 @@ export const appRouter = router({
       return { 
         success: true, 
         userCount: users.length,
-        users: users.map(u => ({ id: u.id, name: u.name, phone: u.phone, role: u.role }))
+        users: users.map(u => ({ 
+          id: u.id, 
+          name: u.name, 
+          phone: u.phone, 
+          role: u.role,
+          hasPassword: !!u.password,
+          passwordLength: u.password ? u.password.length : 0
+        }))
       };
     }),
+    
+    checkUser: publicProcedure
+      .input(z.object({ phone: z.string() }))
+      .query(async ({ input }) => {
+        const user = await db.getUserByPhone(input.phone);
+        if (!user) {
+          return { success: false, message: 'User not found' };
+        }
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            name: user.name,
+            phone: user.phone,
+            role: user.role,
+            hasPassword: !!user.password,
+            passwordLength: user.password ? user.password.length : 0,
+            passwordPreview: user.password ? user.password.substring(0, 10) + '...' : 'NO PASSWORD'
+          }
+        };
+      }),
   }),
 
   auth: router({
