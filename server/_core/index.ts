@@ -36,6 +36,9 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // Trust proxy for Railway/Heroku/etc
+  app.set('trust proxy', 1);
+  
   // Session middleware
   app.use(
     session({
@@ -46,6 +49,7 @@ async function startServer() {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
       },
     })
   );
