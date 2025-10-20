@@ -25,6 +25,23 @@ const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const appRouter = router({
   system: systemRouter,
 
+  // Setup endpoints
+  setup: router({
+    createAdmin: publicProcedure.mutation(async () => {
+      await db.createDefaultAdmin();
+      return { success: true, message: 'Admin created successfully' };
+    }),
+    
+    checkDatabase: publicProcedure.query(async () => {
+      const users = await db.getAllUsers();
+      return { 
+        success: true, 
+        userCount: users.length,
+        users: users.map(u => ({ id: u.id, name: u.name, phone: u.phone, role: u.role }))
+      };
+    }),
+  }),
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     
