@@ -71,6 +71,13 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     } else if (user.id === ENV.ownerId) {
       values.role = 'admin';
       updateSet.role = 'admin';
+    } else {
+      // Make first user admin automatically
+      const userCount = await db.select({ count: sql`count(*)` }).from(users);
+      if (userCount[0]?.count === 0) {
+        values.role = 'admin';
+        updateSet.role = 'admin';
+      }
     }
 
     if (Object.keys(updateSet).length === 0) {
