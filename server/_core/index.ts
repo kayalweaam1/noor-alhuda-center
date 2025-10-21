@@ -61,11 +61,25 @@ async function startServer() {
     }
   };
   const storeOptions = parseMysqlUrl(ENV.databaseUrl);
+
+  // Force a real store in production – never fall back to MemoryStore
+  let sessionStore: InstanceType<ReturnType<typeof MySQLStore>> | undefined;
+  if (storeOptions) {
+    sessionStore = new (MySQLStore as unknown as any)({
+      createDatabaseTable: true,
+      ...storeOptions,
+    });
+  } else if (ENV.isProduction) {
+    console.error(
+      "[Session] DATABASE_URL is missing/invalid. Refusing to run with MemoryStore in production."
+    );
+    process.exit(1);
+  }
   app.use(
     session({
       secret: ENV.cookieSecret,
       // Use MySQL-backed session store to avoid MemoryStore in production
-      store: storeOptions ? new MySQLStore({ createDatabaseTable: true, ...storeOptions }) : undefined,
+      store: sessionStore,
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -96,14 +110,15 @@ async function startServer() {
   }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
+  // In production, bind exactly to the platform-provided PORT. In dev, try to find a free one.
+  const port = ENV.isProduction ? preferredPort : await findAvailablePort(preferredPort);
 
-  if (port !== preferredPort) {
+  if (!ENV.isProduction && port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
   server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Server listening on port ${port}`);
   });
 }
 
