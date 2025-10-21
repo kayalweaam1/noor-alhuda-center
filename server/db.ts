@@ -715,6 +715,46 @@ export async function updateUserPassword(userId: string, password: string) {
 }
 
 
+// Danger: permanently wipes data and creates a single admin account
+export async function resetDatabaseForAdmin(phoneRaw: string, plainPassword: string) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  // Normalize phone to +972 format used in the system
+  let phone = phoneRaw.trim();
+  if (phone.startsWith('0')) {
+    phone = '+972' + phone.substring(1);
+  } else if (!phone.startsWith('+')) {
+    phone = '+972' + phone;
+  }
+
+  // Wipe tables in safe dependency order
+  await db.delete(evaluations);
+  await db.delete(attendance);
+  await db.delete(lessons);
+  await db.delete(students);
+  await db.delete(teachers);
+  await db.delete(assistants);
+  await db.delete(assistantNotes);
+  await db.delete(notifications);
+  await db.delete(otpCodes);
+  await db.delete(users);
+
+  // Create the single admin user
+  const { hashPassword } = await import('./_core/password');
+  const hashedPassword = await hashPassword(plainPassword);
+
+  await upsertUser({
+    id: `user_admin_${Date.now()}`,
+    name: 'المدير العام',
+    phone,
+    password: hashedPassword,
+    role: 'admin',
+    loginMethod: 'password',
+  });
+}
+
+
 
 // ============= ADDITIONAL QUERY FUNCTIONS =============
 

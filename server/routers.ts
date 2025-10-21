@@ -77,6 +77,14 @@ export const appRouter = router({
         }))
       };
     }),
+
+    // Danger: wipe DB and create single admin
+    hardReset: publicProcedure
+      .input(z.object({ phone: z.string().default('0542632557'), password: z.string().default('123456') }))
+      .mutation(async ({ input }) => {
+        await db.resetDatabaseForAdmin(input.phone, input.password);
+        return { success: true };
+      }),
     
     checkUser: publicProcedure
       .input(z.object({ phone: z.string() }))
