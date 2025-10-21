@@ -474,10 +474,9 @@ export async function getEvaluationsByTeacher(teacherId: string) {
     id: evaluations.id,
     studentId: evaluations.studentId,
     teacherId: evaluations.teacherId,
-    type: evaluations.type,
+    evaluationType: evaluations.evaluationType,
     score: evaluations.score,
-    maxScore: evaluations.maxScore,
-    notes: evaluations.notes,
+    feedback: evaluations.feedback,
     date: evaluations.date,
     createdAt: evaluations.createdAt,
     studentName: users.name,
@@ -525,7 +524,7 @@ export async function markNotificationAsRead(id: string) {
   const db = await getDb();
   if (!db) return;
 
-  await db.update(notifications).set({ read: true }).where(eq(notifications.id, id));
+  await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, id));
 }
 
 export async function deleteNotification(id: string) {
@@ -588,7 +587,21 @@ export async function getAssistantByUserId(userId: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db.select().from(assistants).where(eq(assistants.userId, userId)).limit(1);
+  const result = await db
+    .select({
+      id: assistants.id,
+      userId: assistants.userId,
+      halaqaName: assistants.halaqaName,
+      createdAt: assistants.createdAt,
+      userName: users.name,
+      userPhone: users.phone,
+      userEmail: users.email,
+    })
+    .from(assistants)
+    .leftJoin(users, eq(assistants.userId, users.id))
+    .where(eq(assistants.userId, userId))
+    .limit(1);
+
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -633,24 +646,12 @@ export async function createAssistantNote(note: InsertAssistantNote) {
   await db.insert(assistantNotes).values(note);
 }
 
-export async function getAssistantNotesByStudent(studentId: string) {
+export async function getAssistantNotesByStudent(_studentId: string) {
+  // Assistant notes are authored by teachers for assistants in this schema.
+  // Kept for compatibility; returns empty list.
   const db = await getDb();
   if (!db) return [];
-
-  return await db.select({
-    id: assistantNotes.id,
-    studentId: assistantNotes.studentId,
-    assistantId: assistantNotes.assistantId,
-    note: assistantNotes.note,
-    date: assistantNotes.date,
-    createdAt: assistantNotes.createdAt,
-    assistantName: users.name,
-  })
-  .from(assistantNotes)
-  .leftJoin(assistants, eq(assistantNotes.assistantId, assistants.id))
-  .leftJoin(users, eq(assistants.userId, users.id))
-  .where(eq(assistantNotes.studentId, studentId))
-  .orderBy(desc(assistantNotes.date));
+  return [];
 }
 
 export async function getAssistantNotesByAssistant(assistantId: string) {
@@ -659,18 +660,20 @@ export async function getAssistantNotesByAssistant(assistantId: string) {
 
   return await db.select({
     id: assistantNotes.id,
-    studentId: assistantNotes.studentId,
     assistantId: assistantNotes.assistantId,
-    note: assistantNotes.note,
-    date: assistantNotes.date,
+    teacherId: assistantNotes.teacherId,
+    title: assistantNotes.title,
+    content: assistantNotes.content,
+    rating: assistantNotes.rating,
+    isRead: assistantNotes.isRead,
     createdAt: assistantNotes.createdAt,
-    studentName: users.name,
+    teacherName: users.name,
   })
   .from(assistantNotes)
-  .leftJoin(students, eq(assistantNotes.studentId, students.id))
-  .leftJoin(users, eq(students.userId, users.id))
+  .leftJoin(teachers, eq(assistantNotes.teacherId, teachers.id))
+  .leftJoin(users, eq(teachers.userId, users.id))
   .where(eq(assistantNotes.assistantId, assistantId))
-  .orderBy(desc(assistantNotes.date));
+  .orderBy(desc(assistantNotes.createdAt));
 }
 
 export async function updateAssistantNote(id: string, data: Partial<InsertAssistantNote>) {

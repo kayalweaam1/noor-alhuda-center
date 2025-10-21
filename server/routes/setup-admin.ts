@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { db } from "../db";
-import { users } from "../../drizzle/schema";
-import { hashPassword } from "../lib/auth";
+import { getUserByPhone, upsertUser } from "../db";
+import { hashPassword } from "../_core/password";
 
 const router = Router();
 
@@ -12,10 +11,9 @@ router.post("/setup-admin", async (req, res) => {
     const password = "123456";
     const hashedPassword = await hashPassword(password);
 
-    // Check if admin already exists
-    const existingUser = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.phone, phone),
-    });
+    // Normalize phone to international format used in auth flow
+    const normalizedPhone = `+972${phone.startsWith("0") ? phone.substring(1) : phone}`;
+    const existingUser = await getUserByPhone(normalizedPhone);
 
     if (existingUser) {
       return res.json({ 
@@ -26,20 +24,22 @@ router.post("/setup-admin", async (req, res) => {
     }
 
     // Create admin user
-    const [newUser] = await db.insert(users).values({
+    const userId = `user_admin_${Date.now()}`;
+    await upsertUser({
+      id: userId,
       name: "المدير العام",
-      phone,
+      phone: normalizedPhone,
       password: hashedPassword,
       role: "admin",
-      status: "active",
-    }).returning();
+      loginMethod: "password",
+    });
 
     res.json({ 
       success: true, 
       message: "تم إنشاء حساب المدير بنجاح",
-      userId: newUser.id,
+      userId,
       credentials: {
-        phone: "0542632557",
+        phone: normalizedPhone,
         password: "123456"
       }
     });
