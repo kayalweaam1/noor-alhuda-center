@@ -113,7 +113,8 @@ export const appRouter = router({
     
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      // Express v5 ignores maxAge in clearCookie; omit it to avoid deprecation
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions });
       return {
         success: true,
       } as const;
