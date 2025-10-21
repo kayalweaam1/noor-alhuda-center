@@ -30,9 +30,16 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
-  // Create default admin if not exists
-  const { createDefaultAdmin } = await import('../db');
-  await createDefaultAdmin();
+  // Create default admin if DB is available (don't crash if DB is down)
+  try {
+    const { createDefaultAdmin } = await import("../db");
+    await createDefaultAdmin();
+  } catch (error) {
+    console.warn(
+      "[Startup] Skipping default admin creation (DB may be unavailable)",
+      error
+    );
+  }
   
   const app = express();
   const server = createServer(app);
@@ -61,18 +68,30 @@ async function startServer() {
     }
   };
   const storeOptions = parseMysqlUrl(ENV.databaseUrl);
+  let sessionStore: any | undefined = undefined;
+  if (storeOptions) {
+    try {
+      sessionStore = new MySQLStore({ createDatabaseTable: true, ...storeOptions });
+    } catch (error) {
+      console.warn(
+        "[Startup] Failed to initialize MySQL session store, falling back to MemoryStore",
+        error
+      );
+      sessionStore = undefined;
+    }
+  }
   app.use(
     session({
       secret: ENV.cookieSecret,
-      // Use MySQL-backed session store to avoid MemoryStore in production
-      store: storeOptions ? new MySQLStore({ createDatabaseTable: true, ...storeOptions }) : undefined,
+      // Use MySQL-backed session store when available, otherwise MemoryStore
+      store: sessionStore,
       resave: false,
       saveUninitialized: false,
       cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       },
     })
   );

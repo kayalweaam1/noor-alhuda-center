@@ -32,7 +32,7 @@
 
 ### المتطلبات
 - Node.js 18 أو أحدث
-- PostgreSQL 14 أو أحدث
+- MySQL 8 أو أحدث
 
 ### خطوات التثبيت
 
@@ -43,20 +43,18 @@ npm install
 
 2. **إعداد قاعدة البيانات**
 ```bash
-# إنشاء قاعدة بيانات PostgreSQL
-createdb welcome_site
-
-# تشغيل الهجرات
-npm run db:push
+docker run --name noor-mysql -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=noor_alhuda -e MYSQL_USER=noor_user -e MYSQL_PASSWORD=password \
+  -p 3306:3306 -d mysql:8
+pnpm db:push
 ```
 
 3. **إعداد ملف البيئة**
 ```bash
-# نسخ ملف البيئة
+# نسخ ملف البيئة وتعديله
 cp .env.example .env
-
-# تعديل ملف .env وإضافة:
-DATABASE_URL="postgresql://username:password@localhost:5432/welcome_site"
+# عدّل السطر التالي لقاعدة بيانات MySQL
+# DATABASE_URL="mysql://noor_user:password@localhost:3306/noor_alhuda"
 ```
 
 4. **تشغيل المشروع**
