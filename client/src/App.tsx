@@ -18,14 +18,20 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherLessons from "./pages/teacher/Lessons";
+import TeacherStudents from "./pages/teacher/Students";
+import TeacherEvaluations from "./pages/teacher/Evaluations";
 import TeacherLayout from "./components/layouts/TeacherLayout";
 import StudentDashboard from "./pages/student/Dashboard";
+import StudentAttendance from "./pages/student/Attendance";
+import StudentLessons from "./pages/student/Lessons";
+import StudentEvaluations from "./pages/student/Evaluations";
 import StudentLayout from "./components/layouts/StudentLayout";
 import AssistantDashboard from "./pages/assistant/Dashboard";
 import AssistantLayout from "./components/layouts/AssistantLayout";
 import Login from "./pages/Login";
 import AdminDirectLogin from "./pages/AdminDirectLogin";
 import Settings from "./pages/Settings";
+import AdminStudentDetail from "./pages/admin/StudentDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -47,6 +53,11 @@ function Router() {
       <Route path="/admin/students">
         <AdminLayout>
           <AdminStudents />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/students/:id">
+        <AdminLayout>
+          <AdminStudentDetail />
         </AdminLayout>
       </Route>
       <Route path="/admin/teachers">
@@ -94,6 +105,16 @@ function Router() {
           <TeacherLessons />
         </TeacherLayout>
       </Route>
+      <Route path="/teacher/students">
+        <TeacherLayout>
+          <TeacherStudents />
+        </TeacherLayout>
+      </Route>
+      <Route path="/teacher/evaluations">
+        <TeacherLayout>
+          <TeacherEvaluations />
+        </TeacherLayout>
+      </Route>
       <Route path="/teacher/settings">
         <TeacherLayout>
           <Settings />
@@ -102,6 +123,21 @@ function Router() {
       <Route path="/student/dashboard">
         <StudentLayout>
           <StudentDashboard />
+        </StudentLayout>
+      </Route>
+      <Route path="/student/attendance">
+        <StudentLayout>
+          <StudentAttendance />
+        </StudentLayout>
+      </Route>
+      <Route path="/student/lessons">
+        <StudentLayout>
+          <StudentLessons />
+        </StudentLayout>
+      </Route>
+      <Route path="/student/evaluations">
+        <StudentLayout>
+          <StudentEvaluations />
         </StudentLayout>
       </Route>
       <Route path="/student/settings">
