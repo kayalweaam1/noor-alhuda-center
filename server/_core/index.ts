@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
+import MySQLStoreFactory from "express-mysql-session";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -39,17 +40,47 @@ async function startServer() {
   // Trust proxy for Railway/Heroku/etc
   app.set('trust proxy', 1);
   
-  // Session middleware
+  // Parse DATABASE_URL -> MySQL connection options
+  function parseMySqlOptionsFromUrl(url?: string) {
+    if (!url) return null;
+    try {
+      const u = new URL(url);
+      return {
+        host: u.hostname,
+        port: parseInt(u.port || "3306"),
+        user: decodeURIComponent(u.username),
+        password: decodeURIComponent(u.password),
+        database: u.pathname.replace(/^\//, ""),
+        createDatabaseTable: true,
+      } as any;
+    } catch (_err) {
+      console.warn("[Session] Failed to parse DATABASE_URL for session store");
+      return null;
+    }
+  }
+
+  // Session middleware (use MySQL store in production)
+  const MySQLStore = MySQLStoreFactory(session);
+  const mysqlOptions = parseMySqlOptionsFromUrl(ENV.databaseUrl);
+  const sessionStore = ENV.isProduction && mysqlOptions
+    ? new MySQLStore(mysqlOptions)
+    : undefined;
+
+  if (ENV.isProduction && !sessionStore) {
+    console.warn("Warning: connect.session() MemoryStore is not designed for production; using in-memory store as fallback.");
+  }
+
   app.use(
     session({
       secret: ENV.cookieSecret,
+      store: sessionStore as any,
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: process.env.NODE_ENV === "production",
+        secure: ENV.isProduction,
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+        sameSite: ENV.isProduction ? 'none' : 'lax',
       },
     })
   );
@@ -73,14 +104,17 @@ async function startServer() {
   }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
+  const port = ENV.isProduction
+    ? preferredPort
+    : await findAvailablePort(preferredPort);
 
-  if (port !== preferredPort) {
+  if (!ENV.isProduction && port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+  const host = ENV.isProduction ? "0.0.0.0" : "localhost";
+  server.listen(port, host, () => {
+    console.log(`Server running on http://${host}:${port}/`);
   });
 }
 
