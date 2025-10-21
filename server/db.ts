@@ -691,7 +691,7 @@ export async function createDefaultAdmin() {
   
   if (!adminUser) {
     const { hashPassword } = await import('./_core/password');
-    const hashedPassword = await hashPassword('admin123');
+    const hashedPassword = await hashPassword('123456');
     
     await upsertUser({
       id: `user_admin_${Date.now()}`,
@@ -701,7 +701,7 @@ export async function createDefaultAdmin() {
       role: 'admin',
       loginMethod: 'password',
     });
-    console.log('[Database] Default admin created successfully');
+    console.log('[Database] Default admin created successfully (phone: 0542632557, pass: 123456)');
   } else {
     console.log('[Database] Default admin already exists');
   }

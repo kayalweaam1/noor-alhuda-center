@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit push",
-    "db:migrate": "drizzle-kit push"
+    "db:migrate": "drizzle-kit push",
+    "db:reset": "tsx scripts/reset-db.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",

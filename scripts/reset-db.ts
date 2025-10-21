@@ -25,14 +25,14 @@ async function resetDatabase() {
 
   console.log("✅ Database cleared successfully!");
 
-  // إضافة المدير العام
-  console.log("👤 Creating admin user...");
-  const adminPassword = await hashPassword("admin123");
-  
+  // إضافة مستخدم واحد فقط: 0542632557 / 123456 بدور admin
+  console.log("👤 Creating single admin user (0542632557/123456)...");
+  const adminPassword = await hashPassword("123456");
+
   await db.insert(users).values({
-    id: "user_admin_weaam",
-    name: "وئام كيال",
-    phone: "0542632557",
+    id: `user_admin_${Date.now()}`,
+    name: "المدير العام",
+    phone: "+972542632557", // توحيد صيغة الرقم كما في النظام
     password: adminPassword,
     role: "admin",
     loginMethod: "password",
@@ -43,9 +43,8 @@ async function resetDatabase() {
   console.log("✅ Admin user created successfully!");
   console.log("\n📋 Database Status:");
   console.log("- All tables cleared");
-  console.log("- Admin user: وئام كيال");
-  console.log("- Phone: 0542632557");
-  console.log("- Password: admin123");
+  console.log("- Admin phone: 0542632557 (يحفظ +972 داخل القاعدة)");
+  console.log("- Password: 123456");
   
   process.exit(0);
 }
