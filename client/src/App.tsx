@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
+import Forbidden from "@/pages/Forbidden";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -32,6 +33,7 @@ import Login from "./pages/Login";
 import AdminDirectLogin from "./pages/AdminDirectLogin";
 import Settings from "./pages/Settings";
 import AdminStudentDetail from "./pages/admin/StudentDetail";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -41,120 +43,167 @@ function Router() {
       <Route path={"/login"} component={Login} />
       <Route path={"/admin-direct"} component={AdminDirectLogin} />
       <Route path="/admin/dashboard">
-        <AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/users">
-        <AdminLayout>
-          <AdminUsers />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminUsers />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/students">
-        <AdminLayout>
-          <AdminStudents />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminStudents />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/students/:id">
-        <AdminLayout>
-          <AdminStudentDetail />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminStudentDetail />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/teachers">
-        <AdminLayout>
-          <AdminTeachers />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminTeachers />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/reports">
-        <AdminLayout>
-          <AdminReports />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminReports />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/lessons">
-        <AdminLayout>
-          <AdminLessons />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminLessons />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/analytics">
-        <AdminLayout>
-          <AdminAnalytics />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminAnalytics />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/admins">
-        <AdminLayout>
-          <AdminAdmins />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminAdmins />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/settings">
-        <AdminLayout>
-          <Settings />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <Settings />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/dashboard">
-        <TeacherLayout>
-          <TeacherDashboard />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherDashboard />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/attendance">
-        <TeacherLayout>
-          <TeacherAttendance />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherAttendance />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/lessons">
-        <TeacherLayout>
-          <TeacherLessons />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherLessons />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/students">
-        <TeacherLayout>
-          <TeacherStudents />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherStudents />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/evaluations">
-        <TeacherLayout>
-          <TeacherEvaluations />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherEvaluations />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/settings">
-        <TeacherLayout>
-          <Settings />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <Settings />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/student/dashboard">
-        <StudentLayout>
-          <StudentDashboard />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <StudentDashboard />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/student/attendance">
-        <StudentLayout>
-          <StudentAttendance />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <StudentAttendance />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/student/lessons">
-        <StudentLayout>
-          <StudentLessons />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <StudentLessons />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/student/evaluations">
-        <StudentLayout>
-          <StudentEvaluations />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <StudentEvaluations />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/student/settings">
-        <StudentLayout>
-          <Settings />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <Settings />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/assistant/dashboard">
-        <AssistantLayout>
-          <AssistantDashboard />
-        </AssistantLayout>
+        <ProtectedRoute requiredRole="assistant">
+          <AssistantLayout>
+            <AssistantDashboard />
+          </AssistantLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/assistant/settings">
-        <AssistantLayout>
-          <Settings />
-        </AssistantLayout>
+        <ProtectedRoute requiredRole="assistant">
+          <AssistantLayout>
+            <Settings />
+          </AssistantLayout>
+        </ProtectedRoute>
       </Route>
+      <Route path={"/403"} component={Forbidden} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

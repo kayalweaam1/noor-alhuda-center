@@ -7,6 +7,7 @@ interface AuthContextType {
   phoneNumber: string | null;
   role: 'admin' | 'teacher' | 'student' | 'assistant' | null;
   isSuperAdmin: boolean;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   phoneNumber: null,
   role: null,
   isSuperAdmin: false,
+  logout: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -24,7 +26,13 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const utils = trpc.useUtils();
   const { data: user, isLoading } = trpc.auth.me.useQuery();
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      utils.auth.me.setData(undefined, null);
+    },
+  });
 
   const phoneNumber = user?.phone || null;
   const role = user?.role || null;
@@ -36,7 +44,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       loading: isLoading, 
       phoneNumber, 
       role, 
-      isSuperAdmin 
+      isSuperAdmin,
+      logout: async () => {
+        try {
+          await logoutMutation.mutateAsync();
+        } finally {
+          utils.auth.me.setData(undefined, null);
+          await utils.auth.me.invalidate();
+        }
+      },
     }}>
       {children}
     </AuthContext.Provider>

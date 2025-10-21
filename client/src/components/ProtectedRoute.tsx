@@ -9,13 +9,14 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const { user, loading, role } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         // Not logged in, redirect to login
-        setLocation('/login');
+        const next = encodeURIComponent(location);
+        setLocation(`/login?next=${next}`);
       } else if (requiredRole && role !== requiredRole) {
         // Wrong role, redirect to appropriate dashboard
         if (role === 'admin') {

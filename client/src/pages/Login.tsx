@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
 export default function Login() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,10 +40,14 @@ export default function Login() {
       // Save user to localStorage
       localStorage.setItem('user', JSON.stringify(result.user));
       
-      // Redirect based on role
+      // Redirect based on role (respect next param if present)
       const role = result.user.role;
+      const url = new URL(window.location.href);
+      const next = url.searchParams.get('next');
       
-      if (role === 'admin') {
+      if (next) {
+        setLocation(next);
+      } else if (role === 'admin') {
         setLocation("/admin/dashboard");
       } else if (role === 'teacher') {
         setLocation("/teacher/dashboard");
