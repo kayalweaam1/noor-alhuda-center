@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import { db } from '../db';
+import * as dbApi from '../db';
 import { users } from '../../drizzle/schema';
 
 const router = Router();
 
 router.post('/api/create-first-admin', async (req, res) => {
   try {
+    const db = await dbApi.getDb();
+    if (!db) return res.status(500).json({ success: false, message: 'Database not available' });
     // Check if any users exist
     const existingUsers = await db.select().from(users).limit(1);
     
@@ -26,9 +28,7 @@ router.post('/api/create-first-admin', async (req, res) => {
       phone: '+972542632557',
       password: hashedPassword,
       role: 'admin',
-      status: 'active',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      // fields not in schema removed
     });
 
     res.json({ 

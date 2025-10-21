@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
-import mysql from "mysql2";
 import mysqlSessionFactory from "express-mysql-session";
 import { createServer } from "http";
 import net from "net";
@@ -43,14 +42,30 @@ async function startServer() {
   
   // Session middleware
   const MySQLStore = mysqlSessionFactory(session as unknown as any);
-  const sessionPool = process.env.DATABASE_URL
-    ? mysql.createPool(process.env.DATABASE_URL as unknown as mysql.PoolOptions)
-    : undefined;
+  const parseMysqlUrl = (url?: string) => {
+    if (!url) return undefined as
+      | { host: string; port?: number; user?: string; password?: string; database?: string }
+      | undefined;
+    try {
+      const u = new URL(url);
+      const dbName = u.pathname?.replace(/^\//, "");
+      return {
+        host: u.hostname,
+        port: u.port ? Number(u.port) : undefined,
+        user: u.username ? decodeURIComponent(u.username) : undefined,
+        password: u.password ? decodeURIComponent(u.password) : undefined,
+        database: dbName || undefined,
+      };
+    } catch {
+      return undefined;
+    }
+  };
+  const storeOptions = parseMysqlUrl(ENV.databaseUrl);
   app.use(
     session({
       secret: ENV.cookieSecret,
-      // Use MySQL-backed session store in production to avoid MemoryStore warning
-      store: sessionPool ? new MySQLStore({}, sessionPool) : undefined,
+      // Use MySQL-backed session store to avoid MemoryStore in production
+      store: storeOptions ? new MySQLStore({ createDatabaseTable: true, ...storeOptions }) : undefined,
       resave: false,
       saveUninitialized: false,
       cookie: {

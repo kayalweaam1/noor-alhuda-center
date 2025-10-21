@@ -1,21 +1,21 @@
 import { Router } from "express";
-import { db } from "../db";
+import * as dbApi from "../db";
 import { users } from "../../drizzle/schema";
-import { hashPassword } from "../lib/auth";
+import { hashPassword } from "../_core/password";
 
 const router = Router();
 
 // Temporary endpoint to create admin user
 router.post("/setup-admin", async (req, res) => {
   try {
+    const db = await dbApi.getDb();
+    if (!db) return res.status(500).json({ success: false, error: 'Database not available' });
     const phone = "0542632557";
     const password = "123456";
     const hashedPassword = await hashPassword(password);
 
     // Check if admin already exists
-    const existingUser = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.phone, phone),
-    });
+    const existingUser = (await db.select().from(users).where(users.phone as any).limit(1))[0];
 
     if (existingUser) {
       return res.json({ 
@@ -26,18 +26,19 @@ router.post("/setup-admin", async (req, res) => {
     }
 
     // Create admin user
-    const [newUser] = await db.insert(users).values({
+    const newUserId = `user_${Date.now()}`;
+    await db.insert(users).values({
+      id: newUserId,
       name: "المدير العام",
       phone,
       password: hashedPassword,
       role: "admin",
-      status: "active",
-    }).returning();
+    });
 
     res.json({ 
       success: true, 
       message: "تم إنشاء حساب المدير بنجاح",
-      userId: newUser.id,
+      userId: newUserId,
       credentials: {
         phone: "0542632557",
         password: "123456"
