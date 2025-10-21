@@ -14,6 +14,7 @@ export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const { data: stats } = trpc.statistics.getOverview.useQuery();
   const hardReset = trpc.setup.hardReset.useMutation();
+  const loginMutation = trpc.auth.login.useMutation();
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -254,7 +255,7 @@ export default function AdminDashboard() {
                           try {
                             setIsSubmitting(true);
                             // نحاول تسجيل الدخول للتحقق من كلمة المرور قبل الحذف
-                            await trpc.auth.login.fetch({ phone: '0542632557', password: confirmPassword });
+                                await loginMutation.mutateAsync({ phone: '0542632557', password: confirmPassword });
                             await hardReset.mutateAsync({ phone: '0542632557', password: '123456' });
                             window.location.reload();
                           } catch (err) {
