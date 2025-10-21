@@ -1,6 +1,10 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, GraduationCap, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
+import { Users, GraduationCap, BookOpen, TrendingUp, AlertCircle, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +13,9 @@ export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { user, loading } = useAuth();
   const { data: stats } = trpc.statistics.getOverview.useQuery();
+  const hardReset = trpc.setup.hardReset.useMutation();
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect if not admin
   useEffect(() => {
@@ -211,6 +218,59 @@ export default function AdminDashboard() {
                 <BookOpen className="w-8 h-8 mx-auto mb-2" />
                 <p className="font-semibold">التقارير</p>
               </button>
+
+              {/* Dangerous Hard Reset Button (admin only) */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    className="p-4 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 col-span-2 md:col-span-1"
+                  >
+                    <Trash2 className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold">حذف كل البيانات</p>
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir="rtl">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>تأكيد حذف كل البيانات</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      هذا الإجراء سيحذف جميع البيانات من قاعدة البيانات نهائيًا ويُبقي حساب مدير واحد فقط. اكتب كلمة مرور المدير الحالية للتأكيد.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="py-2">
+                    <Input
+                      type="password"
+                      placeholder="كلمة مرور المدير"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button
+                        variant="destructive"
+                        disabled={isSubmitting || confirmPassword.length < 4}
+                        onClick={async () => {
+                          try {
+                            setIsSubmitting(true);
+                            // نحاول تسجيل الدخول للتحقق من كلمة المرور قبل الحذف
+                            await trpc.auth.login.fetch({ phone: '0542632557', password: confirmPassword });
+                            await hardReset.mutateAsync({ phone: '0542632557', password: '123456' });
+                            window.location.reload();
+                          } catch (err) {
+                            alert('كلمة المرور غير صحيحة أو حدث خطأ');
+                          } finally {
+                            setIsSubmitting(false);
+                            setConfirmPassword('');
+                          }
+                        }}
+                      >
+                        تأكيد الحذف
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
