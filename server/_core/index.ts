@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
+import mysql from "mysql2";
+import mysqlSessionFactory from "express-mysql-session";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -40,9 +42,15 @@ async function startServer() {
   app.set('trust proxy', 1);
   
   // Session middleware
+  const MySQLStore = mysqlSessionFactory(session as unknown as any);
+  const sessionPool = process.env.DATABASE_URL
+    ? mysql.createPool(process.env.DATABASE_URL as unknown as mysql.PoolOptions)
+    : undefined;
   app.use(
     session({
       secret: ENV.cookieSecret,
+      // Use MySQL-backed session store in production to avoid MemoryStore warning
+      store: sessionPool ? new MySQLStore({}, sessionPool) : undefined,
       resave: false,
       saveUninitialized: false,
       cookie: {
