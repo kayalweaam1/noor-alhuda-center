@@ -4,7 +4,7 @@
 
 **اسم المشروع:** مركز نور الهدى للقرآن الكريم  
 **النوع:** نظام إدارة مركز تحفيظ القرآن  
-**التقنيات:** React + TypeScript + Node.js + MySQL + tRPC
+**التقنيات:** React + TypeScript + Node.js + MySQL + tRPC (محدّث)
 
 ---
 
