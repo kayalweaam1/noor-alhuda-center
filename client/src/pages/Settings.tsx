@@ -131,7 +131,7 @@ export default function Settings() {
 
               <Button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
+                className="w-full bg-white hover:bg-white"
                 disabled={changePasswordMutation.isPending}
               >
                 {changePasswordMutation.isPending ? "جاري التحديث..." : "تحديث كلمة المرور"}

@@ -43,7 +43,7 @@ export default function TeachersPage() {
     <div className="p-6 space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-emerald-200">
+        <Card className="border-gray-200">
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-sm text-emerald-700 mb-2">إجمالي المربين</p>
@@ -85,11 +85,11 @@ export default function TeachersPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-emerald-900">إدارة المربين</CardTitle>
+              <CardTitle className="text-2xl text-gray-900">إدارة المربين</CardTitle>
               <CardDescription>إدارة جميع مربي المركز</CardDescription>
             </div>
             <Button 
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              className="bg-white hover:bg-white"
               onClick={() => setShowAddModal(true)}
             >
               <UserPlus className="w-4 h-4 ml-2" />
@@ -106,30 +106,30 @@ export default function TeachersPage() {
                 placeholder="البحث عن مربي (الاسم، التخصص)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 border-emerald-200 focus:border-emerald-500"
+                className="pr-10 border-gray-200 focus:border-gray-500"
               />
             </div>
           </div>
 
           {/* Teachers Table */}
-          <div className="rounded-lg border border-emerald-200 overflow-hidden">
+          <div className="rounded-lg border border-gray-200 overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-emerald-50">
-                  <TableHead className="text-right font-bold text-emerald-900">المربي</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">التخصص</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">عدد الطلاب</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">رقم الهاتف</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">تاريخ التعيين</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="text-right font-bold text-gray-900">المربي</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">التخصص</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">عدد الطلاب</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">رقم الهاتف</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">تاريخ التعيين</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredTeachers?.map((teacher) => (
-                  <TableRow key={teacher.id} className="hover:bg-emerald-50/50">
+                  <TableRow key={teacher.id} className="hover:bg-gray-50/50">
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-gray-200">
                           <span className="text-white font-bold text-sm">
                             {teacher.userName?.charAt(0) || 'م'}
                           </span>
@@ -141,7 +141,7 @@ export default function TeachersPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="border-emerald-300">
+                      <Badge variant="outline" className="border-gray-300">
                         {teacher.specialization || 'عام'}
                       </Badge>
                     </TableCell>

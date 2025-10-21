@@ -124,7 +124,7 @@ export default function StudentsPage() {
             <div className="flex gap-2">
               <Button 
                 variant="outline"
-                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                className="border-gray-600 text-gray-600 hover:bg-white"
                 onClick={() => exportStudents(students || [])}
               >
                 <Download className="w-4 h-4 ml-2" />
@@ -180,7 +180,7 @@ export default function StudentsPage() {
                 {filteredStudents?.map((student) => {
                   const attendanceRate = getAttendanceRate(student);
                   return (
-                    <TableRow key={student.id} className="hover:bg-emerald-50/50">
+                    <TableRow key={student.id} className="hover:bg-gray-50/50">
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
@@ -220,7 +220,7 @@ export default function StudentsPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                            className="border-gray-200 text-gray-600 hover:bg-white"
                             onClick={() => {
                               setSelectedStudent(student);
                               setShowEditModal(true);

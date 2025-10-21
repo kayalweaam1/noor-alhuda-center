@@ -138,7 +138,7 @@ export default function SendAssistantNoteModal({
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-white hover:bg-white"
               disabled={createNote.isPending}
             >
               {createNote.isPending ? "جاري الإرسال..." : "إرسال الملاحظة"}

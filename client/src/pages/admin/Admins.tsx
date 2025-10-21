@@ -109,7 +109,7 @@ export default function Admins() {
               onChange={(e) => setNewPhone(e.target.value)}
               dir="ltr"
             />
-            <Button onClick={handleAddAdmin} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={handleAddAdmin} className="bg-white hover:bg-white">
               <Plus className="w-4 h-4 ml-2" />
               إضافة
             </Button>
@@ -138,7 +138,7 @@ export default function Admins() {
                       <Crown className="w-6 h-6 text-white" />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center">
                       <Shield className="w-6 h-6 text-white" />
                     </div>
                   )}

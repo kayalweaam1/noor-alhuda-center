@@ -181,7 +181,7 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
             </Button>
             <Button
               onClick={handleImport}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-white hover:bg-white"
               disabled={!file || importing}
             >
               {importing ? "جاري الاستيراد..." : "استيراد الطلاب"}

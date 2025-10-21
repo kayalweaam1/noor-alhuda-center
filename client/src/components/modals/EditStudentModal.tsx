@@ -127,7 +127,7 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-white hover:bg-white"
               disabled={updateStudent.isPending}
             >
               {updateStudent.isPending ? "جاري التحديث..." : "تحديث البيانات"}

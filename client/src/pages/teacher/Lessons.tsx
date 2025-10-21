@@ -162,14 +162,14 @@ export default function TeacherLessons() {
           </CardContent>
         </Card>
 
-        <Card className="border-emerald-200">
+        <Card className="border-gray-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Clock className="w-5 h-5 text-emerald-600" />
-                <p className="text-sm text-emerald-700">الدروس القادمة</p>
-              </div>
-              <p className="text-4xl font-bold text-emerald-900">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Clock className="w-5 h-5 text-gray-600" />
+                    <p className="text-sm text-gray-700">الدروس القادمة</p>
+                  </div>
+                  <p className="text-4xl font-bold text-gray-900">
                 {myLessons.filter(l => new Date(l.date) > new Date()).length}
               </p>
             </div>
@@ -250,13 +250,13 @@ export default function TeacherLessons() {
                     {dayLessons.map((lesson) => (
                       <div
                         key={lesson.id}
-                        className="text-xs p-1 bg-emerald-100 border border-emerald-300 rounded group relative"
+                        className="text-xs p-1 bg-gray-100 border border-gray-300 rounded group relative"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <div className="font-semibold text-emerald-900 truncate">
+                        <div className="font-semibold text-gray-900 truncate">
                           {lesson.title}
                         </div>
-                        <div className="text-emerald-600 flex items-center gap-1">
+                        <div className="text-gray-600 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(lesson.date).toLocaleTimeString('ar', {
                             hour: '2-digit',
@@ -320,7 +320,7 @@ export default function TeacherLessons() {
               <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
                 إلغاء
               </Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
+              <Button type="submit" className="bg-white hover:bg-white">
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة الدرس
               </Button>

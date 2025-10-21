@@ -64,18 +64,18 @@ export default function AdminDashboard() {
     <div className="min-h-screen" dir="rtl">
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center">
               <span className="text-2xl text-white font-bold">
                 {user.name?.charAt(0) || 'م'}
               </span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-emerald-900">
+              <h1 className="text-3xl font-bold text-gray-900">
                 مرحباً، {user.name || 'المدير'}
               </h1>
-              <p className="text-emerald-700 mt-1">
+              <p className="text-gray-700 mt-1">
                 لوحة التحكم الرئيسية - مركز نور الهدى
               </p>
             </div>
@@ -119,24 +119,24 @@ export default function AdminDashboard() {
           {/* Attendance Chart Placeholder */}
           <Card className="border-emerald-200">
             <CardHeader>
-              <CardTitle className="text-emerald-900">نسبة الحضور</CardTitle>
+              <CardTitle className="text-gray-900">نسبة الحضور</CardTitle>
               <CardDescription>إحصائيات الحضور الشهرية</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
+              <div className="h-64 flex items-center justify-center bg-white border border-gray-100 rounded-xl">
                 <div className="text-center">
-                  <TrendingUp className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-                  <p className="text-emerald-700 font-semibold">رسم بياني للحضور</p>
-                  <p className="text-sm text-emerald-600 mt-2">سيتم إضافة البيانات قريباً</p>
+                  <TrendingUp className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-700 font-semibold">رسم بياني للحضور</p>
+                  <p className="text-sm text-gray-600 mt-2">سيتم إضافة البيانات قريباً</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Recent Alerts */}
-          <Card className="border-emerald-200">
+          <Card className="border-gray-200">
             <CardHeader>
-              <CardTitle className="text-emerald-900">التنبيهات الأخيرة</CardTitle>
+            <CardTitle className="text-gray-900">التنبيهات الأخيرة</CardTitle>
               <CardDescription>آخر الإشعارات والتحديثات</CardDescription>
             </CardHeader>
             <CardContent>
@@ -159,12 +159,12 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                  <Users className="w-5 h-5 text-emerald-600 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <Users className="w-5 h-5 text-gray-600 mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-semibold text-emerald-900">طالب جديد</p>
-                    <p className="text-sm text-emerald-700">تم تسجيل 2 طلاب جدد اليوم</p>
-                    <p className="text-xs text-emerald-600 mt-1">منذ 8 ساعات</p>
+                    <p className="font-semibold text-gray-900">طالب جديد</p>
+                    <p className="text-sm text-gray-700">تم تسجيل 2 طلاب جدد اليوم</p>
+                    <p className="text-xs text-gray-600 mt-1">منذ 8 ساعات</p>
                   </div>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="border-emerald-200">
+          <Card className="border-gray-200">
           <CardHeader>
             <CardTitle className="text-emerald-900">إجراءات سريعة</CardTitle>
             <CardDescription>الوظائف الأكثر استخداماً</CardDescription>
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
 
               <button
                 onClick={() => setLocation('/admin/teachers')}
-                className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                className="p-4 bg-white text-gray-900 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-gray-200"
               >
                 <GraduationCap className="w-8 h-8 mx-auto mb-2" />
                 <p className="font-semibold">إدارة المربين</p>

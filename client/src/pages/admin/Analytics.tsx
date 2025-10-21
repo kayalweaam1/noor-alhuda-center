@@ -74,12 +74,12 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100">
+        <Card className="border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100">
           <CardContent className="pt-6">
             <div className="text-center">
-              <BookOpen className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-              <p className="text-sm text-emerald-700 mb-1">إجمالي الدروس</p>
-              <p className="text-4xl font-bold text-emerald-900">{totalLessons}</p>
+              <BookOpen className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+              <p className="text-sm text-gray-700 mb-1">إجمالي الدروس</p>
+              <p className="text-4xl font-bold text-gray-900">{totalLessons}</p>
             </div>
           </CardContent>
         </Card>
@@ -108,9 +108,9 @@ export default function AnalyticsPage() {
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Average Scores */}
-        <Card className="border-emerald-200">
+        <Card className="border-gray-200">
           <CardHeader>
-            <CardTitle className="text-emerald-900 flex items-center gap-2">
+            <CardTitle className="text-gray-900 flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
               متوسط الدرجات
             </CardTitle>
@@ -149,11 +149,11 @@ export default function AnalyticsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">التلاوة</span>
-                <span className="text-sm font-bold text-emerald-600">{avgRecitation.toFixed(1)}/10</span>
+                <span className="text-sm font-bold text-gray-600">{avgRecitation.toFixed(1)}/10</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
-                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-gray-400 to-gray-500 h-3 rounded-full transition-all duration-500"
                   style={{ width: `${(avgRecitation / 10) * 100}%` }}
                 ></div>
               </div>
@@ -189,11 +189,11 @@ export default function AnalyticsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">حاضر</span>
-                <span className="text-sm font-bold text-emerald-600">{presentCount} ({((presentCount / (attendance?.length || 1)) * 100).toFixed(0)}%)</span>
+                <span className="text-sm font-bold text-gray-600">{presentCount} ({((presentCount / (attendance?.length || 1)) * 100).toFixed(0)}%)</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
-                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full"
+                  className="bg-gradient-to-r from-gray-400 to-gray-500 h-3 rounded-full"
                   style={{ width: `${(presentCount / (attendance?.length || 1)) * 100}%` }}
                 ></div>
               </div>
@@ -244,7 +244,7 @@ export default function AnalyticsPage() {
             {Object.entries(halaqas).map(([halaqa, count], index) => {
               const colors = [
                 'from-blue-500 to-blue-600',
-                'from-emerald-500 to-emerald-600',
+                'from-gray-400 to-gray-500',
                 'from-purple-500 to-purple-600',
                 'from-orange-500 to-orange-600',
                 'from-pink-500 to-pink-600',

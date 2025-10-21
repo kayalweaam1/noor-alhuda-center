@@ -55,13 +55,13 @@ export default function TeacherAttendance() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-emerald-900">تسجيل الحضور</h1>
+          <h1 className="text-3xl font-bold text-gray-900">تسجيل الحضور</h1>
           <p className="text-gray-600 mt-1">تسجيل حضور وغياب الطلاب</p>
         </div>
         <Button
           onClick={handleSaveAttendance}
           disabled={saving || Object.keys(attendance).length === 0}
-          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+          className="bg-white hover:bg-white"
         >
           <Save className="w-4 h-4 ml-2" />
           {saving ? "جاري الحفظ..." : "حفظ الحضور"}
@@ -69,28 +69,28 @@ export default function TeacherAttendance() {
       </div>
 
       {/* Date Selector */}
-      <Card className="border-emerald-200">
+      <Card className="border-gray-200">
         <CardHeader>
-          <CardTitle className="text-emerald-900">اختر التاريخ</CardTitle>
+          <CardTitle className="text-gray-900">اختر التاريخ</CardTitle>
           <CardDescription>حدد تاريخ الحصة</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
-            <Calendar className="w-6 h-6 text-emerald-600" />
+            <Calendar className="w-6 h-6 text-gray-600" />
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="flex-1 p-3 border border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none"
+              className="flex-1 p-3 border border-gray-200 rounded-lg focus:border-gray-500 focus:outline-none"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Students List */}
-      <Card className="border-emerald-200">
+      <Card className="border-gray-200">
         <CardHeader>
-          <CardTitle className="text-emerald-900">طلاب الحلقة</CardTitle>
+          <CardTitle className="text-gray-900">طلاب الحلقة</CardTitle>
           <CardDescription>
             اضغط على الطالب لتبديل الحضور/الغياب ({myStudents.length} طالب)
           </CardDescription>
@@ -110,7 +110,7 @@ export default function TeacherAttendance() {
                     onClick={() => handleToggleAttendance(student.id)}
                     className={`p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
                       isPresent
-                        ? 'border-emerald-500 bg-emerald-50'
+                        ? 'border-gray-400 bg-gray-50'
                         : attendance[student.id] === false
                         ? 'border-red-500 bg-red-50'
                         : 'border-gray-300 bg-white'
@@ -119,7 +119,7 @@ export default function TeacherAttendance() {
                     <div className="flex items-center gap-3">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                         isPresent
-                          ? 'bg-emerald-500'
+                          ? 'bg-gray-400'
                           : attendance[student.id] === false
                           ? 'bg-red-500'
                           : 'bg-gray-300'

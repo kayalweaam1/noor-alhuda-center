@@ -111,8 +111,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
-                      : "text-gray-700 hover:bg-emerald-50"
+                      ? "bg-white text-gray-900 shadow-lg"
+                      : "text-gray-700 hover:bg-white"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -125,7 +125,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         <div className="absolute bottom-0 right-0 left-0 p-4 border-t border-emerald-200 bg-white">
           <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center">
               <span className="text-white font-bold">
                 {user?.name?.charAt(0) || 'م'}
               </span>
@@ -160,7 +160,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 rounded-lg hover:bg-emerald-50 transition-colors"
+                className="p-2 rounded-lg hover:bg-white transition-colors"
               >
                 {sidebarOpen ? (
                   <X className="w-6 h-6 text-emerald-700" />

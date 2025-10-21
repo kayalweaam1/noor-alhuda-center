@@ -59,13 +59,13 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-emerald-900">التقارير</h1>
+          <h1 className="text-3xl font-bold text-gray-900">التقارير</h1>
           <p className="text-gray-600 mt-1">تصدير وعرض التقارير الشاملة</p>
         </div>
         <Button
           onClick={handleExportAll}
           disabled={loading}
-          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+          className="bg-white hover:bg-white"
         >
           <Download className="w-4 h-4 ml-2" />
           {loading ? "جاري التصدير..." : "تصدير الكل"}
@@ -84,7 +84,7 @@ export default function ReportsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-emerald-200">
+        <Card className="border-gray-200">
           <CardContent className="pt-6">
             <div className="text-center">
               <Users className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
@@ -133,7 +133,7 @@ export default function ReportsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-3">
+            <div className="flex gap-3">
                   <Button
                     variant="outline"
                     className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
@@ -142,11 +142,11 @@ export default function ReportsPage() {
                     <FileText className="w-4 h-4 ml-2" />
                     عرض
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-                    onClick={() => toast.info("قريباً: تصدير PDF")}
-                  >
+              <Button
+                variant="outline"
+                className="flex-1 border-gray-200 text-gray-600 hover:bg-gray-50"
+                onClick={() => toast.info("قريباً: تصدير PDF")}
+              >
                     <Download className="w-4 h-4 ml-2" />
                     PDF
                   </Button>
@@ -166,16 +166,16 @@ export default function ReportsPage() {
       </div>
 
       {/* Custom Report Builder */}
-      <Card className="border-emerald-200">
+      <Card className="border-gray-200">
         <CardHeader>
-          <CardTitle className="text-emerald-900">إنشاء تقرير مخصص</CardTitle>
+          <CardTitle className="text-gray-900">إنشاء تقرير مخصص</CardTitle>
           <CardDescription>اختر المعايير لإنشاء تقرير مخصص</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">نوع التقرير</label>
-              <select className="w-full p-3 border border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none">
+              <select className="w-full p-3 border border-gray-200 rounded-lg focus:border-gray-500 focus:outline-none">
                 <option>الحضور والغياب</option>
                 <option>التقييمات</option>
                 <option>السلوك</option>
@@ -185,7 +185,7 @@ export default function ReportsPage() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">الفترة الزمنية</label>
-              <select className="w-full p-3 border border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none">
+              <select className="w-full p-3 border border-gray-200 rounded-lg focus:border-gray-500 focus:outline-none">
                 <option>آخر 7 أيام</option>
                 <option>آخر 30 يوم</option>
                 <option>آخر 3 أشهر</option>
@@ -195,7 +195,7 @@ export default function ReportsPage() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">الحلقة</label>
-              <select className="w-full p-3 border border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none">
+              <select className="w-full p-3 border border-gray-200 rounded-lg focus:border-gray-500 focus:outline-none">
                 <option>جميع الحلقات</option>
                 <option>حلقة الصباح</option>
                 <option>حلقة المساء</option>
@@ -204,7 +204,7 @@ export default function ReportsPage() {
           </div>
 
           <div className="mt-6 flex gap-3">
-            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+            <Button className="bg-white hover:bg-white">
               <Filter className="w-4 h-4 ml-2" />
               إنشاء التقرير
             </Button>

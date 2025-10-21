@@ -143,7 +143,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-white hover:bg-white"
               disabled={createUser.isPending}
             >
               {createUser.isPending ? "جاري الإضافة..." : "إضافة المستخدم"}

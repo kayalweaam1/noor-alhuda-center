@@ -117,7 +117,7 @@ export default function Login() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-lg py-6"
+              className="w-full bg-white hover:bg-white text-lg py-6 border border-gray-200 text-gray-900"
             >
               {loading ? (
                 "جاري تسجيل الدخول..."

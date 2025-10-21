@@ -116,7 +116,7 @@ export default function AttendanceFull() {
                       </TableCell>
                       <TableCell>
                         {attendance[student.id] === 'present' && (
-                          <Badge className="bg-green-500">حاضر</Badge>
+                          <Badge className="bg-white">حاضر</Badge>
                         )}
                         {attendance[student.id] === 'absent' && (
                           <Badge className="bg-red-500">غائب</Badge>
@@ -133,7 +133,7 @@ export default function AttendanceFull() {
                           <Button
                             size="sm"
                             variant={attendance[student.id] === 'present' ? 'default' : 'outline'}
-                            className={attendance[student.id] === 'present' ? 'bg-green-600 hover:bg-green-700' : ''}
+                            className={attendance[student.id] === 'present' ? 'bg-white hover:bg-white' : ''}
                             onClick={() => handleAttendanceChange(student.id, 'present')}
                           >
                             <Check className="h-4 w-4" />
@@ -164,7 +164,7 @@ export default function AttendanceFull() {
               <div className="mt-6 flex justify-end">
                 <Button
                   onClick={handleSubmit}
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-white hover:bg-white"
                   disabled={markAttendanceMutation.isPending || Object.keys(attendance).length === 0}
                 >
                   {markAttendanceMutation.isPending ? "جاري الحفظ..." : "حفظ الحضور"}

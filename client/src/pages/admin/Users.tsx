@@ -76,15 +76,15 @@ export default function UsersPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <Card className="border-emerald-200">
+      <Card className="border-gray-200">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-emerald-900">إدارة المستخدمين</CardTitle>
+            <CardTitle className="text-2xl text-gray-900">إدارة المستخدمين</CardTitle>
               <CardDescription>إدارة جميع مستخدمي النظام</CardDescription>
             </div>
             <Button 
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              className="bg-white hover:bg-white"
               onClick={() => setShowAddModal(true)}
             >
               <UserPlus className="w-4 h-4 ml-2" />
@@ -101,30 +101,30 @@ export default function UsersPage() {
                 placeholder="البحث عن مستخدم (الاسم، البريد، رقم الهاتف)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 border-emerald-200 focus:border-emerald-500"
+                className="pr-10 border-gray-200 focus:border-gray-500"
               />
             </div>
           </div>
 
           {/* Users Table */}
-          <div className="rounded-lg border border-emerald-200 overflow-hidden">
+          <div className="rounded-lg border border-gray-200 overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-emerald-50">
-                  <TableHead className="text-right font-bold text-emerald-900">الاسم</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">البريد الإلكتروني</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">رقم الهاتف</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الدور</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">تاريخ التسجيل</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="text-right font-bold text-gray-900">الاسم</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">البريد الإلكتروني</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">رقم الهاتف</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">الدور</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">تاريخ التسجيل</TableHead>
+                  <TableHead className="text-right font-bold text-gray-900">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers?.map((user) => (
-                  <TableRow key={user.id} className="hover:bg-emerald-50/50">
+                  <TableRow key={user.id} className="hover:bg-gray-50/50">
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-gray-200">
                           <span className="text-white font-bold text-sm">
                             {user.name?.charAt(0) || '؟'}
                           </span>
@@ -194,12 +194,12 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center gap-3">
-                <Shield className="w-8 h-8 text-emerald-600" />
+                <Shield className="w-8 h-8 text-gray-600" />
                 <div>
-                  <p className="text-sm text-emerald-700">المربين</p>
-                  <p className="text-2xl font-bold text-emerald-900">
+                  <p className="text-sm text-gray-700">المربين</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     {users?.filter(u => u.role === 'teacher').length || 0}
                   </p>
                 </div>

@@ -38,7 +38,7 @@ export default function StudentDashboard() {
   const behaviorScore = 90;
 
   const getBehaviorColor = (score: number) => {
-    if (score >= 90) return "from-emerald-500 to-green-600";
+    if (score >= 90) return "from-gray-200 to-gray-300";
     if (score >= 75) return "from-blue-500 to-cyan-600";
     if (score >= 60) return "from-amber-500 to-yellow-600";
     return "from-red-500 to-orange-600";
@@ -99,9 +99,9 @@ export default function StudentDashboard() {
               </div>
               
               <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="text-center p-3 bg-emerald-50 rounded-lg">
-                  <p className="text-xs text-emerald-700 mb-1">ممتاز</p>
-                  <div className="w-full h-2 bg-emerald-500 rounded"></div>
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-700 mb-1">ممتاز</p>
+                  <div className="w-full h-2 bg-gray-300 rounded"></div>
                 </div>
                 <div className="text-center p-3 bg-amber-50 rounded-lg">
                   <p className="text-xs text-amber-700 mb-1">جيد</p>
@@ -133,11 +133,11 @@ export default function StudentDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-emerald-200">
+          <Card className="border-gray-200">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg text-gray-700">الدروس</CardTitle>
-                <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gray-300 flex items-center justify-center">
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -172,14 +172,14 @@ export default function StudentDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5" />
+              <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <CheckCircle className="w-5 h-5 text-gray-600 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-emerald-900">أداء ممتاز</p>
-                  <p className="text-sm text-emerald-700 mt-1">
+                  <p className="font-semibold text-gray-900">أداء ممتاز</p>
+                  <p className="text-sm text-gray-700 mt-1">
                     حفظ متقن للسور المطلوبة، استمر على هذا المستوى
                   </p>
-                  <p className="text-xs text-emerald-600 mt-2">منذ يومين</p>
+                  <p className="text-xs text-gray-600 mt-2">منذ يومين</p>
                 </div>
               </div>
 
@@ -219,12 +219,12 @@ export default function StudentDashboard() {
                   <div
                     className={`w-full h-16 rounded-lg flex items-center justify-center ${
                       record.present
-                        ? 'bg-emerald-100 border-2 border-emerald-500'
+                        ? 'bg-gray-100 border-2 border-gray-400'
                         : 'bg-red-100 border-2 border-red-500'
                     }`}
                   >
                     {record.present ? (
-                      <CheckCircle className="w-6 h-6 text-emerald-600" />
+                      <CheckCircle className="w-6 h-6 text-gray-600" />
                     ) : (
                       <AlertCircle className="w-6 h-6 text-red-600" />
                     )}

@@ -137,7 +137,7 @@ export default function EditUserModal({ open, onOpenChange, user, onSuccess }: E
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-white hover:bg-white"
               disabled={updateUser.isPending}
             >
               {updateUser.isPending ? "جاري التحديث..." : "تحديث البيانات"}

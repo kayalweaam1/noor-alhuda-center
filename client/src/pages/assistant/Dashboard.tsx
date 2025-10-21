@@ -22,7 +22,7 @@ export default function AssistantDashboard() {
   return (
     <div className="p-6 space-y-6" dir="rtl">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg p-6 text-white">
+      <div className="bg-white rounded-lg p-6 text-gray-900 border border-gray-200">
         <h1 className="text-3xl font-bold mb-2">مرحباً، {profile?.userName || "المساعد"}</h1>
         <p className="text-emerald-50">الحلقة: {profile?.halaqaName || "غير محدد"}</p>
       </div>

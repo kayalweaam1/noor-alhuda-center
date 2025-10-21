@@ -123,7 +123,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
             </Button>
             <Button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-white hover:bg-white"
               disabled={createTeacher.isPending}
             >
               {createTeacher.isPending ? "جاري الإضافة..." : "إضافة المربي"}

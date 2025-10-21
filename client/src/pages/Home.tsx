@@ -26,7 +26,7 @@ export default function Home() {
           <Button
             onClick={() => setLocation("/login")}
             size="lg"
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-12 py-6 text-xl rounded-xl shadow-lg hover:shadow-xl transition-all"
+            className="bg-white text-gray-900 px-12 py-6 text-xl rounded-xl shadow-lg hover:shadow-xl transition-all border border-gray-200"
           >
             <LogIn className="w-6 h-6 ml-3" />
             تسجيل الدخول

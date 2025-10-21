@@ -39,7 +39,7 @@ export default function NotFound() {
           >
             <Button
               onClick={handleGoHome}
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+              className="bg-white text-gray-900 px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border border-gray-200"
             >
               <ArrowRight className="w-4 h-4 ml-2" />
               العودة للرئيسية

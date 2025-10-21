@@ -27,17 +27,17 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       {/* Header */}
-      <header className="bg-white border-b border-emerald-200 shadow-sm sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">ن</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-emerald-900">نور الهدى</h1>
-                <p className="text-xs text-emerald-600">لوحة المساعد</p>
+                <h1 className="text-xl font-bold text-gray-900">نور الهدى</h1>
+                <p className="text-xs text-gray-600">لوحة المساعد</p>
               </div>
             </div>
 
@@ -57,9 +57,9 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
               <div className="flex items-center gap-3">
                 <div className="text-right">
                   <p className="text-sm font-semibold text-gray-900">{user?.name || "المساعد"}</p>
-                  <p className="text-xs text-emerald-600">مساعد</p>
+                  <p className="text-xs text-gray-600">مساعد</p>
                 </div>
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-white" />
                 </div>
               </div>
@@ -86,8 +86,8 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
                     variant="ghost"
                     className={`rounded-t-lg rounded-b-none h-12 gap-2 ${
                       isActive
-                        ? "bg-emerald-50 text-emerald-700 border-b-2 border-emerald-600"
-                        : "text-gray-600 hover:text-emerald-700 hover:bg-emerald-50/50"
+                        ? "bg-white text-gray-700 border-b-2 border-gray-600"
+                        : "text-gray-600 hover:text-gray-700 hover:bg-white/50"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -106,7 +106,7 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-emerald-200 mt-12">
+      <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="container mx-auto px-4 py-6">
           <p className="text-center text-sm text-gray-600">
             © 2025 نور الهدى - جميع الحقوق محفوظة

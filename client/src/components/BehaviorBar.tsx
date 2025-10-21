@@ -10,7 +10,7 @@ export default function BehaviorBar({ score, size = "md", showLabel = true }: Be
   
   // Determine color based on score
   const getColor = (score: number) => {
-    if (score >= 80) return { bg: "bg-green-500", text: "text-green-700", label: "ممتاز" };
+    if (score >= 80) return { bg: "bg-white", text: "text-gray-700", label: "ممتاز" };
     if (score >= 60) return { bg: "bg-yellow-500", text: "text-yellow-700", label: "جيد" };
     if (score >= 40) return { bg: "bg-orange-500", text: "text-orange-700", label: "مقبول" };
     return { bg: "bg-red-500", text: "text-red-700", label: "ضعيف" };
