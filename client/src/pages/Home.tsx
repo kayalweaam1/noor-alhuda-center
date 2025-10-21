@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 
@@ -23,14 +23,15 @@ export default function Home() {
 
         {/* Login Button */}
         <div className="pt-8">
-          <Button
-            onClick={() => setLocation("/login")}
-            size="lg"
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-12 py-6 text-xl rounded-xl shadow-lg hover:shadow-xl transition-all"
-          >
-            <LogIn className="w-6 h-6 ml-3" />
-            تسجيل الدخول
-          </Button>
+          <Link href="/login">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-12 py-6 text-xl rounded-xl shadow-lg hover:shadow-xl transition-all"
+            >
+              <LogIn className="w-6 h-6 ml-3" />
+              تسجيل الدخول
+            </Button>
+          </Link>
         </div>
 
         {/* Footer */}

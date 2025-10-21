@@ -14,7 +14,7 @@ import { UserPlus, Search, Edit, Trash2, Eye, TrendingUp, TrendingDown } from "l
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import AddStudentModal from "@/components/modals/AddStudentModal";
 import EditStudentModal from "@/components/modals/EditStudentModal";
 import ImportStudentsModal from "@/components/modals/ImportStudentsModal";
@@ -209,14 +209,15 @@ export default function StudentsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                            onClick={() => setLocation(`/admin/students/${student.id}`)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
+                          <Link href={`/admin/students/${student.id}`}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </Link>
                           <Button
                             size="sm"
                             variant="outline"

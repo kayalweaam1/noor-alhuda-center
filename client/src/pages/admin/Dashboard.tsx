@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, GraduationCap, BookOpen, TrendingUp, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminDashboard() {
@@ -180,37 +180,33 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button
-                onClick={() => setLocation('/admin/users')}
-                className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-              >
-                <Users className="w-8 h-8 mx-auto mb-2" />
-                <p className="font-semibold">إدارة المستخدمين</p>
-              </button>
+              <Link href="/admin/users">
+                <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                  <Users className="w-8 h-8 mx-auto mb-2" />
+                  <p className="font-semibold">إدارة المستخدمين</p>
+                </div>
+              </Link>
 
-              <button
-                onClick={() => setLocation('/admin/teachers')}
-                className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-              >
-                <GraduationCap className="w-8 h-8 mx-auto mb-2" />
-                <p className="font-semibold">إدارة المربين</p>
-              </button>
+              <Link href="/admin/teachers">
+                <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                  <GraduationCap className="w-8 h-8 mx-auto mb-2" />
+                  <p className="font-semibold">إدارة المربين</p>
+                </div>
+              </Link>
 
-              <button
-                onClick={() => setLocation('/admin/students')}
-                className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-              >
-                <Users className="w-8 h-8 mx-auto mb-2" />
-                <p className="font-semibold">إدارة الطلاب</p>
-              </button>
+              <Link href="/admin/students">
+                <div className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                  <Users className="w-8 h-8 mx-auto mb-2" />
+                  <p className="font-semibold">إدارة الطلاب</p>
+                </div>
+              </Link>
 
-              <button
-                onClick={() => setLocation('/admin/reports')}
-                className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-              >
-                <BookOpen className="w-8 h-8 mx-auto mb-2" />
-                <p className="font-semibold">التقارير</p>
-              </button>
+              <Link href="/admin/reports">
+                <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                  <BookOpen className="w-8 h-8 mx-auto mb-2" />
+                  <p className="font-semibold">التقارير</p>
+                </div>
+              </Link>
             </div>
           </CardContent>
         </Card>

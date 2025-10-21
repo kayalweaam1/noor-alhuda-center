@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BookOpen, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function TeacherDashboard() {
@@ -126,37 +126,33 @@ export default function TeacherDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setLocation('/teacher/students')}
-                  className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                >
-                  <Users className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-semibold text-sm">طلابي</p>
-                </button>
+                <Link href="/teacher/students">
+                  <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                    <Users className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-sm">طلابي</p>
+                  </div>
+                </Link>
 
-                <button
-                  onClick={() => setLocation('/teacher/attendance')}
-                  className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                >
-                  <Calendar className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-semibold text-sm">تسجيل الحضور</p>
-                </button>
+                <Link href="/teacher/attendance">
+                  <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                    <Calendar className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-sm">تسجيل الحضور</p>
+                  </div>
+                </Link>
 
-                <button
-                  onClick={() => setLocation('/teacher/lessons')}
-                  className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                >
-                  <BookOpen className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-semibold text-sm">الدروس</p>
-                </button>
+                <Link href="/teacher/lessons">
+                  <div className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                    <BookOpen className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-sm">الدروس</p>
+                  </div>
+                </Link>
 
-                <button
-                  onClick={() => setLocation('/teacher/evaluations')}
-                  className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                >
-                  <TrendingUp className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-semibold text-sm">التقييمات</p>
-                </button>
+                <Link href="/teacher/evaluations">
+                  <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                    <TrendingUp className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-sm">التقييمات</p>
+                  </div>
+                </Link>
               </div>
             </CardContent>
           </Card>
