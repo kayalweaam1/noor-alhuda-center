@@ -12,7 +12,12 @@
     "test": "vitest run",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit push",
-    "db:reset": "tsx scripts/reset-db.ts"
+    "db:reset": "tsx scripts/reset-db.ts",
+    "db:up": "docker compose up -d mysql",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f mysql",
+    "db:wait": "sh -c 'until docker compose ps --format json | jq -e \
+      \"map(select(.Name==\\\"noor-mysql\\\" and .Health==\\\"healthy\\\")) | length > 0\"; do echo waiting for mysql...; sleep 2; done'"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
