@@ -94,6 +94,7 @@ function Router() {
           <TeacherLessons />
         </TeacherLayout>
       </Route>
+      {/* Teacher pages that are not yet implemented were removed to avoid broken links */}
       <Route path="/teacher/settings">
         <TeacherLayout>
           <Settings />
