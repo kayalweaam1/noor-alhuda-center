@@ -53,6 +53,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       path: "/admin/teachers",
     },
     {
+      title: "المساعدون",
+      icon: Users,
+      path: "/admin/assistants",
+    },
+    {
       title: "الطلاب",
       icon: Users,
       path: "/admin/students",

@@ -15,6 +15,7 @@ import AdminLessons from "./pages/admin/Lessons";
 import AdminAnalytics from "./pages/admin/Analytics";
 import AdminAdmins from "./pages/admin/Admins";
 import AdminLayout from "./components/layouts/AdminLayout";
+import AdminAssistants from "./pages/admin/Assistants";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherLessons from "./pages/teacher/Lessons";
@@ -70,6 +71,13 @@ function Router() {
         <ProtectedRoute requiredRole="admin">
           <AdminLayout>
             <AdminTeachers />
+          </AdminLayout>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/assistants">
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminAssistants />
           </AdminLayout>
         </ProtectedRoute>
       </Route>

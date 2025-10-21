@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { ENV } from "./env";
+import { COOKIE_NAME } from "@shared/const";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -63,6 +64,7 @@ async function startServer() {
   const storeOptions = parseMysqlUrl(ENV.databaseUrl);
   app.use(
     session({
+      name: COOKIE_NAME,
       secret: ENV.cookieSecret,
       // Use MySQL-backed session store to avoid MemoryStore in production
       store: storeOptions ? new MySQLStore({ createDatabaseTable: true, ...storeOptions }) : undefined,
