@@ -18,6 +18,8 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherLessons from "./pages/teacher/Lessons";
+import TeacherStudents from "./pages/teacher/Students";
+import TeacherEvaluations from "./pages/teacher/Evaluations";
 import TeacherLayout from "./components/layouts/TeacherLayout";
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentLayout from "./components/layouts/StudentLayout";
@@ -26,6 +28,7 @@ import AssistantLayout from "./components/layouts/AssistantLayout";
 import Login from "./pages/Login";
 import AdminDirectLogin from "./pages/AdminDirectLogin";
 import Settings from "./pages/Settings";
+import AdminStudentDetails from "./pages/admin/StudentDetails";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -47,6 +50,11 @@ function Router() {
       <Route path="/admin/students">
         <AdminLayout>
           <AdminStudents />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/students/:id">
+        <AdminLayout>
+          <AdminStudentDetails />
         </AdminLayout>
       </Route>
       <Route path="/admin/teachers">
@@ -89,9 +97,19 @@ function Router() {
           <TeacherAttendance />
         </TeacherLayout>
       </Route>
+      <Route path="/teacher/students">
+        <TeacherLayout>
+          <TeacherStudents />
+        </TeacherLayout>
+      </Route>
       <Route path="/teacher/lessons">
         <TeacherLayout>
           <TeacherLessons />
+        </TeacherLayout>
+      </Route>
+      <Route path="/teacher/evaluations">
+        <TeacherLayout>
+          <TeacherEvaluations />
         </TeacherLayout>
       </Route>
       {/* Teacher pages that are not yet implemented were removed to avoid broken links */}

@@ -209,15 +209,14 @@ export default function StudentsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {/* Details page not implemented yet; hide to avoid 404 */}
-                          {/* <Button
+                          <Button
                             size="sm"
                             variant="outline"
                             className="border-blue-200 text-blue-600 hover:bg-blue-50"
                             onClick={() => setLocation(`/admin/students/${student.id}`)}
                           >
                             <Eye className="w-4 h-4" />
-                          </Button> */}
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
