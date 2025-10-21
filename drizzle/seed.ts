@@ -1,5 +1,13 @@
 import { getDb } from "../server/db";
-import { users, teachers, students, lessons, attendance, evaluations, notifications } from "./schema";
+import {
+  users,
+  teachers,
+  students,
+  lessons,
+  attendance,
+  evaluations,
+  notifications,
+} from "./schema";
 import { hashPassword } from "../server/_core/password";
 
 async function seed() {
@@ -38,7 +46,7 @@ async function seed() {
   // Create teachers
   console.log("Creating teachers...");
   const teacherPassword = await hashPassword("teacher123");
-  
+
   const teacher1Id = "teacher_1";
   await db.insert(users).values({
     id: `user_${teacher1Id}`,
@@ -49,7 +57,7 @@ async function seed() {
     loginMethod: "password",
     createdAt: new Date(),
   });
-  
+
   await db.insert(teachers).values({
     id: teacher1Id,
     userId: `user_${teacher1Id}`,
@@ -68,7 +76,7 @@ async function seed() {
     loginMethod: "password",
     createdAt: new Date(),
   });
-  
+
   await db.insert(teachers).values({
     id: teacher2Id,
     userId: `user_${teacher2Id}`,
@@ -80,20 +88,45 @@ async function seed() {
   // Create students
   console.log("Creating students...");
   const studentPassword = await hashPassword("student123");
-  
+
   const students_data = [
-    { name: "عمر خالد", phone: "+972503333333", teacherId: teacher1Id, grade: "الصف الثالث" },
-    { name: "فاطمة أحمد", phone: "+972504444444", teacherId: teacher1Id, grade: "الصف الثالث" },
-    { name: "يوسف محمد", phone: "+972505555555", teacherId: teacher2Id, grade: "الصف الرابع" },
-    { name: "مريم علي", phone: "+972506666666", teacherId: teacher2Id, grade: "الصف الرابع" },
-    { name: "خالد عبدالرحمن", phone: "+972507777777", teacherId: teacher1Id, grade: "الصف الثالث" },
+    {
+      name: "عمر خالد",
+      phone: "+972503333333",
+      teacherId: teacher1Id,
+      grade: "الصف الثالث",
+    },
+    {
+      name: "فاطمة أحمد",
+      phone: "+972504444444",
+      teacherId: teacher1Id,
+      grade: "الصف الثالث",
+    },
+    {
+      name: "يوسف محمد",
+      phone: "+972505555555",
+      teacherId: teacher2Id,
+      grade: "الصف الرابع",
+    },
+    {
+      name: "مريم علي",
+      phone: "+972506666666",
+      teacherId: teacher2Id,
+      grade: "الصف الرابع",
+    },
+    {
+      name: "خالد عبدالرحمن",
+      phone: "+972507777777",
+      teacherId: teacher1Id,
+      grade: "الصف الثالث",
+    },
   ];
 
   for (let i = 0; i < students_data.length; i++) {
     const student = students_data[i];
     const studentId = `student_${i + 1}`;
     const userId = `user_${studentId}`;
-    
+
     await db.insert(users).values({
       id: userId,
       name: student.name,
@@ -103,7 +136,7 @@ async function seed() {
       loginMethod: "password",
       createdAt: new Date(),
     });
-    
+
     await db.insert(students).values({
       id: studentId,
       userId: userId,
@@ -121,7 +154,8 @@ async function seed() {
     id: lesson1Id,
     teacherId: teacher1Id,
     title: "سورة البقرة - الآيات 1-10",
-    description: "تحفيظ ومراجعة الآيات الأولى من سورة البقرة مع شرح معاني الكلمات",
+    description:
+      "تحفيظ ومراجعة الآيات الأولى من سورة البقرة مع شرح معاني الكلمات",
     date: new Date(),
     createdAt: new Date(),
   });
@@ -201,7 +235,8 @@ async function seed() {
       id: "notification_1",
       userId: "user_admin_main",
       title: "مرحباً بك في نظام مركز نور الهدى",
-      message: "تم إنشاء حسابك بنجاح. يمكنك الآن إدارة المستخدمين والطلاب والمربين.",
+      message:
+        "تم إنشاء حسابك بنجاح. يمكنك الآن إدارة المستخدمين والطلاب والمربين.",
       type: "success",
       isRead: false,
       createdAt: new Date(),
@@ -230,12 +265,11 @@ async function seed() {
   console.log("Admin: +972542632557 / admin123");
   console.log("Teacher: +972501111111 / teacher123");
   console.log("Student: +972503333333 / student123");
-  
+
   process.exit(0);
 }
 
-seed().catch((error) => {
+seed().catch(error => {
   console.error("❌ Seeding failed:", error);
   process.exit(1);
 });
-

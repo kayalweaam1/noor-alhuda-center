@@ -1,6 +1,19 @@
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, BookOpen, TrendingUp, Award, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Calendar,
+  BookOpen,
+  TrendingUp,
+  Award,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
@@ -9,19 +22,18 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function StudentDashboard() {
   const [, setLocation] = useLocation();
   const { user, loading } = useAuth();
-  const { data: student } = trpc.students.getMyProfile.useQuery(
-    undefined,
-    { enabled: !!user?.id && user?.role === 'student' }
-  );
+  const { data: student } = trpc.students.getMyProfile.useQuery(undefined, {
+    enabled: !!user?.id && user?.role === "student",
+  });
 
   // Redirect if not student
   useEffect(() => {
-    if (user && user.role !== 'student') {
-      setLocation('/');
+    if (user && user.role !== "student") {
+      setLocation("/");
     }
   }, [user, setLocation]);
 
-  if (!user || user.role !== 'student') {
+  if (!user || user.role !== "student") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -45,28 +57,38 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50" dir="rtl">
+    <div
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50"
+      dir="rtl"
+    >
       <div className="p-6 space-y-6">
         {/* Welcome Section with Profile */}
         <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center border-4 border-white shadow-lg">
               <span className="text-4xl text-white font-bold">
-                {user.name?.charAt(0) || 'ط'}
+                {user.name?.charAt(0) || "ط"}
               </span>
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-blue-900">
-                {user.name || 'الطالب'}
+                {user.name || "الطالب"}
               </h1>
               <p className="text-blue-700 mt-1">
-                حلقة {student?.grade || 'القرآن الكريم'}
+                حلقة {student?.grade || "القرآن الكريم"}
               </p>
               <div className="flex items-center gap-4 mt-3">
                 <Badge className="bg-blue-500">طالب</Badge>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Calendar className="w-4 h-4" />
-                  <span>انضم: {student?.enrollmentDate ? new Date(student.enrollmentDate).toLocaleDateString('ar-SA') : '-'}</span>
+                  <span>
+                    انضم:{" "}
+                    {student?.enrollmentDate
+                      ? new Date(student.enrollmentDate).toLocaleDateString(
+                          "ar-SA"
+                        )
+                      : "-"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -83,8 +105,12 @@ export default function StudentDashboard() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-gray-700">التقييم السلوكي</span>
-                  <span className="text-2xl font-bold text-gray-900">{behaviorScore}%</span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    التقييم السلوكي
+                  </span>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {behaviorScore}%
+                  </span>
                 </div>
                 <div className="h-8 bg-gray-200 rounded-full overflow-hidden">
                   <div
@@ -92,12 +118,18 @@ export default function StudentDashboard() {
                     style={{ width: `${behaviorScore}%` }}
                   >
                     <span className="text-white font-bold text-sm">
-                      {behaviorScore >= 90 ? 'ممتاز' : behaviorScore >= 75 ? 'جيد جداً' : behaviorScore >= 60 ? 'جيد' : 'يحتاج تحسين'}
+                      {behaviorScore >= 90
+                        ? "ممتاز"
+                        : behaviorScore >= 75
+                          ? "جيد جداً"
+                          : behaviorScore >= 60
+                            ? "جيد"
+                            : "يحتاج تحسين"}
                     </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-4 mt-6">
                 <div className="text-center p-3 bg-emerald-50 rounded-lg">
                   <p className="text-xs text-emerald-700 mb-1">ممتاز</p>
@@ -121,15 +153,21 @@ export default function StudentDashboard() {
           <Card className="border-blue-200">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-gray-700">نسبة الحضور</CardTitle>
+                <CardTitle className="text-lg text-gray-700">
+                  نسبة الحضور
+                </CardTitle>
                 <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center">
                   <Calendar className="w-6 h-6 text-white" />
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-gray-900 mb-2">{attendanceRate}%</div>
-              <CardDescription className="text-gray-600">حضور منتظم</CardDescription>
+              <div className="text-4xl font-bold text-gray-900 mb-2">
+                {attendanceRate}%
+              </div>
+              <CardDescription className="text-gray-600">
+                حضور منتظم
+              </CardDescription>
             </CardContent>
           </Card>
 
@@ -144,14 +182,18 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-gray-900 mb-2">24</div>
-              <CardDescription className="text-gray-600">درس مكتمل</CardDescription>
+              <CardDescription className="text-gray-600">
+                درس مكتمل
+              </CardDescription>
             </CardContent>
           </Card>
 
           <Card className="border-amber-200">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-gray-700">الإنجازات</CardTitle>
+                <CardTitle className="text-lg text-gray-700">
+                  الإنجازات
+                </CardTitle>
                 <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center">
                   <Award className="w-6 h-6 text-white" />
                 </div>
@@ -159,7 +201,9 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-gray-900 mb-2">5</div>
-              <CardDescription className="text-gray-600">شارة مكتسبة</CardDescription>
+              <CardDescription className="text-gray-600">
+                شارة مكتسبة
+              </CardDescription>
             </CardContent>
           </Card>
         </div>
@@ -206,21 +250,21 @@ export default function StudentDashboard() {
           <CardContent>
             <div className="grid grid-cols-7 gap-2">
               {[
-                { day: 'السبت', present: true },
-                { day: 'الأحد', present: true },
-                { day: 'الاثنين', present: false },
-                { day: 'الثلاثاء', present: true },
-                { day: 'الأربعاء', present: true },
-                { day: 'الخميس', present: true },
-                { day: 'الجمعة', present: false },
+                { day: "السبت", present: true },
+                { day: "الأحد", present: true },
+                { day: "الاثنين", present: false },
+                { day: "الثلاثاء", present: true },
+                { day: "الأربعاء", present: true },
+                { day: "الخميس", present: true },
+                { day: "الجمعة", present: false },
               ].map((record, index) => (
                 <div key={index} className="text-center">
                   <p className="text-xs text-gray-600 mb-2">{record.day}</p>
                   <div
                     className={`w-full h-16 rounded-lg flex items-center justify-center ${
                       record.present
-                        ? 'bg-emerald-100 border-2 border-emerald-500'
-                        : 'bg-red-100 border-2 border-red-500'
+                        ? "bg-emerald-100 border-2 border-emerald-500"
+                        : "bg-red-100 border-2 border-red-500"
                     }`}
                   >
                     {record.present ? (
@@ -238,4 +282,3 @@ export default function StudentDashboard() {
     </div>
   );
 }
-

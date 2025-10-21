@@ -1,5 +1,16 @@
 import { getDb } from "../server/db";
-import { users, teachers, students, lessons, attendance, evaluations, notifications, assistants, assistantNotes, otpCodes } from "../drizzle/schema";
+import {
+  users,
+  teachers,
+  students,
+  lessons,
+  attendance,
+  evaluations,
+  notifications,
+  assistants,
+  assistantNotes,
+  otpCodes,
+} from "../drizzle/schema";
 import { hashPassword } from "../server/_core/password";
 
 async function resetDatabase() {
@@ -28,7 +39,7 @@ async function resetDatabase() {
   // إضافة المدير العام
   console.log("👤 Creating admin user...");
   const adminPassword = await hashPassword("admin123");
-  
+
   await db.insert(users).values({
     id: "user_admin_weaam",
     name: "وئام كيال",
@@ -46,12 +57,11 @@ async function resetDatabase() {
   console.log("- Admin user: وئام كيال");
   console.log("- Phone: 0542632557");
   console.log("- Password: admin123");
-  
+
   process.exit(0);
 }
 
-resetDatabase().catch((error) => {
+resetDatabase().catch(error => {
   console.error("❌ Reset failed:", error);
   process.exit(1);
 });
-

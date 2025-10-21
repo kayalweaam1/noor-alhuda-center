@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Phone, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -17,7 +23,7 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (phoneNumber.length < 10) {
       toast.error("رقم الهاتف غير صحيح");
       return;
@@ -30,24 +36,24 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const result = await loginMutation.mutateAsync({ 
-        phone: phoneNumber, 
-        password: password 
+      const result = await loginMutation.mutateAsync({
+        phone: phoneNumber,
+        password: password,
       });
-      
+
       toast.success("مرحباً بك! تم تسجيل الدخول بنجاح");
-      
+
       // Save user to localStorage
-      localStorage.setItem('user', JSON.stringify(result.user));
-      
+      localStorage.setItem("user", JSON.stringify(result.user));
+
       // Redirect based on role
       const role = result.user.role;
-      
-      if (role === 'admin') {
+
+      if (role === "admin") {
         setLocation("/admin/dashboard");
-      } else if (role === 'teacher') {
+      } else if (role === "teacher") {
         setLocation("/teacher/dashboard");
-      } else if (role === 'assistant') {
+      } else if (role === "assistant") {
         setLocation("/assistant/dashboard");
       } else {
         setLocation("/student/dashboard");
@@ -61,20 +67,16 @@ export default function Login() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4 bg-white"
       dir="rtl"
     >
-      
       <Card className="w-full max-w-md relative z-10 border-emerald-200 shadow-2xl">
         <CardHeader className="text-center space-y-4">
-
           <CardTitle className="text-3xl font-bold text-emerald-900">
             مركز نور الهدى
           </CardTitle>
-          <CardDescription className="text-lg">
-            تسجيل الدخول
-          </CardDescription>
+          <CardDescription className="text-lg">تسجيل الدخول</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -88,7 +90,7 @@ export default function Login() {
                 <Input
                   type="tel"
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={e => setPhoneNumber(e.target.value)}
                   placeholder="0542632557"
                   className="pr-12 text-lg border-emerald-200 focus:border-emerald-500"
                   required
@@ -106,7 +108,7 @@ export default function Login() {
                 <Input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="pr-12 text-lg border-emerald-200 focus:border-emerald-500"
                   required
@@ -134,4 +136,3 @@ export default function Login() {
     </div>
   );
 }
-

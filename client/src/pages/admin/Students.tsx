@@ -1,6 +1,12 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -10,7 +16,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Search, Edit, Trash2, Eye, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  UserPlus,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -32,13 +46,13 @@ export default function StudentsPage() {
   const { data: students, refetch } = trpc.students.getAll.useQuery();
   const deleteStudentMutation = trpc.students.delete.useMutation();
 
-  const filteredStudents = students?.filter((student) =>
+  const filteredStudents = students?.filter(student =>
     student.userName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = async (studentId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا الطالب؟")) return;
-    
+
     try {
       await deleteStudentMutation.mutateAsync({ id: studentId });
       toast.success("تم حذف الطالب بنجاح");
@@ -69,11 +83,13 @@ export default function StudentsPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-sm text-blue-700 mb-2">إجمالي الطلاب</p>
-              <p className="text-4xl font-bold text-blue-900">{students?.length || 0}</p>
+              <p className="text-4xl font-bold text-blue-900">
+                {students?.length || 0}
+              </p>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-emerald-200">
           <CardContent className="pt-6">
             <div className="text-center">
@@ -118,11 +134,13 @@ export default function StudentsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-emerald-900">إدارة الطلاب</CardTitle>
+              <CardTitle className="text-2xl text-emerald-900">
+                إدارة الطلاب
+              </CardTitle>
               <CardDescription>إدارة جميع طلاب المركز</CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button 
+              <Button
                 variant="outline"
                 className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
                 onClick={() => exportStudents(students || [])}
@@ -130,7 +148,7 @@ export default function StudentsPage() {
                 <Download className="w-4 h-4 ml-2" />
                 تصدير
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 className="border-blue-600 text-blue-600 hover:bg-blue-50"
                 onClick={() => setShowImportModal(true)}
@@ -138,7 +156,7 @@ export default function StudentsPage() {
                 <Upload className="w-4 h-4 ml-2" />
                 استيراد
               </Button>
-              <Button 
+              <Button
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
                 onClick={() => setShowAddModal(true)}
               >
@@ -156,7 +174,7 @@ export default function StudentsPage() {
               <Input
                 placeholder="البحث عن طالب (الاسم، الحلقة، المربي)..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pr-10 border-emerald-200 focus:border-emerald-500"
               />
             </div>
@@ -167,45 +185,76 @@ export default function StudentsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-emerald-50">
-                  <TableHead className="text-right font-bold text-emerald-900">الطالب</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الحلقة</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">المربي</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">نسبة الحضور</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الأداء</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">تاريخ التسجيل</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الطالب
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الحلقة
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    المربي
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    نسبة الحضور
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الأداء
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    تاريخ التسجيل
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الإجراءات
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredStudents?.map((student) => {
+                {filteredStudents?.map(student => {
                   const attendanceRate = getAttendanceRate(student);
                   return (
-                    <TableRow key={student.id} className="hover:bg-emerald-50/50">
+                    <TableRow
+                      key={student.id}
+                      className="hover:bg-emerald-50/50"
+                    >
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
                             <span className="text-white font-bold text-sm">
-                              {student.userName?.charAt(0) || 'ط'}
+                              {student.userName?.charAt(0) || "ط"}
                             </span>
                           </div>
                           <div>
-                            <p className="font-semibold">{student.userName || 'غير محدد'}</p>
-                            <p className="text-xs text-gray-500">{student.userPhone || '-'}</p>
+                            <p className="font-semibold">
+                              {student.userName || "غير محدد"}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {student.userPhone || "-"}
+                            </p>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="border-emerald-300">
-                          {student.grade || 'غير محدد'}
+                          {student.grade || "غير محدد"}
                         </Badge>
                       </TableCell>
-                      <TableCell>{'غير محدد'}</TableCell>
+                      <TableCell>{"غير محدد"}</TableCell>
                       <TableCell>
-                        <BehaviorBar score={attendanceRate} size="sm" showLabel={false} />
+                        <BehaviorBar
+                          score={attendanceRate}
+                          size="sm"
+                          showLabel={false}
+                        />
                       </TableCell>
-                      <TableCell>{getPerformanceBadge(attendanceRate)}</TableCell>
                       <TableCell>
-                        {student.createdAt ? new Date(student.createdAt).toLocaleDateString('ar-SA') : '-'}
+                        {getPerformanceBadge(attendanceRate)}
+                      </TableCell>
+                      <TableCell>
+                        {student.createdAt
+                          ? new Date(student.createdAt).toLocaleDateString(
+                              "ar-SA"
+                            )
+                          : "-"}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -213,7 +262,9 @@ export default function StudentsPage() {
                             size="sm"
                             variant="outline"
                             className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                            onClick={() => setLocation(`/admin/students/${student.id}`)}
+                            onClick={() =>
+                              setLocation(`/admin/students/${student.id}`)
+                            }
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -253,25 +304,24 @@ export default function StudentsPage() {
         </CardContent>
       </Card>
 
-      <AddStudentModal 
-        open={showAddModal} 
+      <AddStudentModal
+        open={showAddModal}
         onOpenChange={setShowAddModal}
         onSuccess={() => refetch()}
       />
-      
-      <EditStudentModal 
-        open={showEditModal} 
+
+      <EditStudentModal
+        open={showEditModal}
         onOpenChange={setShowEditModal}
         student={selectedStudent}
         onSuccess={() => refetch()}
       />
-      
-      <ImportStudentsModal 
-        open={showImportModal} 
+
+      <ImportStudentsModal
+        open={showImportModal}
         onOpenChange={setShowImportModal}
         onSuccess={() => refetch()}
       />
     </div>
   );
 }
-

@@ -1,6 +1,12 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,14 +28,15 @@ export default function TeachersPage() {
   const { data: teachers, refetch } = trpc.teachers.getAll.useQuery();
   const deleteTeacherMutation = trpc.teachers.delete.useMutation();
 
-  const filteredTeachers = teachers?.filter((teacher) =>
-    teacher.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    teacher.specialization?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTeachers = teachers?.filter(
+    teacher =>
+      teacher.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      teacher.specialization?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = async (teacherId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا المربي؟")) return;
-    
+
     try {
       await deleteTeacherMutation.mutateAsync({ id: teacherId });
       toast.success("تم حذف المربي بنجاح");
@@ -47,11 +54,13 @@ export default function TeachersPage() {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-sm text-emerald-700 mb-2">إجمالي المربين</p>
-              <p className="text-4xl font-bold text-emerald-900">{teachers?.length || 0}</p>
+              <p className="text-4xl font-bold text-emerald-900">
+                {teachers?.length || 0}
+              </p>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-blue-200">
           <CardContent className="pt-6">
             <div className="text-center">
@@ -59,9 +68,7 @@ export default function TeachersPage() {
                 <Users className="w-4 h-4 text-blue-600" />
                 <p className="text-sm text-blue-700">الطلاب النشطين</p>
               </div>
-              <p className="text-4xl font-bold text-blue-900">
-                0
-              </p>
+              <p className="text-4xl font-bold text-blue-900">0</p>
             </div>
           </CardContent>
         </Card>
@@ -73,9 +80,7 @@ export default function TeachersPage() {
                 <BookOpen className="w-4 h-4 text-amber-600" />
                 <p className="text-sm text-amber-700">متوسط الطلاب/مربي</p>
               </div>
-              <p className="text-4xl font-bold text-amber-900">
-                0
-              </p>
+              <p className="text-4xl font-bold text-amber-900">0</p>
             </div>
           </CardContent>
         </Card>
@@ -85,10 +90,12 @@ export default function TeachersPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-emerald-900">إدارة المربين</CardTitle>
+              <CardTitle className="text-2xl text-emerald-900">
+                إدارة المربين
+              </CardTitle>
               <CardDescription>إدارة جميع مربي المركز</CardDescription>
             </div>
-            <Button 
+            <Button
               className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               onClick={() => setShowAddModal(true)}
             >
@@ -105,7 +112,7 @@ export default function TeachersPage() {
               <Input
                 placeholder="البحث عن مربي (الاسم، التخصص)..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pr-10 border-emerald-200 focus:border-emerald-500"
               />
             </div>
@@ -116,33 +123,49 @@ export default function TeachersPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-emerald-50">
-                  <TableHead className="text-right font-bold text-emerald-900">المربي</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">التخصص</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">عدد الطلاب</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">رقم الهاتف</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">تاريخ التعيين</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    المربي
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    التخصص
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    عدد الطلاب
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    رقم الهاتف
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    تاريخ التعيين
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الإجراءات
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredTeachers?.map((teacher) => (
+                {filteredTeachers?.map(teacher => (
                   <TableRow key={teacher.id} className="hover:bg-emerald-50/50">
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                           <span className="text-white font-bold text-sm">
-                            {teacher.userName?.charAt(0) || 'م'}
+                            {teacher.userName?.charAt(0) || "م"}
                           </span>
                         </div>
                         <div>
-                          <p className="font-semibold">{teacher.userName || 'غير محدد'}</p>
-                          <p className="text-xs text-gray-500">{teacher.userEmail || '-'}</p>
+                          <p className="font-semibold">
+                            {teacher.userName || "غير محدد"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {teacher.userEmail || "-"}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="border-emerald-300">
-                        {teacher.specialization || 'عام'}
+                        {teacher.specialization || "عام"}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -151,9 +174,13 @@ export default function TeachersPage() {
                         <span className="font-semibold">0</span>
                       </div>
                     </TableCell>
-                    <TableCell>{teacher.userPhone || '-'}</TableCell>
+                    <TableCell>{teacher.userPhone || "-"}</TableCell>
                     <TableCell>
-                      {teacher.createdAt ? new Date(teacher.createdAt).toLocaleDateString('ar-SA') : '-'}
+                      {teacher.createdAt
+                        ? new Date(teacher.createdAt).toLocaleDateString(
+                            "ar-SA"
+                          )
+                        : "-"}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -188,12 +215,11 @@ export default function TeachersPage() {
         </CardContent>
       </Card>
 
-      <AddTeacherModal 
-        open={showAddModal} 
+      <AddTeacherModal
+        open={showAddModal}
         onOpenChange={setShowAddModal}
         onSuccess={refetch}
       />
     </div>
   );
 }
-

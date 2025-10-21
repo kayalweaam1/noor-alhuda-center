@@ -7,18 +7,17 @@ export default function Home() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
+    <div
+      className="min-h-screen bg-gray-50 flex items-center justify-center"
+      dir="rtl"
+    >
       <div className="text-center space-y-8 p-8">
-
-
         {/* Title */}
         <div className="space-y-3">
           <h1 className="text-5xl font-bold text-emerald-900">
             مركز نور الهدى
           </h1>
-          <p className="text-xl text-emerald-700">
-            لتحفيظ القرآن الكريم
-          </p>
+          <p className="text-xl text-emerald-700">لتحفيظ القرآن الكريم</p>
         </div>
 
         {/* Login Button */}
@@ -43,4 +42,3 @@ export default function Home() {
     </div>
   );
 }
-

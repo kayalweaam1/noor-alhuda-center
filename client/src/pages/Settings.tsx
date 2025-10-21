@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,7 +74,9 @@ export default function Settings() {
             </div>
             <div>
               <Label className="text-gray-600">رقم الهاتف</Label>
-              <p className="text-lg font-medium" dir="ltr">{user?.phone || "غير محدد"}</p>
+              <p className="text-lg font-medium" dir="ltr">
+                {user?.phone || "غير محدد"}
+              </p>
             </div>
             <div>
               <Label className="text-gray-600">الدور</Label>
@@ -99,7 +107,7 @@ export default function Settings() {
                   id="currentPassword"
                   type="password"
                   value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  onChange={e => setCurrentPassword(e.target.value)}
                   placeholder="أدخل كلمة المرور الحالية"
                   required
                 />
@@ -111,19 +119,21 @@ export default function Settings() {
                   id="newPassword"
                   type="password"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={e => setNewPassword(e.target.value)}
                   placeholder="أدخل كلمة المرور الجديدة"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">تأكيد كلمة المرور الجديدة *</Label>
+                <Label htmlFor="confirmPassword">
+                  تأكيد كلمة المرور الجديدة *
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="أعد إدخال كلمة المرور الجديدة"
                   required
                 />
@@ -134,7 +144,9 @@ export default function Settings() {
                 className="w-full bg-emerald-600 hover:bg-emerald-700"
                 disabled={changePasswordMutation.isPending}
               >
-                {changePasswordMutation.isPending ? "جاري التحديث..." : "تحديث كلمة المرور"}
+                {changePasswordMutation.isPending
+                  ? "جاري التحديث..."
+                  : "تحديث كلمة المرور"}
               </Button>
             </form>
           </CardContent>
@@ -143,4 +155,3 @@ export default function Settings() {
     </div>
   );
 }
-

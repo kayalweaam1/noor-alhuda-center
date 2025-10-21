@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
@@ -13,7 +19,11 @@ interface ImportStudentsModalProps {
   onSuccess?: () => void;
 }
 
-export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: ImportStudentsModalProps) {
+export default function ImportStudentsModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: ImportStudentsModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
 
@@ -23,7 +33,7 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       // Check file type
-      if (!selectedFile.name.endsWith('.csv')) {
+      if (!selectedFile.name.endsWith(".csv")) {
         toast.error("يرجى رفع ملف CSV فقط");
         return;
       }
@@ -41,7 +51,7 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
 
     try {
       const data = await parseCSV(file);
-      
+
       if (data.length === 0) {
         toast.error("الملف فارغ");
         setImporting(false);
@@ -68,8 +78,10 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
         }
       }
 
-      toast.success(`تم استيراد ${successCount} طالب بنجاح${errorCount > 0 ? ` (${errorCount} فشل)` : ""}`);
-      
+      toast.success(
+        `تم استيراد ${successCount} طالب بنجاح${errorCount > 0 ? ` (${errorCount} فشل)` : ""}`
+      );
+
       setFile(null);
       onOpenChange(false);
       onSuccess?.();
@@ -85,14 +97,16 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
 محمد أحمد,+972501234567,123456,teacher_123,الصف الأول
 فاطمة علي,+972509876543,123456,teacher_123,الصف الثاني`;
 
-    const blob = new Blob(["\ufeff" + template], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["\ufeff" + template], {
+      type: "text/csv;charset=utf-8;",
+    });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute("href", url);
     link.setAttribute("download", "students_template.csv");
     link.style.visibility = "hidden";
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -114,7 +128,9 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
             <div className="flex items-start gap-3">
               <FileSpreadsheet className="h-5 w-5 text-blue-600 mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-medium text-blue-900 mb-1">تحميل النموذج</h4>
+                <h4 className="font-medium text-blue-900 mb-1">
+                  تحميل النموذج
+                </h4>
                 <p className="text-sm text-blue-700 mb-2">
                   قم بتحميل ملف النموذج وملء بيانات الطلاب
                 </p>
@@ -148,7 +164,9 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
                 className="cursor-pointer text-sm text-gray-600 hover:text-emerald-600"
               >
                 {file ? (
-                  <span className="text-emerald-600 font-medium">{file.name}</span>
+                  <span className="text-emerald-600 font-medium">
+                    {file.name}
+                  </span>
                 ) : (
                   <span>اضغط لاختيار ملف CSV</span>
                 )}
@@ -161,7 +179,9 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
             <h4 className="font-medium mb-2">تعليمات:</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>يجب أن يكون الملف بصيغة CSV</li>
-              <li>الأعمدة المطلوبة: الاسم، رقم الهاتف، كلمة المرور، معرف المربي</li>
+              <li>
+                الأعمدة المطلوبة: الاسم، رقم الهاتف، كلمة المرور، معرف المربي
+              </li>
               <li>كلمة المرور الافتراضية: 123456</li>
             </ul>
           </div>
@@ -192,4 +212,3 @@ export default function ImportStudentsModal({ open, onOpenChange, onSuccess }: I
     </Dialog>
   );
 }
-

@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +19,11 @@ interface AddTeacherModalProps {
   onSuccess?: () => void;
 }
 
-export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTeacherModalProps) {
+export default function AddTeacherModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: AddTeacherModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+972");
   const [halaqaName, setHalaqaName] = useState("");
@@ -26,7 +36,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
       onOpenChange(false);
       onSuccess?.();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error("فشل في إضافة المربي: " + error.message);
     },
   });
@@ -59,9 +69,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
       <DialogContent className="sm:max-w-[500px]" dir="rtl">
         <DialogHeader>
           <DialogTitle>إضافة مربي جديد</DialogTitle>
-          <DialogDescription>
-            أدخل بيانات المربي الجديد
-          </DialogDescription>
+          <DialogDescription>أدخل بيانات المربي الجديد</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,7 +78,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="أدخل اسم المربي"
               required
             />
@@ -82,7 +90,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={e => setPhone(e.target.value)}
               placeholder="+972501234567"
               dir="ltr"
               required
@@ -94,7 +102,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
             <Input
               id="halaqa"
               value={halaqaName}
-              onChange={(e) => setHalaqaName(e.target.value)}
+              onChange={e => setHalaqaName(e.target.value)}
               placeholder="مثال: حلقة الصف الثالث"
             />
           </div>
@@ -104,7 +112,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
             <Textarea
               id="specialization"
               value={specialization}
-              onChange={(e) => setSpecialization(e.target.value)}
+              onChange={e => setSpecialization(e.target.value)}
               placeholder="مثال: تحفيظ القرآن، التجويد"
               rows={3}
             />
@@ -134,4 +142,3 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
     </Dialog>
   );
 }
-

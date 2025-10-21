@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'teacher' | 'student';
+  requiredRole?: "admin" | "teacher" | "student";
 }
 
-export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  requiredRole,
+}: ProtectedRouteProps) {
   const { user, loading, role } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -15,15 +18,15 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     if (!loading) {
       if (!user) {
         // Not logged in, redirect to login
-        setLocation('/login');
+        setLocation("/login");
       } else if (requiredRole && role !== requiredRole) {
         // Wrong role, redirect to appropriate dashboard
-        if (role === 'admin') {
-          setLocation('/admin/dashboard');
-        } else if (role === 'teacher') {
-          setLocation('/teacher/dashboard');
+        if (role === "admin") {
+          setLocation("/admin/dashboard");
+        } else if (role === "teacher") {
+          setLocation("/teacher/dashboard");
         } else {
-          setLocation('/student/dashboard');
+          setLocation("/student/dashboard");
         }
       }
     }
@@ -50,4 +53,3 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
 
   return <>{children}</>;
 }
-

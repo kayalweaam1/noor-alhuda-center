@@ -1,7 +1,20 @@
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar, Users, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  BookOpen,
+  Calendar,
+  Users,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -12,7 +25,7 @@ export default function AdminLessonsPage() {
 
   const getTeacherName = (teacherId: string) => {
     const teacher = teachers?.find(t => t.id === teacherId);
-    return teacher?.userName || 'غير محدد';
+    return teacher?.userName || "غير محدد";
   };
 
   // Get calendar data
@@ -24,11 +37,29 @@ export default function AdminLessonsPage() {
   const startingDayOfWeek = firstDay.getDay();
 
   const monthNames = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
   ];
 
-  const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const dayNames = [
+    "الأحد",
+    "الإثنين",
+    "الثلاثاء",
+    "الأربعاء",
+    "الخميس",
+    "الجمعة",
+    "السبت",
+  ];
 
   // Get lessons for a specific date
   const getLessonsForDate = (day: number) => {
@@ -36,9 +67,11 @@ export default function AdminLessonsPage() {
     const date = new Date(year, month, day);
     return lessons.filter(lesson => {
       const lessonDate = new Date(lesson.date);
-      return lessonDate.getDate() === day &&
-             lessonDate.getMonth() === month &&
-             lessonDate.getFullYear() === year;
+      return (
+        lessonDate.getDate() === day &&
+        lessonDate.getMonth() === month &&
+        lessonDate.getFullYear() === year
+      );
     });
   };
 
@@ -72,7 +105,9 @@ export default function AdminLessonsPage() {
                 <BookOpen className="w-5 h-5 text-orange-600" />
                 <p className="text-sm text-orange-700">إجمالي الدروس</p>
               </div>
-              <p className="text-4xl font-bold text-orange-900">{lessons?.length || 0}</p>
+              <p className="text-4xl font-bold text-orange-900">
+                {lessons?.length || 0}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -87,7 +122,10 @@ export default function AdminLessonsPage() {
               <p className="text-4xl font-bold text-blue-900">
                 {lessons?.filter(l => {
                   const lessonDate = new Date(l.date);
-                  return lessonDate.getMonth() === month && lessonDate.getFullYear() === year;
+                  return (
+                    lessonDate.getMonth() === month &&
+                    lessonDate.getFullYear() === year
+                  );
                 }).length || 0}
               </p>
             </div>
@@ -126,8 +164,12 @@ export default function AdminLessonsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-orange-900">تقويم الدروس</CardTitle>
-              <CardDescription>عرض جميع دروس المربين حسب التاريخ</CardDescription>
+              <CardTitle className="text-2xl text-orange-900">
+                تقويم الدروس
+              </CardTitle>
+              <CardDescription>
+                عرض جميع دروس المربين حسب التاريخ
+              </CardDescription>
             </div>
             <div className="flex items-center gap-4">
               <Button
@@ -156,7 +198,7 @@ export default function AdminLessonsPage() {
           {/* Calendar Grid */}
           <div className="grid grid-cols-7 gap-2">
             {/* Day names header */}
-            {dayNames.map((day) => (
+            {dayNames.map(day => (
               <div
                 key={day}
                 className="text-center font-bold text-sm text-orange-900 p-2 bg-orange-50 rounded"
@@ -172,7 +214,7 @@ export default function AdminLessonsPage() {
               }
 
               const dayLessons = getLessonsForDate(day);
-              const isToday = 
+              const isToday =
                 day === new Date().getDate() &&
                 month === new Date().getMonth() &&
                 year === new Date().getFullYear();
@@ -181,16 +223,20 @@ export default function AdminLessonsPage() {
                 <div
                   key={day}
                   className={`min-h-24 p-2 border rounded-lg ${
-                    isToday ? 'border-orange-500 bg-orange-50' : 'border-gray-200'
-                  } ${dayLessons.length > 0 ? 'bg-blue-50/30' : ''}`}
+                    isToday
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-gray-200"
+                  } ${dayLessons.length > 0 ? "bg-blue-50/30" : ""}`}
                 >
-                  <div className={`text-sm font-semibold mb-1 ${
-                    isToday ? 'text-orange-600' : 'text-gray-700'
-                  }`}>
+                  <div
+                    className={`text-sm font-semibold mb-1 ${
+                      isToday ? "text-orange-600" : "text-gray-700"
+                    }`}
+                  >
                     {day}
                   </div>
                   <div className="space-y-1">
-                    {dayLessons.map((lesson) => (
+                    {dayLessons.map(lesson => (
                       <div
                         key={lesson.id}
                         className="text-xs p-1 bg-emerald-100 border border-emerald-300 rounded"
@@ -202,9 +248,9 @@ export default function AdminLessonsPage() {
                           {getTeacherName(lesson.teacherId)}
                         </div>
                         <div className="text-emerald-600">
-                          {new Date(lesson.date).toLocaleTimeString('ar', {
-                            hour: '2-digit',
-                            minute: '2-digit'
+                          {new Date(lesson.date).toLocaleTimeString("ar", {
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </div>
                       </div>
@@ -226,4 +272,3 @@ export default function AdminLessonsPage() {
     </div>
   );
 }
-

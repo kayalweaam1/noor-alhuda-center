@@ -1,28 +1,28 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import pg from 'pg';
-import { sql } from 'drizzle-orm';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import pg from "pg";
+import { sql } from "drizzle-orm";
 
 const { Pool } = pg;
 
 async function runMigration() {
-  console.log('🔧 Starting database migration...');
-  
+  console.log("🔧 Starting database migration...");
+
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    throw new Error('DATABASE_URL environment variable is not set');
+    throw new Error("DATABASE_URL environment variable is not set");
   }
 
   const pool = new Pool({
     connectionString,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
   });
 
   const db = drizzle(pool);
 
   try {
-    console.log('📊 Creating tables...');
-    
+    console.log("📊 Creating tables...");
+
     // Create all tables
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS users (
@@ -143,15 +143,15 @@ async function runMigration() {
       );
     `);
 
-    console.log('✅ Tables created successfully!');
-    
+    console.log("✅ Tables created successfully!");
+
     await pool.end();
-    console.log('🎉 Migration completed!');
+    console.log("🎉 Migration completed!");
   } catch (error: any) {
-    if (error.code === '42P07') {
-      console.log('ℹ️  Tables already exist, skipping creation');
+    if (error.code === "42P07") {
+      console.log("ℹ️  Tables already exist, skipping creation");
     } else {
-      console.error('❌ Migration failed:', error);
+      console.error("❌ Migration failed:", error);
       throw error;
     }
     await pool.end();
@@ -159,4 +159,3 @@ async function runMigration() {
 }
 
 runMigration().catch(console.error);
-

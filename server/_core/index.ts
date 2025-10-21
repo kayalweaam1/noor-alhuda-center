@@ -30,15 +30,15 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 
 async function startServer() {
   // Create default admin if not exists
-  const { createDefaultAdmin } = await import('../db');
+  const { createDefaultAdmin } = await import("../db");
   await createDefaultAdmin();
-  
+
   const app = express();
   const server = createServer(app);
-  
+
   // Trust proxy for Railway/Heroku/etc
-  app.set('trust proxy', 1);
-  
+  app.set("trust proxy", 1);
+
   // Session middleware
   app.use(
     session({
@@ -49,11 +49,11 @@ async function startServer() {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       },
     })
   );
-  
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

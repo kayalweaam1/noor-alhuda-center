@@ -26,7 +26,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const menuItems = [
@@ -53,7 +53,10 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50" dir="rtl">
+    <div
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50"
+      dir="rtl"
+    >
       {/* Sidebar */}
       <aside
         className={`fixed top-0 right-0 h-full bg-white border-l border-blue-200 shadow-xl transition-all duration-300 z-50 ${
@@ -62,7 +65,11 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
       >
         <div className="p-6 border-b border-blue-200">
           <div className="flex flex-col items-center gap-3">
-            <img src={APP_LOGO} alt={APP_TITLE} className="w-24 h-24 object-contain" />
+            <img
+              src={APP_LOGO}
+              alt={APP_TITLE}
+              className="w-24 h-24 object-contain"
+            />
             <div className="text-center">
               <h2 className="font-bold text-lg text-blue-900">{APP_TITLE}</h2>
               <p className="text-xs text-blue-600">لوحة الطالب</p>
@@ -71,7 +78,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
         </div>
 
         <nav className="p-4 space-y-2">
-          {menuItems.map((item) => {
+          {menuItems.map(item => {
             const Icon = item.icon;
             const isActive = location === item.path;
             return (
@@ -95,12 +102,12 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
           <div className="flex items-center gap-3 mb-3 px-2">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
               <span className="text-white font-bold">
-                {user?.name?.charAt(0) || 'ط'}
+                {user?.name?.charAt(0) || "ط"}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-gray-900 truncate">
-                {user?.name || 'الطالب'}
+                {user?.name || "الطالب"}
               </p>
               <p className="text-xs text-gray-600">طالب</p>
             </div>
@@ -137,7 +144,8 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
                 )}
               </button>
               <h1 className="text-xl font-bold text-blue-900">
-                {menuItems.find((item) => item.path === location)?.title || "لوحة التحكم"}
+                {menuItems.find(item => item.path === location)?.title ||
+                  "لوحة التحكم"}
               </h1>
             </div>
 
@@ -164,4 +172,3 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
     </div>
   );
 }
-

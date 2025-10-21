@@ -1,19 +1,26 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Calendar, CheckCircle, XCircle, Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function TeacherAttendance() {
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(
-    undefined,
-    { enabled: !!user?.id && user?.role === 'teacher' }
-  );
+  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(undefined, {
+    enabled: !!user?.id && user?.role === "teacher",
+  });
   const { data: students } = trpc.students.getAll.useQuery();
-  
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [attendance, setAttendance] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
 
@@ -22,22 +29,23 @@ export default function TeacherAttendance() {
   const handleToggleAttendance = (studentId: string) => {
     setAttendance(prev => ({
       ...prev,
-      [studentId]: !prev[studentId]
+      [studentId]: !prev[studentId],
     }));
   };
 
   const handleSaveAttendance = async () => {
     setSaving(true);
     try {
-      const promises = Object.entries(attendance).map(([studentId, isPresent]) =>
-        createAttendanceMutation.mutateAsync({
-          id: `${studentId}-${selectedDate}`,
-          studentId,
-          date: new Date(selectedDate),
-          status: isPresent ? 'present' : 'absent',
-        })
+      const promises = Object.entries(attendance).map(
+        ([studentId, isPresent]) =>
+          createAttendanceMutation.mutateAsync({
+            id: `${studentId}-${selectedDate}`,
+            studentId,
+            date: new Date(selectedDate),
+            status: isPresent ? "present" : "absent",
+          })
       );
-      
+
       await Promise.all(promises);
       toast.success("تم حفظ الحضور بنجاح");
       setAttendance({});
@@ -80,7 +88,7 @@ export default function TeacherAttendance() {
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={e => setSelectedDate(e.target.value)}
               className="flex-1 p-3 border border-emerald-200 rounded-lg focus:border-emerald-500 focus:outline-none"
             />
           </div>
@@ -102,7 +110,7 @@ export default function TeacherAttendance() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {myStudents.map((student) => {
+              {myStudents.map(student => {
                 const isPresent = attendance[student.id] ?? false;
                 return (
                   <button
@@ -110,36 +118,42 @@ export default function TeacherAttendance() {
                     onClick={() => handleToggleAttendance(student.id)}
                     className={`p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
                       isPresent
-                        ? 'border-emerald-500 bg-emerald-50'
+                        ? "border-emerald-500 bg-emerald-50"
                         : attendance[student.id] === false
-                        ? 'border-red-500 bg-red-50'
-                        : 'border-gray-300 bg-white'
+                          ? "border-red-500 bg-red-50"
+                          : "border-gray-300 bg-white"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        isPresent
-                          ? 'bg-emerald-500'
-                          : attendance[student.id] === false
-                          ? 'bg-red-500'
-                          : 'bg-gray-300'
-                      }`}>
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          isPresent
+                            ? "bg-emerald-500"
+                            : attendance[student.id] === false
+                              ? "bg-red-500"
+                              : "bg-gray-300"
+                        }`}
+                      >
                         {isPresent ? (
                           <CheckCircle className="w-6 h-6 text-white" />
                         ) : attendance[student.id] === false ? (
                           <XCircle className="w-6 h-6 text-white" />
                         ) : (
                           <span className="text-white font-bold">
-                            {student.userName?.charAt(0) || 'ط'}
+                            {student.userName?.charAt(0) || "ط"}
                           </span>
                         )}
                       </div>
                       <div className="flex-1 text-right">
                         <p className="font-semibold text-gray-900">
-                          {student.userName || 'غير محدد'}
+                          {student.userName || "غير محدد"}
                         </p>
                         <p className="text-xs text-gray-600">
-                          {isPresent ? 'حاضر' : attendance[student.id] === false ? 'غائب' : 'لم يتم التسجيل'}
+                          {isPresent
+                            ? "حاضر"
+                            : attendance[student.id] === false
+                              ? "غائب"
+                              : "لم يتم التسجيل"}
                         </p>
                       </div>
                     </div>
@@ -184,4 +198,3 @@ export default function TeacherAttendance() {
     </div>
   );
 }
-

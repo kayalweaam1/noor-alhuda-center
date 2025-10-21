@@ -15,7 +15,7 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const unreadCount = notifications?.filter(n => !n.isRead).length || 0;
@@ -36,7 +36,9 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
                 <span className="text-white font-bold text-lg">ن</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-emerald-900">نور الهدى</h1>
+                <h1 className="text-xl font-bold text-emerald-900">
+                  نور الهدى
+                </h1>
                 <p className="text-xs text-emerald-600">لوحة المساعد</p>
               </div>
             </div>
@@ -53,10 +55,12 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
                   )}
                 </Button>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{user?.name || "المساعد"}</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {user?.name || "المساعد"}
+                  </p>
                   <p className="text-xs text-emerald-600">مساعد</p>
                 </div>
                 <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center">
@@ -77,7 +81,7 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
 
           {/* Navigation */}
           <nav className="flex gap-1 -mb-px">
-            {navItems.map((item) => {
+            {navItems.map(item => {
               const Icon = item.icon;
               const isActive = location === item.path;
               return (
@@ -101,9 +105,7 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto">
-        {children}
-      </main>
+      <main className="container mx-auto">{children}</main>
 
       {/* Footer */}
       <footer className="bg-white border-t border-emerald-200 mt-12">
@@ -116,4 +118,3 @@ export default function AssistantLayout({ children }: AssistantLayoutProps) {
     </div>
   );
 }
-

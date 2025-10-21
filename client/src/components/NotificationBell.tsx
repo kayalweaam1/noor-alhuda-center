@@ -27,9 +27,7 @@ export default function NotificationBell() {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <Badge 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500"
-            >
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500">
               {unreadCount}
             </Badge>
           )}
@@ -49,7 +47,7 @@ export default function NotificationBell() {
               <p className="font-medium">{notification.title}</p>
               <p className="text-sm text-gray-600">{notification.message}</p>
               <p className="text-xs text-gray-400 mt-1">
-                {new Date(notification.createdAt).toLocaleString('ar')}
+                {new Date(notification.createdAt).toLocaleString("ar")}
               </p>
             </DropdownMenuItem>
           ))
@@ -62,4 +60,3 @@ export default function NotificationBell() {
     </DropdownMenu>
   );
 }
-

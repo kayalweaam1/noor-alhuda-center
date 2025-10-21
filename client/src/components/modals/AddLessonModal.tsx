@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 interface AddLessonModalProps {
   open: boolean;
@@ -24,10 +24,10 @@ interface AddLessonModalProps {
 }
 
 export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [teacherId, setTeacherId] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [teacherId, setTeacherId] = useState("");
 
   const utils = trpc.useUtils();
   const { data: teachers } = trpc.teachers.getAll.useQuery();
@@ -41,10 +41,10 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
   });
 
   const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setDate('');
-    setTeacherId('');
+    setTitle("");
+    setDescription("");
+    setDate("");
+    setTeacherId("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,7 +69,7 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder="مثال: تفسير سورة البقرة"
               required
             />
@@ -80,7 +80,7 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="وصف مختصر للدرس..."
               rows={3}
             />
@@ -92,7 +92,7 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
               id="date"
               type="datetime-local"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={e => setDate(e.target.value)}
               required
             />
           </div>
@@ -104,7 +104,7 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
                 <SelectValue placeholder="اختر المربي" />
               </SelectTrigger>
               <SelectContent>
-                {teachers?.map((teacher) => (
+                {teachers?.map(teacher => (
                   <SelectItem key={teacher.id} value={teacher.id}>
                     {teacher.userName || teacher.userPhone || teacher.id}
                   </SelectItem>
@@ -118,18 +118,15 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
               إلغاء
             </Button>
             <Button type="submit" disabled={createLesson.isPending}>
-              {createLesson.isPending ? 'جاري الإضافة...' : 'إضافة'}
+              {createLesson.isPending ? "جاري الإضافة..." : "إضافة"}
             </Button>
           </div>
 
           {createLesson.error && (
-            <p className="text-sm text-red-600">
-              {createLesson.error.message}
-            </p>
+            <p className="text-sm text-red-600">{createLesson.error.message}</p>
           )}
         </form>
       </DialogContent>
     </Dialog>
   );
 }
-

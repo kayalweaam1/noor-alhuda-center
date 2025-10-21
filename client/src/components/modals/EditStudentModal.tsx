@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +29,12 @@ interface EditStudentModalProps {
   onSuccess?: () => void;
 }
 
-export default function EditStudentModal({ open, onOpenChange, student, onSuccess }: EditStudentModalProps) {
+export default function EditStudentModal({
+  open,
+  onOpenChange,
+  student,
+  onSuccess,
+}: EditStudentModalProps) {
   const [halaqaName, setHalaqaName] = useState("");
   const [parentPhone, setParentPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -68,9 +79,7 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
       <DialogContent className="sm:max-w-[500px]" dir="rtl">
         <DialogHeader>
           <DialogTitle>تعديل بيانات الطالب</DialogTitle>
-          <DialogDescription>
-            قم بتحديث معلومات الطالب
-          </DialogDescription>
+          <DialogDescription>قم بتحديث معلومات الطالب</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -79,7 +88,7 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
             <Input
               id="halaqaName"
               value={halaqaName}
-              onChange={(e) => setHalaqaName(e.target.value)}
+              onChange={e => setHalaqaName(e.target.value)}
               placeholder="أدخل اسم الحلقة"
             />
           </div>
@@ -90,7 +99,7 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
               id="parentPhone"
               type="tel"
               value={parentPhone}
-              onChange={(e) => setParentPhone(e.target.value)}
+              onChange={e => setParentPhone(e.target.value)}
               placeholder="+972501234567"
               dir="ltr"
             />
@@ -101,7 +110,7 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
             <Input
               id="address"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={e => setAddress(e.target.value)}
               placeholder="أدخل العنوان"
             />
           </div>
@@ -111,7 +120,7 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
             <Textarea
               id="notes"
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={e => setNotes(e.target.value)}
               placeholder="أدخل ملاحظات إضافية"
               rows={3}
             />
@@ -138,4 +147,3 @@ export default function EditStudentModal({ open, onOpenChange, student, onSucces
     </Dialog>
   );
 }
-

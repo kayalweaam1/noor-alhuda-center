@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 
 const SALT_ROUNDS = 10;
 
@@ -12,7 +12,10 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Compare a plain text password with a hashed password
  */
-export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+export async function comparePassword(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
   return await bcrypt.compare(password, hashedPassword);
 }
 
@@ -23,4 +26,3 @@ export function isHashed(password: string): boolean {
   // Bcrypt hashes start with $2a$, $2b$, or $2y$
   return /^\$2[aby]\$\d{2}\$/.test(password);
 }
-

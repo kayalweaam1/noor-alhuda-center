@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +22,12 @@ interface SendAssistantNoteModalProps {
   onSuccess?: () => void;
 }
 
-export default function SendAssistantNoteModal({ 
-  open, 
-  onOpenChange, 
-  assistantId, 
+export default function SendAssistantNoteModal({
+  open,
+  onOpenChange,
+  assistantId,
   assistantName,
-  onSuccess 
+  onSuccess,
 }: SendAssistantNoteModalProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -66,9 +72,7 @@ export default function SendAssistantNoteModal({
       <DialogContent className="sm:max-w-[600px]" dir="rtl">
         <DialogHeader>
           <DialogTitle>إرسال ملاحظة وتقييم</DialogTitle>
-          <DialogDescription>
-            إلى المساعد: {assistantName}
-          </DialogDescription>
+          <DialogDescription>إلى المساعد: {assistantName}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -77,7 +81,7 @@ export default function SendAssistantNoteModal({
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder="مثال: ملاحظات حول الأداء اليوم"
               required
             />
@@ -88,7 +92,7 @@ export default function SendAssistantNoteModal({
             <Textarea
               id="content"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={e => setContent(e.target.value)}
               placeholder="اكتب ملاحظاتك وتقييمك للمساعد..."
               rows={6}
               required
@@ -107,17 +111,15 @@ export default function SendAssistantNoteModal({
                 >
                   <Star
                     className={`w-8 h-8 ${
-                      i < rating 
-                        ? 'text-amber-500 fill-amber-500' 
-                        : 'text-gray-300'
+                      i < rating
+                        ? "text-amber-500 fill-amber-500"
+                        : "text-gray-300"
                     }`}
                   />
                 </button>
               ))}
               {rating > 0 && (
-                <span className="text-sm text-gray-600 mr-2">
-                  ({rating}/5)
-                </span>
+                <span className="text-sm text-gray-600 mr-2">({rating}/5)</span>
               )}
             </div>
             <p className="text-xs text-gray-500">
@@ -149,4 +151,3 @@ export default function SendAssistantNoteModal({
     </Dialog>
   );
 }
-

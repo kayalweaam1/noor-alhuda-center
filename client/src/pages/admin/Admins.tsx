@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Plus, Trash2, Crown } from "lucide-react";
@@ -55,7 +61,10 @@ export default function Admins() {
       return;
     }
 
-    setAdminPhones([...adminPhones, { phone: newPhone, name: newName, isSuperAdmin: false }]);
+    setAdminPhones([
+      ...adminPhones,
+      { phone: newPhone, name: newName, isSuperAdmin: false },
+    ]);
     setNewPhone("+972");
     setNewName("");
     toast.success("تم إضافة المدير بنجاح");
@@ -90,9 +99,7 @@ export default function Admins() {
             <Plus className="w-5 h-5" />
             إضافة مدير جديد
           </CardTitle>
-          <CardDescription>
-            أدخل رقم الهاتف واسم المدير الجديد
-          </CardDescription>
+          <CardDescription>أدخل رقم الهاتف واسم المدير الجديد</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -100,16 +107,19 @@ export default function Admins() {
               type="text"
               placeholder="اسم المدير"
               value={newName}
-              onChange={(e) => setNewName(e.target.value)}
+              onChange={e => setNewName(e.target.value)}
             />
             <Input
               type="tel"
               placeholder="+972501234567"
               value={newPhone}
-              onChange={(e) => setNewPhone(e.target.value)}
+              onChange={e => setNewPhone(e.target.value)}
               dir="ltr"
             />
-            <Button onClick={handleAddAdmin} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={handleAddAdmin}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               <Plus className="w-4 h-4 ml-2" />
               إضافة
             </Button>
@@ -121,13 +131,11 @@ export default function Admins() {
       <Card>
         <CardHeader>
           <CardTitle>قائمة المدراء</CardTitle>
-          <CardDescription>
-            جميع المدراء المسجلين في النظام
-          </CardDescription>
+          <CardDescription>جميع المدراء المسجلين في النظام</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {adminPhones.map((admin) => (
+            {adminPhones.map(admin => (
               <div
                 key={admin.phone}
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
@@ -190,7 +198,9 @@ export default function Admins() {
                 <li>• المدير العام (+972542632557) لا يمكن حذفه</li>
                 <li>• فقط المدير العام يمكنه إضافة وحذف المدراء الآخرين</li>
                 <li>• جميع المدراء لهم نفس الصلاحيات في النظام</li>
-                <li>• عند إضافة مدير جديد، يمكنه تسجيل الدخول فوراً برقم هاتفه</li>
+                <li>
+                  • عند إضافة مدير جديد، يمكنه تسجيل الدخول فوراً برقم هاتفه
+                </li>
               </ul>
             </div>
           </div>
@@ -199,4 +209,3 @@ export default function Admins() {
     </div>
   );
 }
-

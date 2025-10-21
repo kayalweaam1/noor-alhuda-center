@@ -1,4 +1,12 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean } from "drizzle-orm/mysql-core";
+import {
+  mysqlEnum,
+  mysqlTable,
+  text,
+  timestamp,
+  varchar,
+  int,
+  boolean,
+} from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -10,7 +18,9 @@ export const users = mysqlTable("users", {
   phone: varchar("phone", { length: 20 }), // Phone number for OTP login
   password: varchar("password", { length: 255 }), // Password for login
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["admin", "teacher", "student", "assistant"]).default("student").notNull(),
+  role: mysqlEnum("role", ["admin", "teacher", "student", "assistant"])
+    .default("student")
+    .notNull(),
   profileImage: text("profileImage"), // URL to profile image
   createdAt: timestamp("createdAt").defaultNow(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow(),
@@ -24,7 +34,10 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const teachers = mysqlTable("teachers", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("userId", { length: 64 })
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
   halaqaName: varchar("halaqaName", { length: 255 }), // e.g., "حلقة الصف الثالث"
   specialization: text("specialization"), // e.g., "تحفيظ القرآن، التجويد"
   createdAt: timestamp("createdAt").defaultNow(),
@@ -38,8 +51,14 @@ export type InsertTeacher = typeof teachers.$inferInsert;
  */
 export const students = mysqlTable("students", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
-  teacherId: varchar("teacherId", { length: 64 }).references(() => teachers.id, { onDelete: "set null" }),
+  userId: varchar("userId", { length: 64 })
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  teacherId: varchar("teacherId", { length: 64 }).references(
+    () => teachers.id,
+    { onDelete: "set null" }
+  ),
   grade: varchar("grade", { length: 50 }), // e.g., "الصف الثالث"
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
   createdAt: timestamp("createdAt").defaultNow(),
@@ -53,7 +72,10 @@ export type InsertStudent = typeof students.$inferInsert;
  */
 export const assistants = mysqlTable("assistants", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("userId", { length: 64 })
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
   halaqaName: varchar("halaqaName", { length: 255 }), // e.g., "حلقة الصف الثالث"
   createdAt: timestamp("createdAt").defaultNow(),
 });
@@ -66,8 +88,12 @@ export type InsertAssistant = typeof assistants.$inferInsert;
  */
 export const attendance = mysqlTable("attendance", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  studentId: varchar("studentId", { length: 64 }).notNull().references(() => students.id, { onDelete: "cascade" }),
-  teacherId: varchar("teacherId", { length: 64 }).notNull().references(() => teachers.id, { onDelete: "cascade" }),
+  studentId: varchar("studentId", { length: 64 })
+    .notNull()
+    .references(() => students.id, { onDelete: "cascade" }),
+  teacherId: varchar("teacherId", { length: 64 })
+    .notNull()
+    .references(() => teachers.id, { onDelete: "cascade" }),
   date: timestamp("date").notNull(),
   status: mysqlEnum("status", ["present", "absent", "excused"]).notNull(),
   notes: text("notes"),
@@ -82,7 +108,9 @@ export type InsertAttendance = typeof attendance.$inferInsert;
  */
 export const lessons = mysqlTable("lessons", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  teacherId: varchar("teacherId", { length: 64 }).notNull().references(() => teachers.id, { onDelete: "cascade" }),
+  teacherId: varchar("teacherId", { length: 64 })
+    .notNull()
+    .references(() => teachers.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(), // e.g., "سورة البقرة - الآيات 1-10"
   description: text("description"),
   date: timestamp("date").notNull(),
@@ -97,9 +125,15 @@ export type InsertLesson = typeof lessons.$inferInsert;
  */
 export const evaluations = mysqlTable("evaluations", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  studentId: varchar("studentId", { length: 64 }).notNull().references(() => students.id, { onDelete: "cascade" }),
-  teacherId: varchar("teacherId", { length: 64 }).notNull().references(() => teachers.id, { onDelete: "cascade" }),
-  lessonId: varchar("lessonId", { length: 64 }).references(() => lessons.id, { onDelete: "set null" }),
+  studentId: varchar("studentId", { length: 64 })
+    .notNull()
+    .references(() => students.id, { onDelete: "cascade" }),
+  teacherId: varchar("teacherId", { length: 64 })
+    .notNull()
+    .references(() => teachers.id, { onDelete: "cascade" }),
+  lessonId: varchar("lessonId", { length: 64 }).references(() => lessons.id, {
+    onDelete: "set null",
+  }),
   score: int("score").notNull(), // Score out of 100
   feedback: text("feedback"),
   evaluationType: varchar("evaluationType", { length: 100 }), // e.g., "تسميع", "اختبار", "تقييم شفهي"
@@ -115,10 +149,14 @@ export type InsertEvaluation = typeof evaluations.$inferInsert;
  */
 export const notifications = mysqlTable("notifications", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("userId", { length: 64 })
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
-  type: mysqlEnum("type", ["info", "warning", "success", "error"]).default("info").notNull(),
+  type: mysqlEnum("type", ["info", "warning", "success", "error"])
+    .default("info")
+    .notNull(),
   isRead: boolean("isRead").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
 });
@@ -146,8 +184,12 @@ export type InsertOtpCode = typeof otpCodes.$inferInsert;
  */
 export const assistantNotes = mysqlTable("assistantNotes", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  assistantId: varchar("assistantId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
-  teacherId: varchar("teacherId", { length: 64 }).notNull().references(() => teachers.id, { onDelete: "cascade" }),
+  assistantId: varchar("assistantId", { length: 64 })
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  teacherId: varchar("teacherId", { length: 64 })
+    .notNull()
+    .references(() => teachers.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   rating: int("rating"), // Rating from 1-5
@@ -157,4 +199,3 @@ export const assistantNotes = mysqlTable("assistantNotes", {
 
 export type AssistantNote = typeof assistantNotes.$inferSelect;
 export type InsertAssistantNote = typeof assistantNotes.$inferInsert;
-

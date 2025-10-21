@@ -1,11 +1,11 @@
-import { createContext, useContext, ReactNode } from 'react';
-import { trpc } from '@/lib/trpc';
+import { createContext, useContext, ReactNode } from "react";
+import { trpc } from "@/lib/trpc";
 
 interface AuthContextType {
   user: any | null;
   loading: boolean;
   phoneNumber: string | null;
-  role: 'admin' | 'teacher' | 'student' | 'assistant' | null;
+  role: "admin" | "teacher" | "student" | "assistant" | null;
   isSuperAdmin: boolean;
 }
 
@@ -28,18 +28,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const phoneNumber = user?.phone || null;
   const role = user?.role || null;
-  const isSuperAdmin = user?.phone === '+972542632557';
+  const isSuperAdmin = user?.phone === "+972542632557";
 
   return (
-    <AuthContext.Provider value={{ 
-      user: user || null, 
-      loading: isLoading, 
-      phoneNumber, 
-      role, 
-      isSuperAdmin 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user: user || null,
+        loading: isLoading,
+        phoneNumber,
+        role,
+        isSuperAdmin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
-

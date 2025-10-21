@@ -8,16 +8,22 @@ import * as db from "./db";
 
 // Helper to check if user is admin
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'admin') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+  if (ctx.user.role !== "admin") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Admin access required",
+    });
   }
   return next({ ctx });
 });
 
 // Helper to check if user is teacher
 const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'teacher' && ctx.user.role !== 'admin') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Teacher access required' });
+  if (ctx.user.role !== "teacher" && ctx.user.role !== "admin") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Teacher access required",
+    });
   }
   return next({ ctx });
 });
@@ -29,61 +35,66 @@ export const appRouter = router({
   setup: router({
     createAdmin: publicProcedure.mutation(async () => {
       await db.createDefaultAdmin();
-      return { success: true, message: 'Admin created successfully' };
+      return { success: true, message: "Admin created successfully" };
     }),
-    
+
     resetAdminPassword: publicProcedure.mutation(async () => {
-      const { hashPassword } = await import('./_core/password');
-      const hashedPassword = await hashPassword('admin123');
-      
+      const { hashPassword } = await import("./_core/password");
+      const hashedPassword = await hashPassword("admin123");
+
       // Update password for default admin
-      const adminUser = await db.getUserByPhone('+972542632557');
+      const adminUser = await db.getUserByPhone("+972542632557");
       if (adminUser) {
         await db.updateUserPassword(adminUser.id, hashedPassword);
-        return { success: true, message: 'Admin password reset successfully', phone: '+972542632557', password: 'admin123' };
+        return {
+          success: true,
+          message: "Admin password reset successfully",
+          phone: "+972542632557",
+          password: "admin123",
+        };
       }
-      return { success: false, message: 'Admin user not found' };
+      return { success: false, message: "Admin user not found" };
     }),
-    
+
     resetAllPasswords: publicProcedure.mutation(async () => {
-      const { hashPassword } = await import('./_core/password');
+      const { hashPassword } = await import("./_core/password");
       const users = await db.getAllUsers();
-      const defaultPassword = '1234567';
+      const defaultPassword = "1234567";
       const hashedPassword = await hashPassword(defaultPassword);
-      
+
       for (const user of users) {
         await db.updateUserPassword(user.id, hashedPassword);
       }
-      
-      return { 
-        success: true, 
+
+      return {
+        success: true,
         message: `Reset passwords for ${users.length} users`,
-        defaultPassword: defaultPassword
+        defaultPassword: defaultPassword,
       };
     }),
-    
+
     checkDatabase: publicProcedure.query(async () => {
       const users = await db.getAllUsers();
-      return { 
-        success: true, 
+      return {
+        success: true,
         userCount: users.length,
-        users: users.map(u => ({ 
-          id: u.id, 
-          name: u.name, 
-          phone: u.phone, 
+        users: users.map(u => ({
+          id: u.id,
+          name: u.name,
+          phone: u.phone,
           role: u.role,
           hasPassword: !!u.password,
-          passwordLength: u.password ? u.password.length : 0
-        }))
+          passwordLength: u.password ? u.password.length : 0,
+        })),
       };
     }),
-    
+
     checkUser: publicProcedure
       .input(z.object({ phone: z.string() }))
       .query(async ({ input }) => {
         const user = await db.getUserByPhone(input.phone);
         if (!user) {
-          return { success: false, message: 'User not found' };
+          return { success: false, message: "User not found" };
         }
         return {
           success: true,
@@ -94,15 +105,17 @@ export const appRouter = router({
             role: user.role,
             hasPassword: !!user.password,
             passwordLength: user.password ? user.password.length : 0,
-            passwordPreview: user.password ? user.password.substring(0, 10) + '...' : 'NO PASSWORD'
-          }
+            passwordPreview: user.password
+              ? user.password.substring(0, 10) + "..."
+              : "NO PASSWORD",
+          },
         };
       }),
   }),
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    
+
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -113,25 +126,33 @@ export const appRouter = router({
 
     // Change password
     changePassword: protectedProcedure
-      .input(z.object({
-        currentPassword: z.string(),
-        newPassword: z.string().min(6),
-      }))
+      .input(
+        z.object({
+          currentPassword: z.string(),
+          newPassword: z.string().min(6),
+        })
+      )
       .mutation(async ({ input, ctx }) => {
         const user = await db.getUser(ctx.user.id);
         if (!user) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
         }
 
         // Check current password
-        const { comparePassword, hashPassword, isHashed } = await import('./_core/password');
-        
-        const passwordMatch = user.password && isHashed(user.password)
-          ? await comparePassword(input.currentPassword, user.password)
-          : user.password === input.currentPassword;
-        
+        const { comparePassword, hashPassword, isHashed } = await import(
+          "./_core/password"
+        );
+
+        const passwordMatch =
+          user.password && isHashed(user.password)
+            ? await comparePassword(input.currentPassword, user.password)
+            : user.password === input.currentPassword;
+
         if (!passwordMatch) {
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Current password is incorrect' });
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Current password is incorrect",
+          });
         }
 
         // Hash and update password
@@ -142,58 +163,79 @@ export const appRouter = router({
 
     // Login with phone and password
     login: publicProcedure
-      .input(z.object({ 
-        phone: z.string(),
-        password: z.string(),
-      }))
+      .input(
+        z.object({
+          phone: z.string(),
+          password: z.string(),
+        })
+      )
       .mutation(async ({ input, ctx }) => {
         // Normalize phone number (add +972 if missing)
         let phone = input.phone.trim();
-        if (phone.startsWith('0')) {
-          phone = '+972' + phone.substring(1);
-        } else if (!phone.startsWith('+')) {
-          phone = '+972' + phone;
+        if (phone.startsWith("0")) {
+          phone = "+972" + phone.substring(1);
+        } else if (!phone.startsWith("+")) {
+          phone = "+972" + phone;
         }
-        
-        console.log('[Login] Attempting login with phone:', phone);
-        
+
+        console.log("[Login] Attempting login with phone:", phone);
+
         // Get user by phone
         const user = await db.getUserByPhone(phone);
-        console.log('[Login] User found:', user ? { id: user.id, phone: user.phone, role: user.role, hasPassword: !!user.password } : 'NOT FOUND');
-        
+        console.log(
+          "[Login] User found:",
+          user
+            ? {
+                id: user.id,
+                phone: user.phone,
+                role: user.role,
+                hasPassword: !!user.password,
+              }
+            : "NOT FOUND"
+        );
+
         if (!user) {
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid phone or password' });
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid phone or password",
+          });
         }
 
         // Check if user has a password
         if (!user.password) {
-          console.log('[Login] User has no password set');
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid phone or password' });
+          console.log("[Login] User has no password set");
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid phone or password",
+          });
         }
 
         // Check password using bcrypt
-        const { comparePassword, isHashed } = await import('./_core/password');
-        
-        console.log('[Login] Password check:', {
+        const { comparePassword, isHashed } = await import("./_core/password");
+
+        console.log("[Login] Password check:", {
           hasPassword: !!user.password,
           isHashed: isHashed(user.password),
-          passwordLength: user.password.length
+          passwordLength: user.password.length,
         });
-        
+
         // If password is not hashed yet (old data), do simple comparison
         // Otherwise use bcrypt compare
         let passwordMatch = false;
         if (isHashed(user.password)) {
           passwordMatch = await comparePassword(input.password, user.password);
-          console.log('[Login] Bcrypt comparison result:', passwordMatch);
+          console.log("[Login] Bcrypt comparison result:", passwordMatch);
         } else {
           passwordMatch = user.password === input.password;
-          console.log('[Login] Plain text comparison result:', passwordMatch);
+          console.log("[Login] Plain text comparison result:", passwordMatch);
         }
-        
+
         if (!passwordMatch) {
-          console.log('[Login] Password mismatch');
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid phone or password' });
+          console.log("[Login] Password mismatch");
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid phone or password",
+          });
         }
 
         // Update last signed in
@@ -217,21 +259,25 @@ export const appRouter = router({
       }),
 
     // Create default admin (for debugging)
-    createAdmin: publicProcedure
-      .mutation(async () => {
-        const { createDefaultAdmin } = await import('./db');
-        await createDefaultAdmin();
-        return { success: true, message: 'Admin created successfully' };
-      }),
+    createAdmin: publicProcedure.mutation(async () => {
+      const { createDefaultAdmin } = await import("./db");
+      await createDefaultAdmin();
+      return { success: true, message: "Admin created successfully" };
+    }),
 
     // Send OTP code
     sendOTP: publicProcedure
       .input(z.object({ phone: z.string() }))
       .mutation(async ({ input }) => {
-        const { generateOTP, sendOTPCode, isValidPhoneNumber } = await import('./_core/sms');
-        
+        const { generateOTP, sendOTPCode, isValidPhoneNumber } = await import(
+          "./_core/sms"
+        );
+
         if (!isValidPhoneNumber(input.phone)) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid phone number format' });
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid phone number format",
+          });
         }
 
         // Generate OTP (fixed 123456 for super admin)
@@ -251,21 +297,26 @@ export const appRouter = router({
         // Send SMS
         await sendOTPCode(input.phone, code);
 
-        return { success: true, message: 'OTP sent successfully' };
+        return { success: true, message: "OTP sent successfully" };
       }),
 
     // Verify OTP and login
     verifyOTP: publicProcedure
-      .input(z.object({ 
-        phone: z.string(),
-        code: z.string(),
-      }))
+      .input(
+        z.object({
+          phone: z.string(),
+          code: z.string(),
+        })
+      )
       .mutation(async ({ input, ctx }) => {
         // Check OTP
         const otpRecord = await db.getValidOtpCode(input.phone, input.code);
-        
+
         if (!otpRecord) {
-          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid or expired OTP' });
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid or expired OTP",
+          });
         }
 
         // Mark OTP as verified
@@ -273,21 +324,24 @@ export const appRouter = router({
 
         // Get or create user
         let user = await db.getUserByPhone(input.phone);
-        
+
         if (!user) {
           // Create new user
           const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           await db.upsertUser({
             id: userId,
             phone: input.phone,
-            role: 'student', // Default role
-            loginMethod: 'otp',
+            role: "student", // Default role
+            loginMethod: "otp",
           });
           user = await db.getUserByPhone(input.phone);
         }
 
         if (!user) {
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create user' });
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create user",
+          });
         }
 
         // Update last signed in
@@ -299,14 +353,14 @@ export const appRouter = router({
           ctx.req.session.userId = user.id;
         }
 
-        return { 
-          success: true, 
+        return {
+          success: true,
           user: {
             id: user.id,
             name: user.name,
             phone: user.phone,
             role: user.role,
-          }
+          },
         };
       }),
   }),
@@ -324,23 +378,27 @@ export const appRouter = router({
       }),
 
     updateRole: adminProcedure
-      .input(z.object({
-        userId: z.string(),
-        role: z.enum(["admin", "teacher", "student"]),
-      }))
+      .input(
+        z.object({
+          userId: z.string(),
+          role: z.enum(["admin", "teacher", "student"]),
+        })
+      )
       .mutation(async ({ input }) => {
         await db.updateUserRole(input.userId, input.role);
         return { success: true };
       }),
 
     update: adminProcedure
-      .input(z.object({
-        userId: z.string(),
-        name: z.string(),
-        phone: z.string(),
-        email: z.string().optional(),
-        role: z.enum(["admin", "teacher", "student", "assistant"]),
-      }))
+      .input(
+        z.object({
+          userId: z.string(),
+          name: z.string(),
+          phone: z.string(),
+          email: z.string().optional(),
+          role: z.enum(["admin", "teacher", "student", "assistant"]),
+        })
+      )
       .mutation(async ({ input }) => {
         await db.upsertUser({
           id: input.userId,
@@ -348,24 +406,26 @@ export const appRouter = router({
           phone: input.phone,
           email: input.email,
           role: input.role,
-          loginMethod: 'firebase',
+          loginMethod: "firebase",
         });
         return { success: true };
       }),
 
     create: adminProcedure
-      .input(z.object({
-        name: z.string(),
-        phone: z.string(),
-        email: z.string().optional(),
-        password: z.string(),
-        role: z.enum(["admin", "teacher", "student"]),
-      }))
+      .input(
+        z.object({
+          name: z.string(),
+          phone: z.string(),
+          email: z.string().optional(),
+          password: z.string(),
+          role: z.enum(["admin", "teacher", "student"]),
+        })
+      )
       .mutation(async ({ input }) => {
         // Hash password before saving
-        const { hashPassword } = await import('./_core/password');
+        const { hashPassword } = await import("./_core/password");
         const hashedPassword = await hashPassword(input.password);
-        
+
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await db.upsertUser({
           id: userId,
@@ -374,7 +434,7 @@ export const appRouter = router({
           email: input.email,
           password: hashedPassword,
           role: input.role,
-          loginMethod: 'firebase',
+          loginMethod: "firebase",
         });
         return { success: true, userId };
       }),
@@ -385,8 +445,8 @@ export const appRouter = router({
         // Prevent deleting current user
         if (input.userId === ctx.user.id) {
           throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'لا يمكنك حذف حسابك الخاص',
+            code: "BAD_REQUEST",
+            message: "لا يمكنك حذف حسابك الخاص",
           });
         }
         await db.deleteUser(input.userId);
@@ -405,24 +465,28 @@ export const appRouter = router({
     }),
 
     create: adminProcedure
-      .input(z.object({
-        id: z.string(),
-        userId: z.string(),
-        halaqaName: z.string().optional(),
-        specialization: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          userId: z.string(),
+          halaqaName: z.string().optional(),
+          specialization: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         await db.createTeacher(input);
         return { success: true };
       }),
 
     createWithUser: adminProcedure
-      .input(z.object({
-        name: z.string(),
-        phone: z.string(),
-        halaqaName: z.string().optional(),
-        specialization: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          name: z.string(),
+          phone: z.string(),
+          halaqaName: z.string().optional(),
+          specialization: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         // Create user first
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -430,8 +494,8 @@ export const appRouter = router({
           id: userId,
           name: input.name,
           phone: input.phone,
-          role: 'teacher',
-          loginMethod: 'firebase',
+          role: "teacher",
+          loginMethod: "firebase",
         });
 
         // Then create teacher
@@ -447,11 +511,13 @@ export const appRouter = router({
       }),
 
     update: adminProcedure
-      .input(z.object({
-        id: z.string(),
-        halaqaName: z.string().optional(),
-        specialization: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          halaqaName: z.string().optional(),
+          specialization: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateTeacher(id, data);
@@ -473,7 +539,7 @@ export const appRouter = router({
     }),
 
     getMyProfile: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== 'student') return null;
+      if (ctx.user.role !== "student") return null;
       return await db.getStudentByUserId(ctx.user.id);
     }),
 
@@ -484,25 +550,29 @@ export const appRouter = router({
     }),
 
     create: adminProcedure
-      .input(z.object({
-        id: z.string(),
-        userId: z.string(),
-        teacherId: z.string().optional(),
-        grade: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          userId: z.string(),
+          teacherId: z.string().optional(),
+          grade: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         await db.createStudent(input);
         return { success: true };
       }),
 
     createWithUser: adminProcedure
-      .input(z.object({
-        name: z.string(),
-        phone: z.string(),
-        password: z.string().optional(),
-        teacherId: z.string(),
-        grade: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          name: z.string(),
+          phone: z.string(),
+          password: z.string().optional(),
+          teacherId: z.string(),
+          grade: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         // Create user first
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -510,9 +580,9 @@ export const appRouter = router({
           id: userId,
           name: input.name,
           phone: input.phone,
-          password: input.password || '123456',
-          role: 'student',
-          loginMethod: 'firebase',
+          password: input.password || "123456",
+          role: "student",
+          loginMethod: "firebase",
         });
 
         // Then create student
@@ -528,11 +598,13 @@ export const appRouter = router({
       }),
 
     update: adminProcedure
-      .input(z.object({
-        id: z.string(),
-        teacherId: z.string().optional(),
-        grade: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          teacherId: z.string().optional(),
+          grade: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateStudent(id, data);
@@ -550,22 +622,30 @@ export const appRouter = router({
   // ============= ATTENDANCE MANAGEMENT =============
   attendance: router({
     getAll: adminProcedure
-      .input(z.object({
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
-      }))
+      .input(
+        z.object({
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
       .query(async ({ input }) => {
         return await db.getAllAttendance(input.startDate, input.endDate);
       }),
 
     getByStudent: protectedProcedure
-      .input(z.object({
-        studentId: z.string(),
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
-      }))
+      .input(
+        z.object({
+          studentId: z.string(),
+          startDate: z.date().optional(),
+          endDate: z.date().optional(),
+        })
+      )
       .query(async ({ input }) => {
-        return await db.getAttendanceByStudent(input.studentId, input.startDate, input.endDate);
+        return await db.getAttendanceByStudent(
+          input.studentId,
+          input.startDate,
+          input.endDate
+        );
       }),
 
     getByTeacher: teacherProcedure
@@ -577,12 +657,14 @@ export const appRouter = router({
       }),
 
     mark: teacherProcedure
-      .input(z.object({
-        studentId: z.string(),
-        date: z.string(),
-        status: z.enum(["present", "absent", "late"]),
-        teacherId: z.string(),
-      }))
+      .input(
+        z.object({
+          studentId: z.string(),
+          date: z.string(),
+          status: z.enum(["present", "absent", "late"]),
+          teacherId: z.string(),
+        })
+      )
       .mutation(async ({ input }) => {
         const id = `attendance_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await db.createAttendance({
@@ -596,17 +678,23 @@ export const appRouter = router({
       }),
 
     create: teacherProcedure
-      .input(z.object({
-        id: z.string(),
-        studentId: z.string(),
-        date: z.date(),
-        status: z.enum(["present", "absent", "excused"]),
-        notes: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          studentId: z.string(),
+          date: z.date(),
+          status: z.enum(["present", "absent", "excused"]),
+          notes: z.string().optional(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const teacher = await db.getTeacherByUserId(ctx.user.id);
-        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
-        
+        if (!teacher)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Teacher profile not found",
+          });
+
         await db.createAttendance({
           ...input,
           teacherId: teacher.id,
@@ -615,11 +703,13 @@ export const appRouter = router({
       }),
 
     update: teacherProcedure
-      .input(z.object({
-        id: z.string(),
-        status: z.enum(["present", "absent", "excused"]).optional(),
-        notes: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          status: z.enum(["present", "absent", "excused"]).optional(),
+          notes: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateAttendance(id, data);
@@ -647,12 +737,14 @@ export const appRouter = router({
     }),
 
     create: adminProcedure
-      .input(z.object({
-        title: z.string(),
-        description: z.string().optional(),
-        date: z.date(),
-        teacherId: z.string(),
-      }))
+      .input(
+        z.object({
+          title: z.string(),
+          description: z.string().optional(),
+          date: z.date(),
+          teacherId: z.string(),
+        })
+      )
       .mutation(async ({ input }) => {
         const lessonId = `lesson_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await db.createLesson({
@@ -663,12 +755,14 @@ export const appRouter = router({
       }),
 
     update: teacherProcedure
-      .input(z.object({
-        id: z.string(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        date: z.date().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          title: z.string().optional(),
+          description: z.string().optional(),
+          date: z.date().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateLesson(id, data);
@@ -702,19 +796,25 @@ export const appRouter = router({
     }),
 
     create: teacherProcedure
-      .input(z.object({
-        id: z.string(),
-        studentId: z.string(),
-        lessonId: z.string().optional(),
-        score: z.number().min(0).max(100),
-        feedback: z.string().optional(),
-        evaluationType: z.string().optional(),
-        date: z.date(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          studentId: z.string(),
+          lessonId: z.string().optional(),
+          score: z.number().min(0).max(100),
+          feedback: z.string().optional(),
+          evaluationType: z.string().optional(),
+          date: z.date(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const teacher = await db.getTeacherByUserId(ctx.user.id);
-        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
-        
+        if (!teacher)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Teacher profile not found",
+          });
+
         await db.createEvaluation({
           ...input,
           teacherId: teacher.id,
@@ -723,12 +823,14 @@ export const appRouter = router({
       }),
 
     update: teacherProcedure
-      .input(z.object({
-        id: z.string(),
-        score: z.number().min(0).max(100).optional(),
-        feedback: z.string().optional(),
-        evaluationType: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          score: z.number().min(0).max(100).optional(),
+          feedback: z.string().optional(),
+          evaluationType: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateEvaluation(id, data);
@@ -777,16 +879,18 @@ export const appRouter = router({
       }),
 
     getMyProfile: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== 'assistant') return null;
+      if (ctx.user.role !== "assistant") return null;
       return await db.getAssistantByUserId(ctx.user.id);
     }),
 
     createWithUser: adminProcedure
-      .input(z.object({
-        name: z.string(),
-        phone: z.string(),
-        halaqaName: z.string(),
-      }))
+      .input(
+        z.object({
+          name: z.string(),
+          phone: z.string(),
+          halaqaName: z.string(),
+        })
+      )
       .mutation(async ({ input }) => {
         // Create user first
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -794,8 +898,8 @@ export const appRouter = router({
           id: userId,
           name: input.name,
           phone: input.phone,
-          role: 'assistant',
-          loginMethod: 'firebase',
+          role: "assistant",
+          loginMethod: "firebase",
         });
 
         // Then create assistant
@@ -810,10 +914,12 @@ export const appRouter = router({
       }),
 
     update: adminProcedure
-      .input(z.object({
-        id: z.string(),
-        halaqaName: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          id: z.string(),
+          halaqaName: z.string().optional(),
+        })
+      )
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
         await db.updateAssistant(id, data);
@@ -831,7 +937,7 @@ export const appRouter = router({
   // ============= ASSISTANT NOTES =============
   assistantNotes: router({
     getMyNotes: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== 'assistant') return [];
+      if (ctx.user.role !== "assistant") return [];
       return await db.getAssistantNotesByAssistant(ctx.user.id);
     }),
 
@@ -842,23 +948,36 @@ export const appRouter = router({
     }),
 
     create: teacherProcedure
-      .input(z.object({
-        assistantId: z.string(),
-        title: z.string(),
-        content: z.string(),
-        rating: z.number().min(1).max(5).optional(),
-      }))
+      .input(
+        z.object({
+          assistantId: z.string(),
+          title: z.string(),
+          content: z.string(),
+          rating: z.number().min(1).max(5).optional(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const teacher = await db.getTeacherByUserId(ctx.user.id);
-        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
+        if (!teacher)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Teacher profile not found",
+          });
 
         // Check if assistant is in the same halaqa
         const assistant = await db.getAssistantById(input.assistantId);
-        if (!assistant) throw new TRPCError({ code: 'NOT_FOUND', message: 'Assistant not found' });
-        
+        if (!assistant)
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Assistant not found",
+          });
+
         const teacherProfile = await db.getTeacher(teacher.id);
         if (teacherProfile?.halaqaName !== assistant.halaqaName) {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Can only write notes for assistants in your halaqa' });
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Can only write notes for assistants in your halaqa",
+          });
         }
 
         const noteId = `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -898,4 +1017,3 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
-

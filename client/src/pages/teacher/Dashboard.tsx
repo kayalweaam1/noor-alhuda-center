@@ -1,6 +1,18 @@
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, BookOpen, TrendingUp, Calendar, AlertCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Users,
+  BookOpen,
+  TrendingUp,
+  Calendar,
+  AlertCircle,
+} from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,19 +20,18 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function TeacherDashboard() {
   const [, setLocation] = useLocation();
   const { user, loading } = useAuth();
-  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(
-    undefined,
-    { enabled: !!user?.id && user?.role === 'teacher' }
-  );
+  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(undefined, {
+    enabled: !!user?.id && user?.role === "teacher",
+  });
 
   // Redirect if not teacher
   useEffect(() => {
-    if (user && user.role !== 'teacher') {
-      setLocation('/');
+    if (user && user.role !== "teacher") {
+      setLocation("/");
     }
   }, [user, setLocation]);
 
-  if (!user || user.role !== 'teacher') {
+  if (!user || user.role !== "teacher") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -71,15 +82,15 @@ export default function TeacherDashboard() {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
               <span className="text-2xl text-white font-bold">
-                {user.name?.charAt(0) || 'م'}
+                {user.name?.charAt(0) || "م"}
               </span>
             </div>
             <div>
               <h1 className="text-3xl font-bold text-emerald-900">
-                مرحباً، {user.name || 'المربي'}
+                مرحباً، {user.name || "المربي"}
               </h1>
               <p className="text-emerald-700 mt-1">
-                لوحة التحكم - حلقة {teacher?.halaqaName || 'القرآن الكريم'}
+                لوحة التحكم - حلقة {teacher?.halaqaName || "القرآن الكريم"}
               </p>
             </div>
           </div>
@@ -99,7 +110,9 @@ export default function TeacherDashboard() {
                     <CardTitle className="text-lg text-gray-700">
                       {stat.title}
                     </CardTitle>
-                    <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}
+                    >
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                   </div>
@@ -127,7 +140,7 @@ export default function TeacherDashboard() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => setLocation('/teacher/students')}
+                  onClick={() => setLocation("/teacher/students")}
                   className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <Users className="w-8 h-8 mx-auto mb-2" />
@@ -135,7 +148,7 @@ export default function TeacherDashboard() {
                 </button>
 
                 <button
-                  onClick={() => setLocation('/teacher/attendance')}
+                  onClick={() => setLocation("/teacher/attendance")}
                   className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <Calendar className="w-8 h-8 mx-auto mb-2" />
@@ -143,7 +156,7 @@ export default function TeacherDashboard() {
                 </button>
 
                 <button
-                  onClick={() => setLocation('/teacher/lessons')}
+                  onClick={() => setLocation("/teacher/lessons")}
                   className="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <BookOpen className="w-8 h-8 mx-auto mb-2" />
@@ -151,7 +164,7 @@ export default function TeacherDashboard() {
                 </button>
 
                 <button
-                  onClick={() => setLocation('/teacher/evaluations')}
+                  onClick={() => setLocation("/teacher/evaluations")}
                   className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <TrendingUp className="w-8 h-8 mx-auto mb-2" />
@@ -173,8 +186,12 @@ export default function TeacherDashboard() {
                   <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div className="flex-1">
                     <p className="font-semibold text-blue-900">درس الصباح</p>
-                    <p className="text-sm text-blue-700">8:00 صباحاً - 10:00 صباحاً</p>
-                    <p className="text-xs text-blue-600 mt-1">حلقة {teacher?.halaqaName || 'القرآن'}</p>
+                    <p className="text-sm text-blue-700">
+                      8:00 صباحاً - 10:00 صباحاً
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      حلقة {teacher?.halaqaName || "القرآن"}
+                    </p>
                   </div>
                 </div>
 
@@ -182,8 +199,12 @@ export default function TeacherDashboard() {
                   <Calendar className="w-5 h-5 text-emerald-600 mt-0.5" />
                   <div className="flex-1">
                     <p className="font-semibold text-emerald-900">درس المساء</p>
-                    <p className="text-sm text-emerald-700">4:00 مساءً - 6:00 مساءً</p>
-                    <p className="text-xs text-emerald-600 mt-1">حلقة {teacher?.halaqaName || 'القرآن'}</p>
+                    <p className="text-sm text-emerald-700">
+                      4:00 مساءً - 6:00 مساءً
+                    </p>
+                    <p className="text-xs text-emerald-600 mt-1">
+                      حلقة {teacher?.halaqaName || "القرآن"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -201,11 +222,15 @@ export default function TeacherDashboard() {
             <div className="space-y-3">
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <p className="text-sm text-gray-700">تم تسجيل حضور 15 طالب - منذ ساعتين</p>
+                <p className="text-sm text-gray-700">
+                  تم تسجيل حضور 15 طالب - منذ ساعتين
+                </p>
               </div>
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                <p className="text-sm text-gray-700">تم إضافة درس جديد - منذ 5 ساعات</p>
+                <p className="text-sm text-gray-700">
+                  تم إضافة درس جديد - منذ 5 ساعات
+                </p>
               </div>
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <div className="w-2 h-2 rounded-full bg-amber-500"></div>
@@ -218,4 +243,3 @@ export default function TeacherDashboard() {
     </div>
   );
 }
-

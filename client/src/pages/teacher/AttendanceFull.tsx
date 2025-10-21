@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -16,17 +22,20 @@ import { Badge } from "@/components/ui/badge";
 
 export default function AttendanceFull() {
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(
-    undefined,
-    { enabled: !!user?.id && user?.role === 'teacher' }
-  );
+  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(undefined, {
+    enabled: !!user?.id && user?.role === "teacher",
+  });
   const { data: students, refetch } = trpc.students.getByTeacher.useQuery(
     undefined,
     { enabled: !!teacher?.id }
   );
-  
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [attendance, setAttendance] = useState<Record<string, 'present' | 'absent' | 'late'>>({});
+
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [attendance, setAttendance] = useState<
+    Record<string, "present" | "absent" | "late">
+  >({});
 
   const markAttendanceMutation = trpc.attendance.mark.useMutation({
     onSuccess: () => {
@@ -38,10 +47,13 @@ export default function AttendanceFull() {
     },
   });
 
-  const handleAttendanceChange = (studentId: string, status: 'present' | 'absent' | 'late') => {
+  const handleAttendanceChange = (
+    studentId: string,
+    status: "present" | "absent" | "late"
+  ) => {
     setAttendance(prev => ({
       ...prev,
-      [studentId]: status
+      [studentId]: status,
     }));
   };
 
@@ -87,7 +99,7 @@ export default function AttendanceFull() {
               <input
                 type="date"
                 value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                onChange={e => setSelectedDate(e.target.value)}
                 className="border rounded px-3 py-1"
               />
             </div>
@@ -115,13 +127,13 @@ export default function AttendanceFull() {
                         {student.user?.name || "غير محدد"}
                       </TableCell>
                       <TableCell>
-                        {attendance[student.id] === 'present' && (
+                        {attendance[student.id] === "present" && (
                           <Badge className="bg-green-500">حاضر</Badge>
                         )}
-                        {attendance[student.id] === 'absent' && (
+                        {attendance[student.id] === "absent" && (
                           <Badge className="bg-red-500">غائب</Badge>
                         )}
-                        {attendance[student.id] === 'late' && (
+                        {attendance[student.id] === "late" && (
                           <Badge className="bg-yellow-500">متأخر</Badge>
                         )}
                         {!attendance[student.id] && (
@@ -132,25 +144,55 @@ export default function AttendanceFull() {
                         <div className="flex gap-2">
                           <Button
                             size="sm"
-                            variant={attendance[student.id] === 'present' ? 'default' : 'outline'}
-                            className={attendance[student.id] === 'present' ? 'bg-green-600 hover:bg-green-700' : ''}
-                            onClick={() => handleAttendanceChange(student.id, 'present')}
+                            variant={
+                              attendance[student.id] === "present"
+                                ? "default"
+                                : "outline"
+                            }
+                            className={
+                              attendance[student.id] === "present"
+                                ? "bg-green-600 hover:bg-green-700"
+                                : ""
+                            }
+                            onClick={() =>
+                              handleAttendanceChange(student.id, "present")
+                            }
                           >
                             <Check className="h-4 w-4" />
                           </Button>
                           <Button
                             size="sm"
-                            variant={attendance[student.id] === 'late' ? 'default' : 'outline'}
-                            className={attendance[student.id] === 'late' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}
-                            onClick={() => handleAttendanceChange(student.id, 'late')}
+                            variant={
+                              attendance[student.id] === "late"
+                                ? "default"
+                                : "outline"
+                            }
+                            className={
+                              attendance[student.id] === "late"
+                                ? "bg-yellow-600 hover:bg-yellow-700"
+                                : ""
+                            }
+                            onClick={() =>
+                              handleAttendanceChange(student.id, "late")
+                            }
                           >
                             <Clock className="h-4 w-4" />
                           </Button>
                           <Button
                             size="sm"
-                            variant={attendance[student.id] === 'absent' ? 'default' : 'outline'}
-                            className={attendance[student.id] === 'absent' ? 'bg-red-600 hover:bg-red-700' : ''}
-                            onClick={() => handleAttendanceChange(student.id, 'absent')}
+                            variant={
+                              attendance[student.id] === "absent"
+                                ? "default"
+                                : "outline"
+                            }
+                            className={
+                              attendance[student.id] === "absent"
+                                ? "bg-red-600 hover:bg-red-700"
+                                : ""
+                            }
+                            onClick={() =>
+                              handleAttendanceChange(student.id, "absent")
+                            }
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -165,9 +207,14 @@ export default function AttendanceFull() {
                 <Button
                   onClick={handleSubmit}
                   className="bg-emerald-600 hover:bg-emerald-700"
-                  disabled={markAttendanceMutation.isPending || Object.keys(attendance).length === 0}
+                  disabled={
+                    markAttendanceMutation.isPending ||
+                    Object.keys(attendance).length === 0
+                  }
                 >
-                  {markAttendanceMutation.isPending ? "جاري الحفظ..." : "حفظ الحضور"}
+                  {markAttendanceMutation.isPending
+                    ? "جاري الحفظ..."
+                    : "حفظ الحضور"}
                 </Button>
               </div>
             </>
@@ -177,4 +224,3 @@ export default function AttendanceFull() {
     </div>
   );
 }
-

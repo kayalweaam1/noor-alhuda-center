@@ -22,7 +22,7 @@ export async function createContext(
         user = dbUser;
       }
     }
-    
+
     // Also try userId-based session
     if (!user && opts.req.session?.userId) {
       const users = await import("../db");

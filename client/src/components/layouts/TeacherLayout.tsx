@@ -27,7 +27,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const menuItems = [
@@ -68,16 +68,22 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       >
         <div className="p-6 border-b border-emerald-200">
           <div className="flex flex-col items-center gap-3">
-            <img src={APP_LOGO} alt={APP_TITLE} className="w-24 h-24 object-contain" />
+            <img
+              src={APP_LOGO}
+              alt={APP_TITLE}
+              className="w-24 h-24 object-contain"
+            />
             <div className="text-center">
-              <h2 className="font-bold text-lg text-emerald-900">{APP_TITLE}</h2>
+              <h2 className="font-bold text-lg text-emerald-900">
+                {APP_TITLE}
+              </h2>
               <p className="text-xs text-emerald-600">لوحة المربي</p>
             </div>
           </div>
         </div>
 
         <nav className="p-4 space-y-2">
-          {menuItems.map((item) => {
+          {menuItems.map(item => {
             const Icon = item.icon;
             const isActive = location === item.path;
             return (
@@ -101,12 +107,12 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
           <div className="flex items-center gap-3 mb-3 px-2">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
               <span className="text-white font-bold">
-                {user?.name?.charAt(0) || 'م'}
+                {user?.name?.charAt(0) || "م"}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-gray-900 truncate">
-                {user?.name || 'المربي'}
+                {user?.name || "المربي"}
               </p>
               <p className="text-xs text-gray-600">مربي</p>
             </div>
@@ -143,7 +149,8 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
                 )}
               </button>
               <h1 className="text-xl font-bold text-emerald-900">
-                {menuItems.find((item) => item.path === location)?.title || "لوحة التحكم"}
+                {menuItems.find(item => item.path === location)?.title ||
+                  "لوحة التحكم"}
               </h1>
             </div>
 
@@ -170,4 +177,3 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     </div>
   );
 }
-

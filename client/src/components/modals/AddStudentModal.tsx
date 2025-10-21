@@ -1,9 +1,21 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -13,7 +25,11 @@ interface AddStudentModalProps {
   onSuccess?: () => void;
 }
 
-export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddStudentModalProps) {
+export default function AddStudentModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: AddStudentModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+972");
   const [teacherId, setTeacherId] = useState("");
@@ -27,7 +43,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
       onOpenChange(false);
       onSuccess?.();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error("فشل في إضافة الطالب: " + error.message);
     },
   });
@@ -60,9 +76,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
       <DialogContent className="sm:max-w-[500px]" dir="rtl">
         <DialogHeader>
           <DialogTitle>إضافة طالب جديد</DialogTitle>
-          <DialogDescription>
-            أدخل بيانات الطالب الجديد
-          </DialogDescription>
+          <DialogDescription>أدخل بيانات الطالب الجديد</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -71,7 +85,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="أدخل اسم الطالب"
               required
             />
@@ -83,7 +97,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={e => setPhone(e.target.value)}
               placeholder="+972501234567"
               dir="ltr"
               required
@@ -97,7 +111,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
                 <SelectValue placeholder="اختر المربي" />
               </SelectTrigger>
               <SelectContent>
-                {teachers?.map((teacher) => (
+                {teachers?.map(teacher => (
                   <SelectItem key={teacher.id} value={teacher.id}>
                     {teacher.userName || teacher.id}
                   </SelectItem>
@@ -111,7 +125,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
             <Input
               id="class"
               value={halaqaClass}
-              onChange={(e) => setHalaqaClass(e.target.value)}
+              onChange={e => setHalaqaClass(e.target.value)}
               placeholder="مثال: الحلقة الأولى"
             />
           </div>
@@ -140,4 +154,3 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
     </Dialog>
   );
 }
-

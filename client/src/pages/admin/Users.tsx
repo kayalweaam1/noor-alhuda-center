@@ -1,6 +1,12 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -33,13 +39,17 @@ export default function UsersPage() {
   const updateRoleMutation = trpc.users.updateRole.useMutation();
   const deleteUserMutation = trpc.users.delete.useMutation();
 
-  const filteredUsers = users?.filter((user) =>
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.phone?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users?.filter(
+    user =>
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.phone?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleRoleChange = async (userId: string, newRole: "admin" | "teacher" | "student") => {
+  const handleRoleChange = async (
+    userId: string,
+    newRole: "admin" | "teacher" | "student"
+  ) => {
     try {
       await updateRoleMutation.mutateAsync({ userId, role: newRole });
       toast.success("تم تحديث الدور بنجاح");
@@ -51,7 +61,7 @@ export default function UsersPage() {
 
   const handleDelete = async (userId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا المستخدم؟")) return;
-    
+
     try {
       await deleteUserMutation.mutateAsync({ userId });
       toast.success("تم حذف المستخدم بنجاح");
@@ -80,10 +90,12 @@ export default function UsersPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-emerald-900">إدارة المستخدمين</CardTitle>
+              <CardTitle className="text-2xl text-emerald-900">
+                إدارة المستخدمين
+              </CardTitle>
               <CardDescription>إدارة جميع مستخدمي النظام</CardDescription>
             </div>
-            <Button 
+            <Button
               className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
               onClick={() => setShowAddModal(true)}
             >
@@ -100,7 +112,7 @@ export default function UsersPage() {
               <Input
                 placeholder="البحث عن مستخدم (الاسم، البريد، رقم الهاتف)..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pr-10 border-emerald-200 focus:border-emerald-500"
               />
             </div>
@@ -111,33 +123,47 @@ export default function UsersPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-emerald-50">
-                  <TableHead className="text-right font-bold text-emerald-900">الاسم</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">البريد الإلكتروني</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">رقم الهاتف</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الدور</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">تاريخ التسجيل</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الاسم
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    البريد الإلكتروني
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    رقم الهاتف
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الدور
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    تاريخ التسجيل
+                  </TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">
+                    الإجراءات
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers?.map((user) => (
+                {filteredUsers?.map(user => (
                   <TableRow key={user.id} className="hover:bg-emerald-50/50">
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                           <span className="text-white font-bold text-sm">
-                            {user.name?.charAt(0) || '؟'}
+                            {user.name?.charAt(0) || "؟"}
                           </span>
                         </div>
-                        <span>{user.name || 'غير محدد'}</span>
+                        <span>{user.name || "غير محدد"}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{user.email || '-'}</TableCell>
-                    <TableCell>{user.phone || '-'}</TableCell>
+                    <TableCell>{user.email || "-"}</TableCell>
+                    <TableCell>{user.phone || "-"}</TableCell>
                     <TableCell>
                       <Select
                         value={user.role || "student"}
-                        onValueChange={(value) => handleRoleChange(user.id, value as any)}
+                        onValueChange={value =>
+                          handleRoleChange(user.id, value as any)
+                        }
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
@@ -150,7 +176,9 @@ export default function UsersPage() {
                       </Select>
                     </TableCell>
                     <TableCell>
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-SA') : '-'}
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString("ar-SA")
+                        : "-"}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -189,7 +217,7 @@ export default function UsersPage() {
                 <div>
                   <p className="text-sm text-purple-700">المدراء</p>
                   <p className="text-2xl font-bold text-purple-900">
-                    {users?.filter(u => u.role === 'admin').length || 0}
+                    {users?.filter(u => u.role === "admin").length || 0}
                   </p>
                 </div>
               </div>
@@ -200,7 +228,7 @@ export default function UsersPage() {
                 <div>
                   <p className="text-sm text-emerald-700">المربين</p>
                   <p className="text-2xl font-bold text-emerald-900">
-                    {users?.filter(u => u.role === 'teacher').length || 0}
+                    {users?.filter(u => u.role === "teacher").length || 0}
                   </p>
                 </div>
               </div>
@@ -211,7 +239,7 @@ export default function UsersPage() {
                 <div>
                   <p className="text-sm text-blue-700">الطلاب</p>
                   <p className="text-2xl font-bold text-blue-900">
-                    {users?.filter(u => u.role === 'student').length || 0}
+                    {users?.filter(u => u.role === "student").length || 0}
                   </p>
                 </div>
               </div>
@@ -220,14 +248,14 @@ export default function UsersPage() {
         </CardContent>
       </Card>
 
-      <AddUserModal 
-        open={showAddModal} 
+      <AddUserModal
+        open={showAddModal}
         onOpenChange={setShowAddModal}
         onSuccess={refetch}
       />
-      
-      <EditUserModal 
-        open={showEditModal} 
+
+      <EditUserModal
+        open={showEditModal}
         onOpenChange={setShowEditModal}
         user={selectedUser}
         onSuccess={refetch}
@@ -235,4 +263,3 @@ export default function UsersPage() {
     </div>
   );
 }
-

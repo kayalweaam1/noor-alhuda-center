@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -12,15 +18,18 @@ export default function AdminDirectLogin() {
   const handleDirectLogin = () => {
     setLoading(true);
     toast.success("مرحباً بك يا مدير! تسجيل دخول مباشر");
-    
+
     // Save to localStorage to simulate logged in state
-    localStorage.setItem('user', JSON.stringify({
-      id: '1',
-      phone: '+972542632557',
-      name: 'المدير العام',
-      role: 'admin'
-    }));
-    
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        id: "1",
+        phone: "+972542632557",
+        name: "المدير العام",
+        role: "admin",
+      })
+    );
+
     // Direct redirect
     setTimeout(() => {
       setLocation("/admin/dashboard");
@@ -29,14 +38,12 @@ export default function AdminDirectLogin() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center p-4 bg-white"
       dir="rtl"
     >
-      
       <Card className="w-full max-w-md relative z-10 border-emerald-200 shadow-2xl">
         <CardHeader className="text-center space-y-4">
-
           <CardTitle className="text-3xl font-bold text-emerald-900">
             مركز نور الهدى
           </CardTitle>
@@ -65,8 +72,8 @@ export default function AdminDirectLogin() {
           </Button>
 
           <div className="text-center">
-            <a 
-              href="/login" 
+            <a
+              href="/login"
               className="text-sm text-emerald-600 hover:text-emerald-700 underline"
             >
               تسجيل الدخول العادي (مع OTP)
@@ -77,4 +84,3 @@ export default function AdminDirectLogin() {
     </div>
   );
 }
-

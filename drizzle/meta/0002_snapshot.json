@@ -72,12 +72,8 @@
           "name": "assistantNotes_assistantId_users_id_fk",
           "tableFrom": "assistantNotes",
           "tableTo": "users",
-          "columnsFrom": [
-            "assistantId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["assistantId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -85,12 +81,8 @@
           "name": "assistantNotes_teacherId_teachers_id_fk",
           "tableFrom": "assistantNotes",
           "tableTo": "teachers",
-          "columnsFrom": [
-            "teacherId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacherId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -98,9 +90,7 @@
       "compositePrimaryKeys": {
         "assistantNotes_id": {
           "name": "assistantNotes_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -166,12 +156,8 @@
           "name": "attendance_studentId_students_id_fk",
           "tableFrom": "attendance",
           "tableTo": "students",
-          "columnsFrom": [
-            "studentId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["studentId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -179,12 +165,8 @@
           "name": "attendance_teacherId_teachers_id_fk",
           "tableFrom": "attendance",
           "tableTo": "teachers",
-          "columnsFrom": [
-            "teacherId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacherId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -192,9 +174,7 @@
       "compositePrimaryKeys": {
         "attendance_id": {
           "name": "attendance_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -274,12 +254,8 @@
           "name": "evaluations_studentId_students_id_fk",
           "tableFrom": "evaluations",
           "tableTo": "students",
-          "columnsFrom": [
-            "studentId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["studentId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -287,12 +263,8 @@
           "name": "evaluations_teacherId_teachers_id_fk",
           "tableFrom": "evaluations",
           "tableTo": "teachers",
-          "columnsFrom": [
-            "teacherId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacherId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -300,12 +272,8 @@
           "name": "evaluations_lessonId_lessons_id_fk",
           "tableFrom": "evaluations",
           "tableTo": "lessons",
-          "columnsFrom": [
-            "lessonId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lessonId"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -313,9 +281,7 @@
       "compositePrimaryKeys": {
         "evaluations_id": {
           "name": "evaluations_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -374,12 +340,8 @@
           "name": "lessons_teacherId_teachers_id_fk",
           "tableFrom": "lessons",
           "tableTo": "teachers",
-          "columnsFrom": [
-            "teacherId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacherId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -387,9 +349,7 @@
       "compositePrimaryKeys": {
         "lessons_id": {
           "name": "lessons_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -457,12 +417,8 @@
           "name": "notifications_userId_users_id_fk",
           "tableFrom": "notifications",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -470,9 +426,7 @@
       "compositePrimaryKeys": {
         "notifications_id": {
           "name": "notifications_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -531,9 +485,7 @@
       "compositePrimaryKeys": {
         "otpCodes_id": {
           "name": "otpCodes_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -593,12 +545,8 @@
           "name": "students_userId_users_id_fk",
           "tableFrom": "students",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -606,12 +554,8 @@
           "name": "students_teacherId_teachers_id_fk",
           "tableFrom": "students",
           "tableTo": "teachers",
-          "columnsFrom": [
-            "teacherId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacherId"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -619,17 +563,13 @@
       "compositePrimaryKeys": {
         "students_id": {
           "name": "students_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "students_userId_unique": {
           "name": "students_userId_unique",
-          "columns": [
-            "userId"
-          ]
+          "columns": ["userId"]
         }
       },
       "checkConstraint": {}
@@ -680,12 +620,8 @@
           "name": "teachers_userId_users_id_fk",
           "tableFrom": "teachers",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -693,17 +629,13 @@
       "compositePrimaryKeys": {
         "teachers_id": {
           "name": "teachers_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "teachers_userId_unique": {
           "name": "teachers_userId_unique",
-          "columns": [
-            "userId"
-          ]
+          "columns": ["userId"]
         }
       },
       "checkConstraint": {}
@@ -783,9 +715,7 @@
       "compositePrimaryKeys": {
         "users_id": {
           "name": "users_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},

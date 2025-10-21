@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +18,11 @@ interface AddAssistantModalProps {
   onSuccess?: () => void;
 }
 
-export default function AddAssistantModal({ open, onOpenChange, onSuccess }: AddAssistantModalProps) {
+export default function AddAssistantModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: AddAssistantModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+972");
   const [halaqaName, setHalaqaName] = useState("");
@@ -66,7 +76,7 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="أدخل اسم المساعد"
               required
             />
@@ -78,7 +88,7 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={e => setPhone(e.target.value)}
               placeholder="+972501234567"
               dir="ltr"
               required
@@ -90,7 +100,7 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
             <Input
               id="halaqa"
               value={halaqaName}
-              onChange={(e) => setHalaqaName(e.target.value)}
+              onChange={e => setHalaqaName(e.target.value)}
               placeholder="مثال: حلقة الصف الثالث"
               required
             />
@@ -123,4 +133,3 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
     </Dialog>
   );
 }
-

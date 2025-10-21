@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { db } from "../db";
+import * as db from "../db";
 import { users } from "../../drizzle/schema";
-import { hashPassword } from "../lib/auth";
+import { hashPassword } from "../_core/password";
 
 const router = Router();
 
@@ -13,44 +13,47 @@ router.post("/setup-admin", async (req, res) => {
     const hashedPassword = await hashPassword(password);
 
     // Check if admin already exists
-    const existingUser = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.phone, phone),
-    });
+    const user = await db.getUserByPhone(phone.startsWith("+") ? phone : "+972" + phone);
+    const existingUser = user || null;
 
     if (existingUser) {
-      return res.json({ 
-        success: false, 
+      return res.json({
+        success: false,
         message: "المدير موجود بالفعل",
-        userId: existingUser.id 
+        userId: existingUser.id,
       });
     }
 
     // Create admin user
-    const [newUser] = await db.insert(users).values({
+    const connection = await db.getDb();
+    if (!connection) {
+      return res.status(500).json({ success: false, error: "Database not available" });
+    }
+    const newUserId = `user_admin_${Date.now()}`;
+    await connection.insert(users).values({
+      id: newUserId,
       name: "المدير العام",
-      phone,
+      phone: phone.startsWith("+") ? phone : "+972" + phone,
       password: hashedPassword,
       role: "admin",
-      status: "active",
-    }).returning();
+    });
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "تم إنشاء حساب المدير بنجاح",
-      userId: newUser.id,
+      userId: newUserId,
       credentials: {
         phone: "0542632557",
-        password: "123456"
-      }
+        password: "123456",
+      },
     });
   } catch (error) {
     console.error("Error creating admin:", error);
-    res.status(500).json({ 
-      success: false, 
-      error: "فشل إنشاء حساب المدير" 
+    res.status(500).json({
+      success: false,
+      error: "فشل إنشاء حساب المدير",
     });
   }
 });
 
 export default router;
-

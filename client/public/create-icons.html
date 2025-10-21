@@ -1,58 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Icon Generator</title>
-</head>
-<body>
+  </head>
+  <body>
     <canvas id="canvas192" width="192" height="192"></canvas>
     <canvas id="canvas512" width="512" height="512"></canvas>
     <script>
-        function createIcon(canvasId, size) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-            
-            // Background gradient (emerald to teal)
-            const gradient = ctx.createLinearGradient(0, 0, size, size);
-            gradient.addColorStop(0, '#059669');
-            gradient.addColorStop(1, '#0d9488');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, size, size);
-            
-            // Draw Arabic letter "ن" (Noon)
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `bold ${size * 0.6}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('ن', size / 2, size / 2);
-        }
-        
-        createIcon('canvas192', 192);
-        createIcon('canvas512', 512);
-        
-        // Convert to PNG and download
+      function createIcon(canvasId, size) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext("2d");
+
+        // Background gradient (emerald to teal)
+        const gradient = ctx.createLinearGradient(0, 0, size, size);
+        gradient.addColorStop(0, "#059669");
+        gradient.addColorStop(1, "#0d9488");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+
+        // Draw Arabic letter "ن" (Noon)
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${size * 0.6}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("ن", size / 2, size / 2);
+      }
+
+      createIcon("canvas192", 192);
+      createIcon("canvas512", 512);
+
+      // Convert to PNG and download
+      setTimeout(() => {
+        const canvas192 = document.getElementById("canvas192");
+        const canvas512 = document.getElementById("canvas512");
+
+        canvas192.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "icon-192.png";
+          a.click();
+        });
+
         setTimeout(() => {
-            const canvas192 = document.getElementById('canvas192');
-            const canvas512 = document.getElementById('canvas512');
-            
-            canvas192.toBlob(blob => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'icon-192.png';
-                a.click();
-            });
-            
-            setTimeout(() => {
-                canvas512.toBlob(blob => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'icon-512.png';
-                    a.click();
-                });
-            }, 1000);
-        }, 500);
+          canvas512.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "icon-512.png";
+            a.click();
+          });
+        }, 1000);
+      }, 500);
     </script>
-</body>
+  </body>
 </html>

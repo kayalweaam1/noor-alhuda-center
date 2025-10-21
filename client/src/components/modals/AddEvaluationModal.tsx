@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 interface AddEvaluationModalProps {
   open: boolean;
@@ -24,12 +24,12 @@ interface AddEvaluationModalProps {
 }
 
 export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
-  const [studentId, setStudentId] = useState('');
-  const [lessonId, setLessonId] = useState('');
-  const [score, setScore] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [evaluationType, setEvaluationType] = useState('');
-  const [behaviorScore, setBehaviorScore] = useState('');
+  const [studentId, setStudentId] = useState("");
+  const [lessonId, setLessonId] = useState("");
+  const [score, setScore] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [evaluationType, setEvaluationType] = useState("");
+  const [behaviorScore, setBehaviorScore] = useState("");
 
   const utils = trpc.useUtils();
   const { data: students } = trpc.students.getAll.useQuery();
@@ -44,12 +44,12 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
   });
 
   const resetForm = () => {
-    setStudentId('');
-    setLessonId('');
-    setScore('');
-    setFeedback('');
-    setEvaluationType('');
-    setBehaviorScore('');
+    setStudentId("");
+    setLessonId("");
+    setScore("");
+    setFeedback("");
+    setEvaluationType("");
+    setBehaviorScore("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -79,7 +79,7 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
                 <SelectValue placeholder="اختر الطالب" />
               </SelectTrigger>
               <SelectContent>
-                {students?.map((student) => (
+                {students?.map(student => (
                   <SelectItem key={student.id} value={student.id}>
                     {student.userName || student.userPhone || student.id}
                   </SelectItem>
@@ -96,7 +96,7 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">بدون درس محدد</SelectItem>
-                {lessons?.map((lesson) => (
+                {lessons?.map(lesson => (
                   <SelectItem key={lesson.id} value={lesson.id}>
                     {lesson.title}
                   </SelectItem>
@@ -113,7 +113,7 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
               min="0"
               max="100"
               value={score}
-              onChange={(e) => setScore(e.target.value)}
+              onChange={e => setScore(e.target.value)}
               placeholder="مثال: 85"
               required
             />
@@ -139,7 +139,7 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
             <Textarea
               id="feedback"
               value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              onChange={e => setFeedback(e.target.value)}
               placeholder="ملاحظات حول أداء الطالب..."
               rows={3}
             />
@@ -150,7 +150,7 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
               إلغاء
             </Button>
             <Button type="submit" disabled={createEvaluation.isPending}>
-              {createEvaluation.isPending ? 'جاري الإضافة...' : 'إضافة'}
+              {createEvaluation.isPending ? "جاري الإضافة..." : "إضافة"}
             </Button>
           </div>
 
@@ -164,4 +164,3 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
     </Dialog>
   );
 }
-

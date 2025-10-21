@@ -1,9 +1,21 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -13,7 +25,11 @@ interface AddUserModalProps {
   onSuccess?: () => void;
 }
 
-export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserModalProps) {
+export default function AddUserModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: AddUserModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+972");
   const [email, setEmail] = useState("");
@@ -62,9 +78,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
       <DialogContent className="sm:max-w-[500px]" dir="rtl">
         <DialogHeader>
           <DialogTitle>إضافة مستخدم جديد</DialogTitle>
-          <DialogDescription>
-            أدخل بيانات المستخدم الجديد
-          </DialogDescription>
+          <DialogDescription>أدخل بيانات المستخدم الجديد</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +87,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="أدخل اسم المستخدم"
               required
             />
@@ -85,7 +99,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={e => setPhone(e.target.value)}
               placeholder="+972501234567"
               dir="ltr"
               required
@@ -98,7 +112,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               placeholder="example@email.com"
               dir="ltr"
             />
@@ -110,7 +124,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
               id="password"
               type="text"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               placeholder="أدخل كلمة المرور"
               required
             />
@@ -154,4 +168,3 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
     </Dialog>
   );
 }
-

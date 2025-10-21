@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -22,11 +34,18 @@ interface EditUserModalProps {
   onSuccess?: () => void;
 }
 
-export default function EditUserModal({ open, onOpenChange, user, onSuccess }: EditUserModalProps) {
+export default function EditUserModal({
+  open,
+  onOpenChange,
+  user,
+  onSuccess,
+}: EditUserModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"admin" | "teacher" | "student" | "assistant">("student");
+  const [role, setRole] = useState<
+    "admin" | "teacher" | "student" | "assistant"
+  >("student");
 
   useEffect(() => {
     if (user) {
@@ -70,9 +89,7 @@ export default function EditUserModal({ open, onOpenChange, user, onSuccess }: E
       <DialogContent className="sm:max-w-[500px]" dir="rtl">
         <DialogHeader>
           <DialogTitle>تعديل بيانات المستخدم</DialogTitle>
-          <DialogDescription>
-            قم بتحديث بيانات المستخدم
-          </DialogDescription>
+          <DialogDescription>قم بتحديث بيانات المستخدم</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -81,7 +98,7 @@ export default function EditUserModal({ open, onOpenChange, user, onSuccess }: E
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="أدخل اسم المستخدم"
               required
             />
@@ -93,7 +110,7 @@ export default function EditUserModal({ open, onOpenChange, user, onSuccess }: E
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={e => setPhone(e.target.value)}
               placeholder="+972501234567"
               dir="ltr"
               required
@@ -106,7 +123,7 @@ export default function EditUserModal({ open, onOpenChange, user, onSuccess }: E
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               placeholder="example@email.com"
               dir="ltr"
             />
@@ -148,4 +165,3 @@ export default function EditUserModal({ open, onOpenChange, user, onSuccess }: E
     </Dialog>
   );
 }
-

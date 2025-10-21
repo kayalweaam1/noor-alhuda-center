@@ -1,53 +1,54 @@
-import { Router } from 'express';
-import bcrypt from 'bcryptjs';
-import { db } from '../db';
-import { users } from '../../drizzle/schema';
+import { Router } from "express";
+import bcrypt from "bcryptjs";
+import * as db from "../db";
+import { users } from "../../drizzle/schema";
 
 const router = Router();
 
-router.post('/api/create-first-admin', async (req, res) => {
+router.post("/api/create-first-admin", async (req, res) => {
   try {
     // Check if any users exist
-    const existingUsers = await db.select().from(users).limit(1);
-    
+    const connection = await db.getDb();
+    if (!connection) {
+      return res.status(500).json({ success: false, message: "Database not available" });
+    }
+    const existingUsers = await connection.select().from(users).limit(1);
+
     if (existingUsers.length > 0) {
-      return res.json({ 
-        success: false, 
-        message: 'Admin already exists or users table is not empty' 
+      return res.json({
+        success: false,
+        message: "Admin already exists or users table is not empty",
       });
     }
 
     // Create admin user
-    const hashedPassword = await bcrypt.hash('123456', 10);
-    
-    await db.insert(users).values({
-      id: 'admin001',
-      name: 'المدير العام',
-      phone: '+972542632557',
+    const hashedPassword = await bcrypt.hash("123456", 10);
+
+    await connection.insert(users).values({
+      id: "admin001",
+      name: "المدير العام",
+      phone: "+972542632557",
       password: hashedPassword,
-      role: 'admin',
-      status: 'active',
+      role: "admin",
       createdAt: new Date(),
-      updatedAt: new Date(),
     });
 
-    res.json({ 
-      success: true, 
-      message: 'Admin created successfully',
+    res.json({
+      success: true,
+      message: "Admin created successfully",
       credentials: {
-        phone: '+972542632557',
-        password: '123456'
-      }
+        phone: "+972542632557",
+        password: "123456",
+      },
     });
   } catch (error) {
-    console.error('Error creating admin:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error creating admin',
-      error: error instanceof Error ? error.message : 'Unknown error'
+    console.error("Error creating admin:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating admin",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
 
 export default router;
-

@@ -1,7 +1,21 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Plus, Trash2, Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  BookOpen,
+  Plus,
+  Trash2,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+} from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,19 +31,18 @@ import { Label } from "@/components/ui/label";
 
 export default function TeacherLessons() {
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(
-    undefined,
-    { enabled: !!user?.id && user?.role === 'teacher' }
-  );
+  const { data: teacher } = trpc.teachers.getMyProfile.useQuery(undefined, {
+    enabled: !!user?.id && user?.role === "teacher",
+  });
   const { data: lessons, refetch } = trpc.lessons.getAll.useQuery();
-  
+
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    time: '09:00',
+    title: "",
+    description: "",
+    time: "09:00",
   });
 
   const createLessonMutation = trpc.lessons.create.useMutation();
@@ -44,11 +57,29 @@ export default function TeacherLessons() {
   const startingDayOfWeek = firstDay.getDay();
 
   const monthNames = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
   ];
 
-  const dayNames = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const dayNames = [
+    "الأحد",
+    "الإثنين",
+    "الثلاثاء",
+    "الأربعاء",
+    "الخميس",
+    "الجمعة",
+    "السبت",
+  ];
 
   // Get lessons for a specific date
   const getLessonsForDate = (day: number) => {
@@ -56,10 +87,12 @@ export default function TeacherLessons() {
     const date = new Date(year, month, day);
     return lessons.filter(lesson => {
       const lessonDate = new Date(lesson.date);
-      return lesson.teacherId === teacher.id &&
-             lessonDate.getDate() === day &&
-             lessonDate.getMonth() === month &&
-             lessonDate.getFullYear() === year;
+      return (
+        lesson.teacherId === teacher.id &&
+        lessonDate.getDate() === day &&
+        lessonDate.getMonth() === month &&
+        lessonDate.getFullYear() === year
+      );
     });
   };
 
@@ -86,7 +119,7 @@ export default function TeacherLessons() {
 
     try {
       // Combine date and time
-      const [hours, minutes] = formData.time.split(':');
+      const [hours, minutes] = formData.time.split(":");
       const lessonDate = new Date(selectedDate);
       lessonDate.setHours(parseInt(hours), parseInt(minutes));
 
@@ -96,10 +129,10 @@ export default function TeacherLessons() {
         date: lessonDate,
         teacherId: teacher.id,
       });
-      
+
       toast.success("تم إضافة الدرس بنجاح");
       setShowAddDialog(false);
-      setFormData({ title: '', description: '', time: '09:00' });
+      setFormData({ title: "", description: "", time: "09:00" });
       refetch();
     } catch (error) {
       toast.error("فشل إضافة الدرس");
@@ -108,7 +141,7 @@ export default function TeacherLessons() {
 
   const handleDelete = async (lessonId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا الدرس؟")) return;
-    
+
     try {
       await deleteLessonMutation.mutateAsync({ id: lessonId });
       toast.success("تم حذف الدرس بنجاح");
@@ -140,7 +173,9 @@ export default function TeacherLessons() {
                 <BookOpen className="w-5 h-5 text-orange-600" />
                 <p className="text-sm text-orange-700">إجمالي دروسي</p>
               </div>
-              <p className="text-4xl font-bold text-orange-900">{myLessons.length}</p>
+              <p className="text-4xl font-bold text-orange-900">
+                {myLessons.length}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -153,10 +188,15 @@ export default function TeacherLessons() {
                 <p className="text-sm text-blue-700">دروس هذا الشهر</p>
               </div>
               <p className="text-4xl font-bold text-blue-900">
-                {myLessons.filter(l => {
-                  const lessonDate = new Date(l.date);
-                  return lessonDate.getMonth() === month && lessonDate.getFullYear() === year;
-                }).length}
+                {
+                  myLessons.filter(l => {
+                    const lessonDate = new Date(l.date);
+                    return (
+                      lessonDate.getMonth() === month &&
+                      lessonDate.getFullYear() === year
+                    );
+                  }).length
+                }
               </p>
             </div>
           </CardContent>
@@ -182,7 +222,9 @@ export default function TeacherLessons() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl text-orange-900">تقويم الدروس</CardTitle>
+              <CardTitle className="text-2xl text-orange-900">
+                تقويم الدروس
+              </CardTitle>
               <CardDescription>انقر على أي يوم لإضافة درس جديد</CardDescription>
             </div>
             <div className="flex items-center gap-4">
@@ -212,7 +254,7 @@ export default function TeacherLessons() {
           {/* Calendar Grid */}
           <div className="grid grid-cols-7 gap-2">
             {/* Day names header */}
-            {dayNames.map((day) => (
+            {dayNames.map(day => (
               <div
                 key={day}
                 className="text-center font-bold text-sm text-orange-900 p-2 bg-orange-50 rounded"
@@ -228,7 +270,7 @@ export default function TeacherLessons() {
               }
 
               const dayLessons = getLessonsForDate(day);
-              const isToday = 
+              const isToday =
                 day === new Date().getDate() &&
                 month === new Date().getMonth() &&
                 year === new Date().getFullYear();
@@ -238,29 +280,33 @@ export default function TeacherLessons() {
                   key={day}
                   onClick={() => handleDayClick(day)}
                   className={`min-h-24 p-2 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                    isToday ? 'border-orange-500 bg-orange-50' : 'border-gray-200'
-                  } ${dayLessons.length > 0 ? 'bg-blue-50/30' : 'hover:bg-gray-50'}`}
+                    isToday
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-gray-200"
+                  } ${dayLessons.length > 0 ? "bg-blue-50/30" : "hover:bg-gray-50"}`}
                 >
-                  <div className={`text-sm font-semibold mb-1 ${
-                    isToday ? 'text-orange-600' : 'text-gray-700'
-                  }`}>
+                  <div
+                    className={`text-sm font-semibold mb-1 ${
+                      isToday ? "text-orange-600" : "text-gray-700"
+                    }`}
+                  >
                     {day}
                   </div>
                   <div className="space-y-1">
-                    {dayLessons.map((lesson) => (
+                    {dayLessons.map(lesson => (
                       <div
                         key={lesson.id}
                         className="text-xs p-1 bg-emerald-100 border border-emerald-300 rounded group relative"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={e => e.stopPropagation()}
                       >
                         <div className="font-semibold text-emerald-900 truncate">
                           {lesson.title}
                         </div>
                         <div className="text-emerald-600 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {new Date(lesson.date).toLocaleTimeString('ar', {
-                            hour: '2-digit',
-                            minute: '2-digit'
+                          {new Date(lesson.date).toLocaleTimeString("ar", {
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </div>
                         <button
@@ -285,7 +331,8 @@ export default function TeacherLessons() {
           <DialogHeader>
             <DialogTitle>إضافة درس جديد</DialogTitle>
             <DialogDescription>
-              {selectedDate && `التاريخ: ${selectedDate.toLocaleDateString('ar-SA')}`}
+              {selectedDate &&
+                `التاريخ: ${selectedDate.toLocaleDateString("ar-SA")}`}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -293,7 +340,9 @@ export default function TeacherLessons() {
               <Label>عنوان الدرس</Label>
               <Input
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 placeholder="مثال: حفظ سورة البقرة"
                 required
               />
@@ -302,7 +351,9 @@ export default function TeacherLessons() {
               <Label>الوصف</Label>
               <Textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="وصف الدرس..."
                 rows={3}
               />
@@ -312,15 +363,24 @@ export default function TeacherLessons() {
               <Input
                 type="time"
                 value={formData.time}
-                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, time: e.target.value })
+                }
                 required
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAddDialog(false)}
+              >
                 إلغاء
               </Button>
-              <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
+              <Button
+                type="submit"
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة الدرس
               </Button>
@@ -331,4 +391,3 @@ export default function TeacherLessons() {
     </div>
   );
 }
-
