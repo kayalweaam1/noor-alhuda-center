@@ -1,4 +1,4 @@
-const CACHE_NAME = 'noor-alhuda-v1';
+const CACHE_NAME = 'noor-alhuda-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -36,33 +36,38 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const isApiRequest = url.pathname.startsWith('/api/');
+  const isGetRequest = request.method === 'GET';
+
+  // Never cache API requests or non-GET requests; always go to network
+  if (!isGetRequest || isApiRequest) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Only cache same-origin GET requests (static assets)
+  if (!isSameOrigin) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        // Only cache successful, basic (same-origin) responses
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseToCache);
+          });
         }
-
-        return fetch(event.request).then(
-          (response) => {
-            // Check if valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        );
-      })
+        return response;
+      });
+    })
   );
 });
 
