@@ -29,6 +29,7 @@ import Login from "./pages/Login";
 import AdminDirectLogin from "./pages/AdminDirectLogin";
 import Settings from "./pages/Settings";
 import AdminStudentDetails from "./pages/admin/StudentDetails";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -38,79 +39,109 @@ function Router() {
       <Route path={"/login"} component={Login} />
       <Route path={"/admin-direct"} component={AdminDirectLogin} />
       <Route path="/admin/dashboard">
-        <AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/users">
-        <AdminLayout>
-          <AdminUsers />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminUsers />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/students">
-        <AdminLayout>
-          <AdminStudents />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminStudents />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/students/:id">
-        <AdminLayout>
-          <AdminStudentDetails />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminStudentDetails />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/teachers">
-        <AdminLayout>
-          <AdminTeachers />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminTeachers />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/reports">
-        <AdminLayout>
-          <AdminReports />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminReports />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/lessons">
-        <AdminLayout>
-          <AdminLessons />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminLessons />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/analytics">
-        <AdminLayout>
-          <AdminAnalytics />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminAnalytics />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/admins">
-        <AdminLayout>
-          <AdminAdmins />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <AdminAdmins />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/admin/settings">
-        <AdminLayout>
-          <Settings />
-        </AdminLayout>
+        <ProtectedRoute requiredRole="admin">
+          <AdminLayout>
+            <Settings />
+          </AdminLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/dashboard">
-        <TeacherLayout>
-          <TeacherDashboard />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherDashboard />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/attendance">
-        <TeacherLayout>
-          <TeacherAttendance />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherAttendance />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/students">
-        <TeacherLayout>
-          <TeacherStudents />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherStudents />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/lessons">
-        <TeacherLayout>
-          <TeacherLessons />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherLessons />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/teacher/evaluations">
-        <TeacherLayout>
-          <TeacherEvaluations />
-        </TeacherLayout>
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherLayout>
+            <TeacherEvaluations />
+          </TeacherLayout>
+        </ProtectedRoute>
       </Route>
       {/* Teacher pages that are not yet implemented were removed to avoid broken links */}
       <Route path="/teacher/settings">
@@ -119,24 +150,32 @@ function Router() {
         </TeacherLayout>
       </Route>
       <Route path="/student/dashboard">
-        <StudentLayout>
-          <StudentDashboard />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <StudentDashboard />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/student/settings">
-        <StudentLayout>
-          <Settings />
-        </StudentLayout>
+        <ProtectedRoute requiredRole="student">
+          <StudentLayout>
+            <Settings />
+          </StudentLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/assistant/dashboard">
-        <AssistantLayout>
-          <AssistantDashboard />
-        </AssistantLayout>
+        <ProtectedRoute>
+          <AssistantLayout>
+            <AssistantDashboard />
+          </AssistantLayout>
+        </ProtectedRoute>
       </Route>
       <Route path="/assistant/settings">
-        <AssistantLayout>
-          <Settings />
-        </AssistantLayout>
+        <ProtectedRoute>
+          <AssistantLayout>
+            <Settings />
+          </AssistantLayout>
+        </ProtectedRoute>
       </Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
