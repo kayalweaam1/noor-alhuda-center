@@ -1,5 +1,6 @@
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2";
 import {
   InsertUser,
   users,
@@ -33,16 +34,34 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
+let _pool: mysql.Pool | null = null;
 let _db: ReturnType<typeof drizzle> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  if (_db) return _db;
+  const connectionString = ENV.databaseUrl || process.env.DATABASE_URL;
+  if (!connectionString) return null;
+
+  const maxRetries = parseInt(process.env.DB_CONNECT_RETRIES ?? "3", 10);
+  const retryDelayMs = parseInt(process.env.DB_CONNECT_RETRY_DELAY_MS ?? "1000", 10);
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      if (!_pool) {
+        _pool = mysql.createPool(connectionString);
+      }
+      // Simple ping to validate connection (use promise wrapper)
+      await _pool.promise().query("SELECT 1");
+      _db = drizzle(_pool);
+      return _db;
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+      console.warn(`[Database] Connect attempt ${attempt + 1} failed`, error);
+      if (attempt === maxRetries) {
+        _db = null;
+        break;
+      }
+      await new Promise(r => setTimeout(r, retryDelayMs));
     }
   }
   return _db;
