@@ -39,10 +39,16 @@
   >
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"
-    ></script>
+    <script type="module">
+      const endpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT;
+      const websiteId = import.meta.env.VITE_ANALYTICS_WEBSITE_ID;
+      if (endpoint && websiteId) {
+        const s = document.createElement('script');
+        s.src = `${endpoint}/umami`;
+        s.async = true;
+        s.dataset.websiteId = websiteId;
+        document.head.appendChild(s);
+      }
+    </script>
   </body>
 </html>
