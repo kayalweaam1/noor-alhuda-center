@@ -127,11 +127,11 @@ export default function TeacherDashboard() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => setLocation('/teacher/students')}
+                  onClick={() => setLocation('/teacher/attendance')}
                   className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <Users className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-semibold text-sm">طلابي</p>
+                  <p className="font-semibold text-sm">طلابي (قريباً)</p>
                 </button>
 
                 <button
@@ -151,11 +151,11 @@ export default function TeacherDashboard() {
                 </button>
 
                 <button
-                  onClick={() => setLocation('/teacher/evaluations')}
+                  onClick={() => setLocation('/teacher/lessons')}
                   className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
                   <TrendingUp className="w-8 h-8 mx-auto mb-2" />
-                  <p className="font-semibold text-sm">التقييمات</p>
+                  <p className="font-semibold text-sm">التقييمات (قريباً)</p>
                 </button>
               </div>
             </CardContent>
