@@ -481,6 +481,15 @@ export const appRouter = router({
       return await db.getAllStudents();
     }),
 
+    // Fetch single student (admin only) for details view
+    getById: adminProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ input }) => {
+        const all = await db.getAllStudents();
+        const student = all.find(s => s.id === input.id);
+        return student ?? null;
+      }),
+
     getMyProfile: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== 'student') return null;
       return await db.getStudentByUserId(ctx.user.id);
