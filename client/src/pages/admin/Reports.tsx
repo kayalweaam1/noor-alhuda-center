@@ -2,20 +2,23 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, FileText, Users, Calendar, TrendingUp, Filter } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { exportAttendance, exportStudents, exportTeachers } from "@/lib/export";
 
 export default function ReportsPage() {
   const [loading, setLoading] = useState(false);
   const { data: students } = trpc.students.getAll.useQuery();
   const { data: teachers } = trpc.teachers.getAll.useQuery();
+  const { data: attendance } = trpc.attendance.getAll.useQuery({});
 
   const handleExportAll = async () => {
     setLoading(true);
     try {
-      // Mock export - will be replaced with real implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success("تم تصدير التقرير بنجاح");
+      exportStudents(students || []);
+      exportTeachers(teachers || []);
+      exportAttendance(attendance || []);
+      toast.success("تم تصدير ملفات CSV للكل");
     } catch (error) {
       toast.error("فشل تصدير التقرير");
     } finally {
@@ -137,7 +140,7 @@ export default function ReportsPage() {
                   <Button
                     variant="outline"
                     className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
-                    onClick={() => toast.info("قريباً: عرض التقرير")}
+                    onClick={() => window.open(window.location.href + `#print-${report.action}`,'_blank')}
                   >
                     <FileText className="w-4 h-4 ml-2" />
                     عرض
@@ -145,7 +148,7 @@ export default function ReportsPage() {
                   <Button
                     variant="outline"
                     className="flex-1 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-                    onClick={() => toast.info("قريباً: تصدير PDF")}
+                    onClick={() => toast.info("للتصدير PDF، اطبع من المتصفح واحفظ كملف PDF")}
                   >
                     <Download className="w-4 h-4 ml-2" />
                     PDF
@@ -153,7 +156,12 @@ export default function ReportsPage() {
                   <Button
                     variant="outline"
                     className="flex-1 border-purple-200 text-purple-600 hover:bg-purple-50"
-                    onClick={() => toast.info("قريباً: تصدير Excel")}
+                    onClick={() => {
+                      if (report.action === 'students') return exportStudents(students || []);
+                      if (report.action === 'teachers') return exportTeachers(teachers || []);
+                      if (report.action === 'attendance') return exportAttendance(attendance || []);
+                      toast.info('لا يوجد بيانات قابلة للتصدير');
+                    }}
                   >
                     <Download className="w-4 h-4 ml-2" />
                     Excel

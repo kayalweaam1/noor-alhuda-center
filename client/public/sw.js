@@ -1,69 +1,102 @@
-const CACHE_NAME = 'noor-alhuda-v1';
-const urlsToCache = [
+// Increment this to bust old caches when deploying
+const CACHE_VERSION = 3;
+const CACHE_NAME = `noor-alhuda-v${CACHE_VERSION}`;
+
+// App shell assets to precache
+const APP_SHELL = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
 ];
 
-// Install event - cache resources
+// Helper: cache static assets (stale-while-revalidate)
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) {
+    // Update in background
+    fetch(request).then((response) => {
+      if (response && response.status === 200) {
+        cache.put(request, response.clone());
+      }
+    }).catch(() => {});
+    return cached;
+  }
+  const response = await fetch(request);
+  if (response && response.status === 200) {
+    cache.put(request, response.clone());
+  }
+  return response;
+}
+
+// Helper: network-first for HTML navigations
+async function networkFirstNavigation(event) {
+  try {
+    const response = await fetch(event.request);
+    const cache = await caches.open(CACHE_NAME);
+    if (response && response.status === 200) {
+      cache.put(event.request, response.clone());
+    }
+    return response;
+  } catch (err) {
+    // Fallback to cached index if offline
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match('/index.html');
+    return cached || new Response('Offline', { status: 503, statusText: 'Offline' });
+  }
+}
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(APP_SHELL);
+    await self.skipWaiting();
+  })());
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((key) => {
+      if (key !== CACHE_NAME) {
+        return caches.delete(key);
+      }
+    }));
+    await self.clients.claim();
+  })());
 });
 
-// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
+  const { request } = event;
 
-        return fetch(event.request).then(
-          (response) => {
-            // Check if valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+  // Never cache non-GET requests
+  if (request.method !== 'GET') {
+    return event.respondWith(fetch(request));
+  }
 
-            // Clone the response
-            const responseToCache = response.clone();
+  const url = new URL(request.url);
 
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+  // Bypass cache entirely for API calls to always get fresh data
+  if (url.pathname.startsWith('/api/')) {
+    return event.respondWith(fetch(request));
+  }
 
-            return response;
-          }
-        );
-      })
-  );
+  // For navigations (SPA routes), use network-first
+  if (request.mode === 'navigate') {
+    return event.respondWith(networkFirstNavigation(event));
+  }
+
+  // For static assets (scripts, styles, images, fonts), use cache-first
+  const destination = request.destination;
+  const staticDestinations = ['script', 'style', 'image', 'font', 'manifest'];
+  if (staticDestinations.includes(destination)) {
+    return event.respondWith(cacheFirst(request));
+  }
+
+  // Default: try cache first, fall back to network
+  return event.respondWith(cacheFirst(request));
 });
 
 // Push notification event
