@@ -40,18 +40,16 @@ export default function Login() {
       // Save user to localStorage
       localStorage.setItem('user', JSON.stringify(result.user));
       
-      // Redirect based on role
+      // Redirect based on role (force full navigation to ensure session cookie is used)
       const role = result.user.role;
-      
-      if (role === 'admin') {
-        setLocation("/admin/dashboard");
-      } else if (role === 'teacher') {
-        setLocation("/teacher/dashboard");
-      } else if (role === 'assistant') {
-        setLocation("/assistant/dashboard");
-      } else {
-        setLocation("/student/dashboard");
-      }
+      const target = role === 'admin'
+        ? '/admin/dashboard'
+        : role === 'teacher'
+        ? '/teacher/dashboard'
+        : role === 'assistant'
+        ? '/assistant/dashboard'
+        : '/student/dashboard';
+      window.location.href = target;
     } catch (error: any) {
       console.error("Error logging in:", error);
       toast.error("رقم الهاتف أو كلمة المرور غير صحيحة");

@@ -234,6 +234,22 @@ export const appRouter = router({
         // Update last signed in
         await db.updateUserLastSignedIn(user.id);
 
+        // Ensure teacher profile exists for teacher accounts
+        if (user.role === 'teacher') {
+          const existingTeacher = await db.getTeacherByUserId(user.id);
+          if (!existingTeacher) {
+            const teacherId = `teacher_${Date.now()}_${Math.random()
+              .toString(36)
+              .substr(2, 9)}`;
+            await db.createTeacher({
+              id: teacherId,
+              userId: user.id,
+              halaqaName: null as any,
+              specialization: null as any,
+            });
+          }
+        }
+
         // Set session
         if (ctx.req.session) {
           ctx.req.session.userId = user.id;
