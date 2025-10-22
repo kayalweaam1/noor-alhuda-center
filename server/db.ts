@@ -14,6 +14,19 @@ import {
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
+// Normalize phone numbers to international format used across the app (+972...)
+function normalizePhoneNumber(rawPhone: string | undefined): string | undefined {
+  if (!rawPhone) return undefined;
+  let phone = rawPhone.trim();
+  if (phone.startsWith("0")) {
+    return "+972" + phone.substring(1);
+  }
+  if (!phone.startsWith("+")) {
+    return "+972" + phone;
+  }
+  return phone;
+}
+
 let _db: ReturnType<typeof drizzle> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
@@ -61,8 +74,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.email = user.email;
     }
     if (user.phone !== undefined) {
-      values.phone = user.phone;
-      updateSet.phone = user.phone;
+      const normalized = normalizePhoneNumber(user.phone);
+      values.phone = normalized;
+      updateSet.phone = normalized;
     }
     if (user.password !== undefined) {
       values.password = user.password;
@@ -139,7 +153,16 @@ export async function getUserByPhone(phone: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+  // First try normalized format, then fall back to the raw input for legacy rows
+  const normalized = normalizePhoneNumber(phone) ?? phone;
+  let result = await db
+    .select()
+    .from(users)
+    .where(eq(users.phone, normalized))
+    .limit(1);
+  if (result.length === 0 && normalized !== phone) {
+    result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+  }
   return result.length > 0 ? result[0] : undefined;
 }
 
