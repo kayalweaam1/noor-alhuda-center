@@ -41,39 +41,41 @@ export function exportToCSV(data: any[], filename: string) {
 
 // Export students data
 export function exportStudents(students: any[]) {
-  const data = students.map(student => ({
-    "الاسم": student.user?.name || "",
-    "رقم الهاتف": student.user?.phone || "",
-    "الحلقة": student.halaqaName || "",
+  const data = students.map((student) => ({
+    // Uses fields provided by trpc.students.getAll
+    "الاسم": student.userName || "",
+    "رقم الهاتف": student.userPhone || "",
     "الصف": student.grade || "",
-    "رقم ولي الأمر": student.parentPhone || "",
-    "العنوان": student.address || "",
+    "تاريخ التسجيل": student.createdAt ? new Date(student.createdAt).toLocaleDateString('ar') : "",
   }));
-  
+
   exportToCSV(data, `students_${new Date().toISOString().split('T')[0]}`);
 }
 
 // Export teachers data
 export function exportTeachers(teachers: any[]) {
-  const data = teachers.map(teacher => ({
-    "الاسم": teacher.user?.name || "",
-    "رقم الهاتف": teacher.user?.phone || "",
+  const data = teachers.map((teacher) => ({
+    // Uses fields provided by trpc.teachers.getAll
+    "الاسم": teacher.userName || "",
+    "رقم الهاتف": teacher.userPhone || "",
     "الحلقة": teacher.halaqaName || "",
     "التخصص": teacher.specialization || "",
+    "تاريخ التعيين": teacher.createdAt ? new Date(teacher.createdAt).toLocaleDateString('ar') : "",
   }));
-  
+
   exportToCSV(data, `teachers_${new Date().toISOString().split('T')[0]}`);
 }
 
 // Export attendance data
 export function exportAttendance(attendance: any[]) {
-  const data = attendance.map(record => ({
-    "الطالب": record.student?.user?.name || "",
-    "التاريخ": new Date(record.date).toLocaleDateString('ar'),
-    "الحالة": record.status === 'present' ? 'حاضر' : record.status === 'absent' ? 'غائب' : 'متأخر',
-    "المربي": record.teacher?.user?.name || "",
+  const data = attendance.map((record) => ({
+    // Uses fields provided by trpc.attendance.getAll
+    "الطالب": record.studentName || "",
+    "التاريخ": record.date ? new Date(record.date).toLocaleDateString('ar') : "",
+    "الحالة": record.status === 'present' ? 'حاضر' : record.status === 'absent' ? 'غائب' : record.status === 'late' ? 'متأخر' : String(record.status || ''),
+    "الحلقة/المربي": record.teacherName || "",
   }));
-  
+
   exportToCSV(data, `attendance_${new Date().toISOString().split('T')[0]}`);
 }
 
