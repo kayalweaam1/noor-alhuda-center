@@ -14,7 +14,6 @@ export default function AdminDashboard() {
   const { user, loading } = useAuth();
   const { data: stats } = trpc.statistics.getOverview.useQuery();
   const hardReset = trpc.setup.hardReset.useMutation();
-  const loginMutation = trpc.auth.login.useMutation();
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -220,58 +219,58 @@ export default function AdminDashboard() {
                 <p className="font-semibold">التقارير</p>
               </button>
 
-              {/* Dangerous Hard Reset Button (admin only) */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button
-                    className="p-4 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 col-span-2 md:col-span-1"
-                  >
-                    <Trash2 className="w-8 h-8 mx-auto mb-2" />
-                    <p className="font-semibold">حذف كل البيانات</p>
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent dir="rtl">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>تأكيد حذف كل البيانات</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      هذا الإجراء سيحذف جميع البيانات من قاعدة البيانات نهائيًا ويُبقي حساب مدير واحد فقط. اكتب كلمة مرور المدير الحالية للتأكيد.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <div className="py-2">
-                    <Input
-                      type="password"
-                      placeholder="كلمة مرور المدير"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </div>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                      <Button
-                        variant="destructive"
-                        disabled={isSubmitting || confirmPassword.length < 4}
-                        onClick={async () => {
-                          try {
-                            setIsSubmitting(true);
-                            // نحاول تسجيل الدخول للتحقق من كلمة المرور قبل الحذف
-                                await loginMutation.mutateAsync({ phone: '0542632557', password: confirmPassword });
-                            await hardReset.mutateAsync({ phone: '0542632557', password: '123456' });
-                            window.location.reload();
-                          } catch (err) {
-                            alert('كلمة المرور غير صحيحة أو حدث خطأ');
-                          } finally {
-                            setIsSubmitting(false);
-                            setConfirmPassword('');
-                          }
-                        }}
-                      >
-                        تأكيد الحذف
-                      </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              {/* Dangerous Hard Reset Button (super admin only) */}
+              {user.phone === '+972542632557' && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="p-4 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 col-span-2 md:col-span-1"
+                    >
+                      <Trash2 className="w-8 h-8 mx-auto mb-2" />
+                      <p className="font-semibold">حذف كل البيانات</p>
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent dir="rtl">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>تأكيد حذف كل البيانات</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        هذا الإجراء سيحذف جميع البيانات من قاعدة البيانات نهائيًا ويُبقي حساب المدير العام فقط. اكتب كلمة مرور المدير العام للتأكيد.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="py-2">
+                      <Input
+                        type="password"
+                        placeholder="كلمة مرور المدير العام"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                      <AlertDialogAction asChild>
+                        <Button
+                          variant="destructive"
+                          disabled={isSubmitting || confirmPassword.length < 4}
+                          onClick={async () => {
+                            try {
+                              setIsSubmitting(true);
+                              await hardReset.mutateAsync({ confirmPassword });
+                              window.location.reload();
+                            } catch (err) {
+                              alert('كلمة المرور غير صحيحة أو حدث خطأ');
+                            } finally {
+                              setIsSubmitting(false);
+                              setConfirmPassword('');
+                            }
+                          }}
+                        >
+                          تأكيد الحذف
+                        </Button>
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           </CardContent>
         </Card>

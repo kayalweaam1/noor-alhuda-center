@@ -38,13 +38,13 @@ export default function StudentsPage() {
 
   const handleDelete = async (studentId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا الطالب؟")) return;
-    
     try {
       await deleteStudentMutation.mutateAsync({ id: studentId });
       toast.success("تم حذف الطالب بنجاح");
       refetch();
-    } catch (error) {
-      toast.error("فشل حذف الطالب");
+    } catch (error: any) {
+      const message = error?.message || 'فشل حذف الطالب';
+      toast.error(message.includes('لا يمكنك حذف حسابك') ? message : 'فشل حذف الطالب');
     }
   };
 

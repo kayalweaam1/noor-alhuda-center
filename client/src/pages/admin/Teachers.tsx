@@ -29,13 +29,12 @@ export default function TeachersPage() {
 
   const handleDelete = async (teacherId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا المربي؟")) return;
-    
     try {
       await deleteTeacherMutation.mutateAsync({ id: teacherId });
       toast.success("تم حذف المربي بنجاح");
       refetch();
-    } catch (error) {
-      toast.error("فشل حذف المربي");
+    } catch (error: any) {
+      toast.error(error?.message || "فشل حذف المربي");
     }
   };
 

@@ -51,13 +51,13 @@ export default function UsersPage() {
 
   const handleDelete = async (userId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا المستخدم؟")) return;
-    
     try {
       await deleteUserMutation.mutateAsync({ userId });
       toast.success("تم حذف المستخدم بنجاح");
       refetch();
-    } catch (error) {
-      toast.error("فشل حذف المستخدم");
+    } catch (error: any) {
+      const message = error?.message || '';
+      toast.error(message || "فشل حذف المستخدم");
     }
   };
 

@@ -78,11 +78,38 @@ export const appRouter = router({
       };
     }),
 
-    // Danger: wipe DB and create single admin
-    hardReset: publicProcedure
-      .input(z.object({ phone: z.string().default('0542632557'), password: z.string().default('123456') }))
-      .mutation(async ({ input }) => {
-        await db.resetDatabaseForAdmin(input.phone, input.password);
+    // Danger: wipe DB and create single admin (SUPER ADMIN ONLY)
+    hardReset: protectedProcedure
+      .input(z.object({ confirmPassword: z.string().min(4) }))
+      .mutation(async ({ input, ctx }) => {
+        // Only super admin (by phone) can execute this
+        const SUPER_ADMIN_PHONE = '+972542632557';
+
+        if (!ctx.user || ctx.user.role !== 'admin' || ctx.user.phone !== SUPER_ADMIN_PHONE) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Super admin access required' });
+        }
+
+        // Verify super admin password
+        const userRecord = await db.getUser(ctx.user.id);
+        if (!userRecord || !userRecord.password) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'كلمة المرور غير صحيحة' });
+        }
+
+        const { comparePassword, isHashed } = await import('./_core/password');
+
+        let passwordMatch = false;
+        if (isHashed(userRecord.password)) {
+          passwordMatch = await comparePassword(input.confirmPassword, userRecord.password);
+        } else {
+          passwordMatch = userRecord.password === input.confirmPassword;
+        }
+
+        if (!passwordMatch) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'كلمة المرور غير صحيحة' });
+        }
+
+        // Perform reset and set the new admin password to the same confirmed password
+        await db.resetDatabaseForAdmin(ctx.user.phone!, input.confirmPassword);
         return { success: true };
       }),
     
@@ -479,6 +506,14 @@ export const appRouter = router({
     getAll: adminProcedure.query(async () => {
       return await db.getAllStudents();
     }),
+
+    getById: adminProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ input }) => {
+        const student = await db.getStudent(input.id);
+        if (!student) return null;
+        return student;
+      }),
 
     getMyProfile: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== 'student') return null;

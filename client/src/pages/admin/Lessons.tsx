@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, Calendar, Users, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { AddLessonModal } from "@/components/modals/AddLessonModal";
 
 export default function AdminLessonsPage() {
   const { data: lessons } = trpc.lessons.getAll.useQuery();
   const { data: teachers } = trpc.teachers.getAll.useQuery();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [showAddLesson, setShowAddLesson] = useState(false);
 
   const getTeacherName = (teacherId: string) => {
     const teacher = teachers?.find(t => t.id === teacherId);
@@ -130,6 +132,9 @@ export default function AdminLessonsPage() {
               <CardDescription>عرض جميع دروس المربين حسب التاريخ</CardDescription>
             </div>
             <div className="flex items-center gap-4">
+              <Button onClick={() => setShowAddLesson(true)} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+                إضافة درس
+              </Button>
               <Button
                 variant="outline"
                 size="icon"
@@ -223,6 +228,9 @@ export default function AdminLessonsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Add Lesson Modal */}
+      <AddLessonModal open={showAddLesson} onClose={() => setShowAddLesson(false)} />
     </div>
   );
 }

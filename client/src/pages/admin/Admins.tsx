@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Plus, Trash2, Crown } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 export default function Admins() {
   const { isSuperAdmin } = useAuth();
-  const [adminPhones, setAdminPhones] = useState([
-    { phone: "+972542632557", name: "المدير العام", isSuperAdmin: true },
-    { phone: "+972506381455", name: "مدير", isSuperAdmin: false },
-  ]);
+  const { data: users, refetch } = trpc.users.getAll.useQuery();
+  const updateRole = trpc.users.updateRole.useMutation();
   const [newPhone, setNewPhone] = useState("+972");
   const [newName, setNewName] = useState("");
 
@@ -39,7 +38,9 @@ export default function Admins() {
     );
   }
 
-  const handleAddAdmin = () => {
+  const admins = useMemo(() => (users || []).filter(u => u.role === 'admin'), [users]);
+
+  const handleAddAdmin = async () => {
     if (!newPhone || newPhone.length < 10) {
       toast.error("رقم الهاتف غير صحيح");
       return;
@@ -50,27 +51,40 @@ export default function Admins() {
       return;
     }
 
-    if (adminPhones.some(a => a.phone === newPhone)) {
-      toast.error("هذا الرقم مسجل بالفعل");
+    const user = (users || []).find(u => u.phone === newPhone);
+    if (!user) {
+      toast.error("المستخدم غير موجود. أنشئه من صفحة المستخدمين أولاً");
       return;
     }
 
-    setAdminPhones([...adminPhones, { phone: newPhone, name: newName, isSuperAdmin: false }]);
-    setNewPhone("+972");
-    setNewName("");
-    toast.success("تم إضافة المدير بنجاح");
+    try {
+      await updateRole.mutateAsync({ userId: user.id, role: 'admin' });
+      await refetch();
+      setNewPhone("+972");
+      setNewName("");
+      toast.success("تم إضافة المدير بنجاح");
+    } catch (e: any) {
+      toast.error(e?.message || "فشل إضافة المدير");
+    }
   };
 
-  const handleRemoveAdmin = (phone: string) => {
+  const handleRemoveAdmin = async (phone: string) => {
     // Cannot remove super admin
     if (phone === "+972542632557") {
       toast.error("لا يمكن حذف المدير العام");
       return;
     }
 
-    if (confirm("هل أنت متأكد من حذف هذا المدير؟")) {
-      setAdminPhones(adminPhones.filter(a => a.phone !== phone));
-      toast.success("تم حذف المدير بنجاح");
+    if (!confirm("هل أنت متأكد من إزالة صلاحية المدير؟")) return;
+
+    const user = (users || []).find(u => u.phone === phone);
+    if (!user) return;
+    try {
+      await updateRole.mutateAsync({ userId: user.id, role: 'teacher' });
+      await refetch();
+      toast.success("تم إزالة صلاحية المدير");
+    } catch (e: any) {
+      toast.error(e?.message || "فشل العملية");
     }
   };
 
@@ -127,13 +141,13 @@ export default function Admins() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {adminPhones.map((admin) => (
+            {admins.map((admin) => (
               <div
                 key={admin.phone}
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  {admin.isSuperAdmin ? (
+                  {admin.phone === "+972542632557" ? (
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
                       <Crown className="w-6 h-6 text-white" />
                     </div>
@@ -145,7 +159,7 @@ export default function Admins() {
                   <div>
                     <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                       {admin.name}
-                      {admin.isSuperAdmin && (
+                      {admin.phone === "+972542632557" && (
                         <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                           مدير عام
                         </span>
@@ -157,7 +171,7 @@ export default function Admins() {
                   </div>
                 </div>
 
-                {!admin.isSuperAdmin && (
+                {admin.phone !== "+972542632557" && (
                   <Button
                     variant="destructive"
                     size="sm"
@@ -171,7 +185,7 @@ export default function Admins() {
             ))}
           </div>
 
-          {adminPhones.length === 0 && (
+          {admins.length === 0 && (
             <div className="text-center py-12 text-gray-500">
               لا يوجد مدراء مسجلين
             </div>
