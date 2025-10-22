@@ -15,10 +15,13 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import AddTeacherModal from "@/components/modals/AddTeacherModal";
+import EditTeacherModal from "@/components/modals/EditTeacherModal";
 
 export default function TeachersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
   const { data: teachers, refetch } = trpc.teachers.getAll.useQuery();
   const deleteTeacherMutation = trpc.teachers.delete.useMutation();
 
@@ -160,6 +163,10 @@ export default function TeachersPage() {
                           size="sm"
                           variant="outline"
                           className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                          onClick={() => {
+                            setSelectedTeacher(teacher);
+                            setShowEditModal(true);
+                          }}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -190,6 +197,13 @@ export default function TeachersPage() {
       <AddTeacherModal 
         open={showAddModal} 
         onOpenChange={setShowAddModal}
+        onSuccess={refetch}
+      />
+      
+      <EditTeacherModal 
+        open={showEditModal} 
+        onOpenChange={setShowEditModal}
+        teacher={selectedTeacher}
         onSuccess={refetch}
       />
     </div>

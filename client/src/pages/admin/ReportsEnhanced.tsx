@@ -15,7 +15,7 @@ import {
 import { format, subDays, subMonths, startOfYear } from "date-fns";
 import { ar } from "date-fns/locale";
 
-export default function ReportsPage() {
+export default function ReportsEnhanced() {
   const [loading, setLoading] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState<string>("attendance");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("7days");
