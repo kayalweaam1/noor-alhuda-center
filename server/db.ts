@@ -1,5 +1,6 @@
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { 
   InsertUser, users, 
   teachers, InsertTeacher, Teacher,
@@ -28,17 +29,58 @@ function normalizePhoneNumber(rawPhone: string | undefined): string | undefined 
 }
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _pool: mysql.Pool | null = null;
+
+function parseMysqlUrl(url?: string):
+  | { host: string; port?: number; user?: string; password?: string; database?: string }
+  | undefined {
+  if (!url) return undefined;
+  try {
+    const u = new URL(url);
+    const dbName = u.pathname?.replace(/^\//, "");
+    return {
+      host: u.hostname,
+      port: u.port ? Number(u.port) : undefined,
+      user: u.username ? decodeURIComponent(u.username) : undefined,
+      password: u.password ? decodeURIComponent(u.password) : undefined,
+      database: dbName || undefined,
+    };
+  } catch {
+    return undefined;
+  }
+}
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+  if (_db) return _db;
+
+  const connectionUrl = ENV.databaseUrl || process.env.DATABASE_URL;
+  if (!connectionUrl) return null;
+
+  try {
+    if (!_pool) {
+      const opts = parseMysqlUrl(connectionUrl);
+      if (!opts?.host || !opts?.user || !opts?.database) {
+        throw new Error("Invalid DATABASE_URL for MySQL");
+      }
+
+      _pool = mysql.createPool({
+        host: opts.host,
+        port: opts.port ?? 3306,
+        user: opts.user,
+        password: opts.password,
+        database: opts.database,
+        connectionLimit: 10,
+        waitForConnections: true,
+      });
     }
+
+    _db = drizzle(_pool);
+  } catch (error) {
+    console.warn("[Database] Failed to connect:", error);
+    _db = null;
   }
+
   return _db;
 }
 
