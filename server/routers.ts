@@ -508,7 +508,15 @@ export const appRouter = router({
   // ============= STUDENT MANAGEMENT =============
   students: router({
     getAll: adminProcedure.query(async () => {
-      return await db.getAllStudents();
+      const list = await db.getAllStudents();
+      // Join with attendance rates for quick overview
+      const rates = await db.getAttendanceRatesByStudent();
+      const map = new Map(rates.map(r => [r.studentId, r] as const));
+      return list.map((s: any) => {
+        const r = map.get(s.id);
+        const rate = r && r.totalCount > 0 ? Math.round((r.presentCount / r.totalCount) * 100) : 0;
+        return { ...s, attendanceRate: rate };
+      });
     }),
 
     getById: adminProcedure

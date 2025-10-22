@@ -465,6 +465,22 @@ export async function deleteAttendance(id: string) {
   await db.delete(attendance).where(eq(attendance.id, id));
 }
 
+export async function getAttendanceRatesByStudent(): Promise<Array<{ studentId: string; totalCount: number; presentCount: number }>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select({
+      studentId: attendance.studentId,
+      totalCount: sql<number>`count(*)`,
+      presentCount: sql<number>`sum(case when ${attendance.status} = 'present' then 1 else 0 end)`,
+    })
+    .from(attendance)
+    .groupBy(attendance.studentId);
+
+  return rows as Array<{ studentId: string; totalCount: number; presentCount: number }>;
+}
+
 // ============= LESSON FUNCTIONS =============
 
 export async function createLesson(lesson: InsertLesson) {

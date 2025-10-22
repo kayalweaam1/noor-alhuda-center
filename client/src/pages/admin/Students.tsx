@@ -48,14 +48,8 @@ export default function StudentsPage() {
     }
   };
 
-  const attendanceByStudentId = (students || []).reduce<Record<string, number>>((acc, s) => {
-    // Placeholder aggregation until a dedicated endpoint is added
-    acc[s.id] = 0;
-    return acc;
-  }, {});
-
   const getAttendanceRate = (student: any) => {
-    const rate = attendanceByStudentId[student.id] ?? 0;
+    const rate = typeof student.attendanceRate === 'number' ? student.attendanceRate : 0;
     return rate;
   };
 
