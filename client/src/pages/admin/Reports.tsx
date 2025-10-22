@@ -11,6 +11,7 @@ export default function ReportsPage() {
   const { data: students } = trpc.students.getAll.useQuery();
   const { data: teachers } = trpc.teachers.getAll.useQuery();
   const { data: attendance } = trpc.attendance.getAll.useQuery({});
+  const totalReports = (students?.length ?? 0) + (teachers?.length ?? 0) + (attendance?.length ?? 0);
 
   const handleExportAll = async () => {
     setLoading(true);
@@ -82,7 +83,7 @@ export default function ReportsPage() {
             <div className="text-center">
               <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
               <p className="text-sm text-blue-700 mb-2">إجمالي التقارير</p>
-              <p className="text-3xl font-bold text-blue-900">12</p>
+              <p className="text-3xl font-bold text-blue-900">{totalReports}</p>
             </div>
           </CardContent>
         </Card>

@@ -48,9 +48,14 @@ export default function StudentsPage() {
     }
   };
 
+  const attendanceByStudentId = (students || []).reduce<Record<string, number>>((acc, s) => {
+    // Placeholder aggregation until a dedicated endpoint is added
+    acc[s.id] = 0;
+    return acc;
+  }, {});
+
   const getAttendanceRate = (student: any) => {
-    // Mock calculation - will be replaced with real data
-    const rate = Math.floor(Math.random() * 40) + 60; // 60-100%
+    const rate = attendanceByStudentId[student.id] ?? 0;
     return rate;
   };
 

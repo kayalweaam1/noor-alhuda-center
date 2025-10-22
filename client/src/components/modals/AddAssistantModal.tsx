@@ -16,6 +16,7 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+972");
   const [halaqaName, setHalaqaName] = useState("");
+  const [password, setPassword] = useState("");
 
   const createAssistant = trpc.assistants.createWithUser.useMutation({
     onSuccess: () => {
@@ -33,6 +34,7 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
     setName("");
     setPhone("+972");
     setHalaqaName("");
+    setPassword("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,6 +48,7 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
     createAssistant.mutate({
       name,
       phone,
+      password: password || undefined,
       halaqaName,
     });
   };
@@ -97,6 +100,18 @@ export default function AddAssistantModal({ open, onOpenChange, onSuccess }: Add
             <p className="text-xs text-gray-500">
               سيتمكن المربي في نفس الحلقة من إرسال ملاحظات وتقييمات للمساعد
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">كلمة المرور (اختياري)</Label>
+            <Input
+              id="password"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="أدخل كلمة المرور"
+              dir="ltr"
+            />
           </div>
 
           <div className="flex gap-3 justify-end pt-4">

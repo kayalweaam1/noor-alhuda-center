@@ -455,18 +455,22 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
+        password: z.string().min(6).optional(),
         halaqaName: z.string().optional(),
         specialization: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Create user first
+        // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password || '123456');
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
+          password: hashedPassword,
           role: 'teacher',
-          loginMethod: 'firebase',
+          loginMethod: 'password',
         });
 
         // Then create teacher
@@ -542,20 +546,22 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
-        password: z.string().optional(),
+        password: z.string().min(6).optional(),
         teacherId: z.string(),
         grade: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Create user first
+        // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password || '123456');
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
-          password: input.password || '123456',
+          password: hashedPassword,
           role: 'student',
-          loginMethod: 'firebase',
+          loginMethod: 'password',
         });
 
         // Then create student
@@ -828,17 +834,21 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
+        password: z.string().min(6).optional(),
         halaqaName: z.string(),
       }))
       .mutation(async ({ input }) => {
-        // Create user first
+        // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password || '123456');
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
+          password: hashedPassword,
           role: 'assistant',
-          loginMethod: 'firebase',
+          loginMethod: 'password',
         });
 
         // Then create assistant
