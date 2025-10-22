@@ -69,7 +69,8 @@ export const attendance = mysqlTable("attendance", {
   studentId: varchar("studentId", { length: 64 }).notNull().references(() => students.id, { onDelete: "cascade" }),
   teacherId: varchar("teacherId", { length: 64 }).notNull().references(() => teachers.id, { onDelete: "cascade" }),
   date: timestamp("date").notNull(),
-  status: mysqlEnum("status", ["present", "absent", "excused"]).notNull(),
+  // Support both historic "excused" and UI-used "late"
+  status: mysqlEnum("status", ["present", "absent", "excused", "late"]).notNull(),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow(),
 });

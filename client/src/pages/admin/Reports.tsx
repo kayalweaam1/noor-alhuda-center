@@ -2,20 +2,29 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, FileText, Users, Calendar, TrendingUp, Filter } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { exportAttendance, exportStudents, exportTeachers } from "@/lib/export";
 
 export default function ReportsPage() {
   const [loading, setLoading] = useState(false);
   const { data: students } = trpc.students.getAll.useQuery();
   const { data: teachers } = trpc.teachers.getAll.useQuery();
+  const { data: attendance } = trpc.attendance.getAll.useQuery({});
+
+  const attendanceRate = useMemo(() => {
+    if (!attendance || attendance.length === 0) return 0;
+    const presentCount = attendance.filter((r: any) => r.status === 'present').length;
+    return Math.round((presentCount / attendance.length) * 100);
+  }, [attendance]);
 
   const handleExportAll = async () => {
     setLoading(true);
     try {
-      // Mock export - will be replaced with real implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success("تم تصدير التقرير بنجاح");
+      exportStudents(students || []);
+      exportTeachers(teachers || []);
+      exportAttendance(attendance || []);
+      toast.success("تم تصدير التقارير (CSV) بنجاح");
     } catch (error) {
       toast.error("فشل تصدير التقرير");
     } finally {
@@ -109,7 +118,7 @@ export default function ReportsPage() {
             <div className="text-center">
               <TrendingUp className="w-8 h-8 text-amber-600 mx-auto mb-2" />
               <p className="text-sm text-amber-700 mb-2">نسبة الحضور</p>
-              <p className="text-3xl font-bold text-amber-900">85%</p>
+              <p className="text-3xl font-bold text-amber-900">{attendanceRate}%</p>
             </div>
           </CardContent>
         </Card>
@@ -137,7 +146,17 @@ export default function ReportsPage() {
                   <Button
                     variant="outline"
                     className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50"
-                    onClick={() => toast.info("قريباً: عرض التقرير")}
+                    onClick={() => {
+                      if (report.action === 'students') {
+                        exportStudents(students || []);
+                      } else if (report.action === 'teachers') {
+                        exportTeachers(teachers || []);
+                      } else if (report.action === 'attendance') {
+                        exportAttendance(attendance || []);
+                      } else {
+                        toast.info("قريباً: عرض التقرير");
+                      }
+                    }}
                   >
                     <FileText className="w-4 h-4 ml-2" />
                     عرض

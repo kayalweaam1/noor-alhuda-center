@@ -1,5 +1,6 @@
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { 
   InsertUser, users, 
   teachers, InsertTeacher, Teacher,
@@ -15,16 +16,28 @@ import {
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _pool: mysql.Pool | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+  if (_db) return _db;
+
+  const url = ENV.databaseUrl || process.env.DATABASE_URL;
+  if (!url) {
+    console.warn("[Database] DATABASE_URL is not set; DB features disabled");
+    return null;
+  }
+
+  try {
+    // Reuse pool if already created
+    if (!_pool) {
+      // mysql2 supports DSN strings directly
+      _pool = mysql.createPool(url);
     }
+    _db = drizzle(_pool);
+  } catch (error) {
+    console.warn("[Database] Failed to connect:", error);
+    _db = null;
   }
   return _db;
 }

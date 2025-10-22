@@ -42,38 +42,36 @@ export function exportToCSV(data: any[], filename: string) {
 // Export students data
 export function exportStudents(students: any[]) {
   const data = students.map(student => ({
-    "الاسم": student.user?.name || "",
-    "رقم الهاتف": student.user?.phone || "",
-    "الحلقة": student.halaqaName || "",
+    "الاسم": student.userName || student.user?.name || "",
+    "رقم الهاتف": student.userPhone || student.user?.phone || "",
+    "الحلقة": student.halaqaName || student.grade || "",
     "الصف": student.grade || "",
-    "رقم ولي الأمر": student.parentPhone || "",
-    "العنوان": student.address || "",
   }));
-  
+
   exportToCSV(data, `students_${new Date().toISOString().split('T')[0]}`);
 }
 
 // Export teachers data
 export function exportTeachers(teachers: any[]) {
   const data = teachers.map(teacher => ({
-    "الاسم": teacher.user?.name || "",
-    "رقم الهاتف": teacher.user?.phone || "",
+    "الاسم": teacher.userName || teacher.user?.name || "",
+    "رقم الهاتف": teacher.userPhone || teacher.user?.phone || "",
     "الحلقة": teacher.halaqaName || "",
     "التخصص": teacher.specialization || "",
   }));
-  
+
   exportToCSV(data, `teachers_${new Date().toISOString().split('T')[0]}`);
 }
 
 // Export attendance data
 export function exportAttendance(attendance: any[]) {
   const data = attendance.map(record => ({
-    "الطالب": record.student?.user?.name || "",
-    "التاريخ": new Date(record.date).toLocaleDateString('ar'),
-    "الحالة": record.status === 'present' ? 'حاضر' : record.status === 'absent' ? 'غائب' : 'متأخر',
-    "المربي": record.teacher?.user?.name || "",
+    "الطالب": record.studentName || record.student?.user?.name || "",
+    "التاريخ": record.date ? new Date(record.date).toLocaleDateString('ar') : "",
+    "الحالة": record.status === 'present' ? 'حاضر' : record.status === 'absent' ? 'غائب' : record.status === 'late' ? 'متأخر' : 'معذور',
+    "المربي/الحلقة": record.teacherName || record.teacher?.user?.name || "",
   }));
-  
+
   exportToCSV(data, `attendance_${new Date().toISOString().split('T')[0]}`);
 }
 
