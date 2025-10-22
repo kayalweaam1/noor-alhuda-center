@@ -49,8 +49,7 @@ export default function StudentsPage() {
   };
 
   const getAttendanceRate = (student: any) => {
-    // Mock calculation - will be replaced with real data
-    const rate = Math.floor(Math.random() * 40) + 60; // 60-100%
+    const rate = typeof student.attendanceRate === 'number' ? student.attendanceRate : 0;
     return rate;
   };
 

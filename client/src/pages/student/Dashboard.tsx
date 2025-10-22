@@ -33,9 +33,19 @@ export default function StudentDashboard() {
     );
   }
 
-  // Mock data - will be replaced with real data
-  const attendanceRate = 85;
-  const behaviorScore = 90;
+  // Derive simple metrics from real data when available
+  const studentIdForQuery = student?.id ?? 'placeholder';
+  const { data: attendanceRecords = [] } = trpc.attendance.getByStudent.useQuery(
+    { studentId: studentIdForQuery },
+    { enabled: !!student?.id }
+  );
+  const attendanceRate = attendanceRecords.length > 0
+    ? Math.round(
+        (attendanceRecords.filter((r: any) => r.status === 'present').length /
+          attendanceRecords.length) * 100
+      )
+    : 0;
+  const behaviorScore = Math.min(100, Math.max(0, 60 + Math.floor(attendanceRate / 5)));
 
   const getBehaviorColor = (score: number) => {
     if (score >= 90) return "from-emerald-500 to-green-600";
@@ -43,6 +53,51 @@ export default function StudentDashboard() {
     if (score >= 60) return "from-amber-500 to-yellow-600";
     return "from-red-500 to-orange-600";
   };
+
+  function getLast7DaysWithPresence(records: any[]) {
+    const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    const today = new Date();
+    const last7: { day: string; present: boolean }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const dayName = days[d.getDay()];
+      const hasPresent = records.some((r: any) => {
+        const rd = new Date(r.date);
+        return rd.getFullYear() === d.getFullYear() && rd.getMonth() === d.getMonth() && rd.getDate() === d.getDate() && r.status === 'present';
+      });
+      last7.push({ day: dayName, present: hasPresent });
+    }
+    return last7;
+  }
+
+  function StudentEvaluations({ studentId }: { studentId?: string }) {
+    const { data: evals = [] } = trpc.evaluations.getByStudent.useQuery(
+      { studentId: studentId as string },
+      { enabled: !!studentId }
+    );
+    if (!studentId) return <p className="text-sm text-gray-600">لا توجد بيانات</p>;
+    if (!evals.length) return <p className="text-sm text-gray-600">لا توجد تقييمات بعد</p>;
+    return (
+      <div className="space-y-3">
+        {evals.slice(0, 5).map((e: any) => (
+          <div key={e.id} className="flex items-start gap-3 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+            <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold text-emerald-900">{e.evaluationType || 'تقييم'}</p>
+              {e.feedback && (
+                <p className="text-sm text-emerald-700 mt-1">{e.feedback}</p>
+              )}
+              <p className="text-xs text-emerald-600 mt-2">{new Date(e.date).toLocaleDateString('ar-SA')}</p>
+            </div>
+            {typeof e.score === 'number' && (
+              <span className="text-sm font-bold text-emerald-700">{e.score}%</span>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50" dir="rtl">
@@ -164,40 +219,18 @@ export default function StudentDashboard() {
           </Card>
         </div>
 
-        {/* Teacher Notes */}
+        {/* Teacher Notes (from evaluations) */}
         <Card className="border-blue-200">
           <CardHeader>
             <CardTitle className="text-blue-900">ملاحظات المربي</CardTitle>
-            <CardDescription>آخر الملاحظات والتوجيهات</CardDescription>
+            <CardDescription>آخر الملاحظات والتقييمات</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-semibold text-emerald-900">أداء ممتاز</p>
-                  <p className="text-sm text-emerald-700 mt-1">
-                    حفظ متقن للسور المطلوبة، استمر على هذا المستوى
-                  </p>
-                  <p className="text-xs text-emerald-600 mt-2">منذ يومين</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-semibold text-blue-900">تحسن ملحوظ</p>
-                  <p className="text-sm text-blue-700 mt-1">
-                    تحسن كبير في التجويد، واصل الممارسة
-                  </p>
-                  <p className="text-xs text-blue-600 mt-2">منذ أسبوع</p>
-                </div>
-              </div>
-            </div>
+            <StudentEvaluations studentId={student?.id} />
           </CardContent>
         </Card>
 
-        {/* Attendance Record */}
+        {/* Attendance Record (last 7 days) */}
         <Card className="border-blue-200">
           <CardHeader>
             <CardTitle className="text-blue-900">سجل الحضور</CardTitle>
@@ -205,15 +238,7 @@ export default function StudentDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-2">
-              {[
-                { day: 'السبت', present: true },
-                { day: 'الأحد', present: true },
-                { day: 'الاثنين', present: false },
-                { day: 'الثلاثاء', present: true },
-                { day: 'الأربعاء', present: true },
-                { day: 'الخميس', present: true },
-                { day: 'الجمعة', present: false },
-              ].map((record, index) => (
+              {getLast7DaysWithPresence(attendanceRecords).map((record, index) => (
                 <div key={index} className="text-center">
                   <p className="text-xs text-gray-600 mb-2">{record.day}</p>
                   <div

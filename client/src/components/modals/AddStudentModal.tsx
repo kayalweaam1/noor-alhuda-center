@@ -18,6 +18,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
   const [phone, setPhone] = useState("+972");
   const [teacherId, setTeacherId] = useState("");
   const [halaqaClass, setHalaqaClass] = useState("");
+  const [password, setPassword] = useState("");
 
   const { data: teachers } = trpc.teachers.getAll.useQuery();
   const createStudent = trpc.students.createWithUser.useMutation({
@@ -37,6 +38,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
     setPhone("+972");
     setTeacherId("");
     setHalaqaClass("");
+    setPassword("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -50,6 +52,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
     createStudent.mutate({
       name,
       phone,
+      password: password || undefined,
       teacherId,
       grade: halaqaClass || undefined,
     });
@@ -104,6 +107,18 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">كلمة المرور (اختياري)</Label>
+            <Input
+              id="password"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="أدخل كلمة المرور"
+              dir="ltr"
+            />
           </div>
 
           <div className="space-y-2">
