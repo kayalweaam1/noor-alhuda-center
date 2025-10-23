@@ -1068,3 +1068,172 @@ export async function updateStudentPaymentStatus(studentId: string, hasPaid: boo
   await db.update(students).set({ hasPaid }).where(eq(students.id, studentId));
 }
 
+
+
+
+// Create all database tables if they don't exist
+export async function initializeDatabaseTables() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error('Database connection failed');
+  }
+
+  try {
+    // Use raw SQL to create tables - this is a workaround since drizzle-kit can't run in production
+    const pool = _pool;
+    if (!pool) {
+      throw new Error('Database pool not initialized');
+    }
+
+    const connection = await pool.getConnection();
+    
+    try {
+      // Create users table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR(64) PRIMARY KEY,
+          name TEXT,
+          email VARCHAR(320),
+          phone VARCHAR(20),
+          password VARCHAR(255),
+          loginMethod VARCHAR(64),
+          role ENUM('admin', 'teacher', 'student', 'assistant') DEFAULT 'student' NOT NULL,
+          profileImage TEXT,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          lastSignedIn TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // Create teachers table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS teachers (
+          id VARCHAR(64) PRIMARY KEY,
+          userId VARCHAR(64) NOT NULL UNIQUE,
+          halaqaName VARCHAR(255),
+          specialization TEXT,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+        )
+      `);
+
+      // Create students table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS students (
+          id VARCHAR(64) PRIMARY KEY,
+          userId VARCHAR(64) NOT NULL UNIQUE,
+          teacherId VARCHAR(64),
+          grade VARCHAR(50),
+          enrollmentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          hasPaid BOOLEAN DEFAULT FALSE NOT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+          FOREIGN KEY (teacherId) REFERENCES teachers(id) ON DELETE SET NULL
+        )
+      `);
+
+      // Create assistants table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS assistants (
+          id VARCHAR(64) PRIMARY KEY,
+          userId VARCHAR(64) NOT NULL UNIQUE,
+          halaqaName VARCHAR(255),
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+        )
+      `);
+
+      // Create attendance table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS attendance (
+          id VARCHAR(64) PRIMARY KEY,
+          studentId VARCHAR(64) NOT NULL,
+          teacherId VARCHAR(64) NOT NULL,
+          date TIMESTAMP NOT NULL,
+          status ENUM('present', 'absent', 'excused') NOT NULL,
+          notes TEXT,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE,
+          FOREIGN KEY (teacherId) REFERENCES teachers(id) ON DELETE CASCADE
+        )
+      `);
+
+      // Create lessons table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS lessons (
+          id VARCHAR(64) PRIMARY KEY,
+          teacherId VARCHAR(64) NOT NULL,
+          title VARCHAR(255) NOT NULL,
+          description TEXT,
+          date TIMESTAMP NOT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (teacherId) REFERENCES teachers(id) ON DELETE CASCADE
+        )
+      `);
+
+      // Create evaluations table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS evaluations (
+          id VARCHAR(64) PRIMARY KEY,
+          studentId VARCHAR(64) NOT NULL,
+          teacherId VARCHAR(64) NOT NULL,
+          lessonId VARCHAR(64),
+          score INT NOT NULL,
+          feedback TEXT,
+          evaluationType VARCHAR(100),
+          date TIMESTAMP NOT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE,
+          FOREIGN KEY (teacherId) REFERENCES teachers(id) ON DELETE CASCADE,
+          FOREIGN KEY (lessonId) REFERENCES lessons(id) ON DELETE SET NULL
+        )
+      `);
+
+      // Create notifications table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS notifications (
+          id VARCHAR(64) PRIMARY KEY,
+          userId VARCHAR(64) NOT NULL,
+          title VARCHAR(255) NOT NULL,
+          message TEXT NOT NULL,
+          type ENUM('info', 'warning', 'success', 'error') DEFAULT 'info' NOT NULL,
+          isRead BOOLEAN DEFAULT FALSE NOT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+        )
+      `);
+
+      // Create otpCodes table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS otpCodes (
+          id VARCHAR(64) PRIMARY KEY,
+          phone VARCHAR(20) NOT NULL,
+          code VARCHAR(6) NOT NULL,
+          expiresAt TIMESTAMP NOT NULL,
+          verified BOOLEAN DEFAULT FALSE NOT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // Create assistantNotes table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS assistantNotes (
+          id VARCHAR(64) PRIMARY KEY,
+          assistantId VARCHAR(64) NOT NULL,
+          studentId VARCHAR(64) NOT NULL,
+          note TEXT NOT NULL,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (assistantId) REFERENCES users(id) ON DELETE CASCADE,
+          FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
+        )
+      `);
+
+      console.log('[Database] All tables created successfully');
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error('[Database] Error creating tables:', error);
+    throw error;
+  }
+}
+

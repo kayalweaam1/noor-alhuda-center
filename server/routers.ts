@@ -29,7 +29,10 @@ export const appRouter = router({
   setup: router({
     initializeDatabase: publicProcedure.mutation(async () => {
       try {
-        // Create default admin (this will also ensure tables exist via drizzle)
+        // Create all database tables first
+        await db.initializeDatabaseTables();
+        
+        // Create default admin
         await db.createDefaultAdmin();
         
         return { 
