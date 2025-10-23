@@ -10,8 +10,9 @@ RUN apt-get update && apt-get install -y build-essential
 # Install pnpm globally
 RUN npm install -g pnpm
 
-# Copy package.json and pnpm-lock.yaml to install dependencies
+# Copy package.json, pnpm-lock.yaml, and patches directory
 COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
 
 # Install dependencies using pnpm
 RUN pnpm install --prod=false
