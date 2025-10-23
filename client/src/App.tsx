@@ -14,6 +14,8 @@ import AdminReports from "./pages/admin/Reports";
 import AdminLessons from "./pages/admin/Lessons";
 import AdminAnalytics from "./pages/admin/Analytics";
 import AdminAdmins from "./pages/admin/Admins";
+import AdminPayments from "./pages/admin/Payments";
+import AdminAppSettings from "./pages/admin/AppSettings";
 import AdminLayout from "./components/layouts/AdminLayout";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
@@ -77,6 +79,16 @@ function Router() {
       <Route path="/admin/settings">
         <AdminLayout>
           <Settings />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/payments">
+        <AdminLayout>
+          <AdminPayments />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/app-settings">
+        <AdminLayout>
+          <AdminAppSettings />
         </AdminLayout>
       </Route>
       <Route path="/teacher/dashboard">

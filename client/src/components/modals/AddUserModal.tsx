@@ -19,6 +19,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "teacher" | "student">("student");
+  const [teacherType, setTeacherType] = useState<"tarbiya" | "tahfiz">("tahfiz");
 
   const createUser = trpc.users.create.useMutation({
     onSuccess: () => {
@@ -38,6 +39,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
     setEmail("");
     setPassword("");
     setRole("student");
+    setTeacherType("tahfiz");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -129,6 +131,21 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
               </SelectContent>
             </Select>
           </div>
+
+          {role === "teacher" && (
+            <div className="space-y-2">
+              <Label htmlFor="teacherType">تصنيف المربي *</Label>
+              <Select value={teacherType} onValueChange={(value: any) => setTeacherType(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر التصنيف" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tahfiz">تحفيظ</SelectItem>
+                  <SelectItem value="tarbiya">تربية</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end pt-4">
             <Button
