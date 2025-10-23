@@ -27,6 +27,30 @@ export const appRouter = router({
 
   // Setup endpoints
   setup: router({
+    initializeDatabase: publicProcedure.mutation(async () => {
+      try {
+        // Run drizzle migrations
+        const { execSync } = require('child_process');
+        execSync('pnpm drizzle-kit push', { stdio: 'inherit' });
+        
+        // Create default admin
+        await db.createDefaultAdmin();
+        
+        return { 
+          success: true, 
+          message: 'Database initialized successfully',
+          phone: '0542632557',
+          password: '123456'
+        };
+      } catch (error) {
+        console.error('Database initialization error:', error);
+        return { 
+          success: false, 
+          message: 'Database initialization failed: ' + (error instanceof Error ? error.message : String(error))
+        };
+      }
+    }),
+    
     createAdmin: publicProcedure.mutation(async () => {
       await db.createDefaultAdmin();
       return { success: true, message: 'Admin created successfully' };
