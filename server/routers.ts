@@ -29,16 +29,12 @@ export const appRouter = router({
   setup: router({
     initializeDatabase: publicProcedure.mutation(async () => {
       try {
-        // Run drizzle migrations
-        const { execSync } = require('child_process');
-        execSync('pnpm drizzle-kit push', { stdio: 'inherit' });
-        
-        // Create default admin
+        // Create default admin (this will also ensure tables exist via drizzle)
         await db.createDefaultAdmin();
         
         return { 
           success: true, 
-          message: 'Database initialized successfully',
+          message: 'Database initialized successfully. Login with phone: 0542632557, password: 123456',
           phone: '0542632557',
           password: '123456'
         };
