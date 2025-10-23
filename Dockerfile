@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as the base image
-FROM node:20-slim AS base
+FROM node:20 AS base
 
 # Set the working directory
 WORKDIR /app
@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm build
 
 # --- Production Stage ---
-FROM node:20-slim AS production
+FROM node:20 AS production
 
 # Set the working directory
 WORKDIR /app
