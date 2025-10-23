@@ -42,6 +42,7 @@ export const students = mysqlTable("students", {
   teacherId: varchar("teacherId", { length: 64 }).references(() => teachers.id, { onDelete: "set null" }),
   grade: varchar("grade", { length: 50 }), // e.g., "الصف الثالث"
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
+  hasPaid: boolean("hasPaid").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
 });
 

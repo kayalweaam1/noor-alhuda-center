@@ -408,27 +408,48 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
-        email: z.string().optional(),
-        password: z.string(),
-        role: z.enum(["admin", "teacher", "student"]),
-      }))
-      .mutation(async ({ input }) => {
+	        email: z.string().optional(),
+	        password: z.string(),
+	        role: z.enum(["admin", "teacher", "student"]),
+	        grade: z.string().optional(), // Added grade
+	      }))
+	      .mutation(async ({ input }) => {
         // Hash password before saving
         const { hashPassword } = await import('./_core/password');
         const hashedPassword = await hashPassword(input.password);
         
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        await db.upsertUser({
-          id: userId,
-          name: input.name,
-          phone: input.phone,
-          email: input.email,
-          password: hashedPassword,
-          role: input.role,
-          loginMethod: 'firebase',
-        });
-        return { success: true, userId };
-      }),
+	        await db.upsertUser({
+	          id: userId,
+	          name: input.name,
+	          phone: input.phone,
+	          email: input.email,
+	          password: hashedPassword,
+	          role: input.role,
+	          loginMethod: 'password', // Changed to 'password' as it seems to be the main login method
+	        });
+
+	        // Automatic registration based on role and grade
+	        if (input.role === 'teacher') {
+	          const teacherId = `teacher_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+	          await db.createTeacher({
+	            id: teacherId,
+	            userId: userId,
+	            halaqaName: input.grade, // Use grade as halaqa name for initial setup
+	            specialization: 'تحفيظ/تربية',
+	          });
+	        } else if (input.role === 'student' && input.grade) {
+	          const studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+	          await db.createStudent({
+	            id: studentId,
+	            userId: userId,
+	            grade: input.grade,
+	            teacherId: undefined, // Teacher will be assigned later
+	          });
+	        }
+
+	        return { success: true, userId };
+	      }),
 
     delete: adminProcedure
       .input(z.object({ userId: z.string() }))
@@ -554,17 +575,22 @@ export const appRouter = router({
       return await db.getStudentsByTeacher(teacher.id);
     }),
 
-    create: adminProcedure
-      .input(z.object({
-        id: z.string(),
-        userId: z.string(),
-        teacherId: z.string().optional(),
-        grade: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        await db.createStudent(input);
-        return { success: true };
-      }),
+	    create: teacherProcedure
+	      .input(z.object({
+	        title: z.string(),
+	        description: z.string().optional(),
+	        date: z.date(),
+	      }))
+	      .mutation(async ({ input, ctx }) => {
+	        const teacher = await db.getTeacherByUserId(ctx.user.id);
+	        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
+
+	        await db.createLesson({
+	          ...input,
+	          teacherId: teacher.id,
+	        });
+	        return { success: true };
+	      }),
 
     createWithUser: adminProcedure
       .input(z.object({
@@ -596,9 +622,34 @@ export const appRouter = router({
           teacherId: input.teacherId,
           grade: input.grade,
         });
+	
+	        return { success: true, userId, studentId };
+	      }),
 
-        return { success: true, userId, studentId };
-      }),
+	    updatePaymentStatus: teacherProcedure
+	      .input(z.object({
+	        studentId: z.string(),
+	        hasPaid: z.boolean(),
+	      }))
+	      .mutation(async ({ input, ctx }) => {
+	        // Check if the teacher is authorized to update this student's status
+	        const student = await db.getStudent(input.studentId);
+	        if (!student) {
+	          throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
+	        }
+
+	        const teacher = await db.getTeacherByUserId(ctx.user.id);
+	        if (!teacher) {
+	          throw new TRPCError({ code: 'FORBIDDEN', message: 'Teacher profile not found' });
+	        }
+
+	        if (student.teacherId !== teacher.id && ctx.user.role !== 'admin') {
+	          throw new TRPCError({ code: 'FORBIDDEN', message: 'Unauthorized to update this student' });
+	        }
+
+	        await db.updateStudentPaymentStatus(input.studentId, input.hasPaid);
+	        return { success: true };
+	      }),
 
     update: adminProcedure
       .input(z.object({

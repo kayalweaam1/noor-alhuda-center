@@ -329,6 +329,7 @@ export async function getAllStudents() {
     teacherId: students.teacherId,
     grade: students.grade,
     enrollmentDate: students.enrollmentDate,
+    hasPaid: students.hasPaid,
     createdAt: students.createdAt,
     userName: users.name,
     userPhone: users.phone,
@@ -349,6 +350,7 @@ export async function getStudentsByTeacher(teacherId: string) {
     teacherId: students.teacherId,
     grade: students.grade,
     enrollmentDate: students.enrollmentDate,
+    hasPaid: students.hasPaid,
     createdAt: students.createdAt,
     userName: users.name,
     userPhone: users.phone,
@@ -1055,5 +1057,14 @@ export async function getStatistics() {
     totalEvaluations,
     recentActivity: recentUsers
   };
+}
+
+
+
+export async function updateStudentPaymentStatus(studentId: string, hasPaid: boolean) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(students).set({ hasPaid }).where(eq(students.id, studentId));
 }
 

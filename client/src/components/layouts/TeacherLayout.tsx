@@ -1,4 +1,4 @@
-import { APP_LOGO, APP_TITLE } from "@/const";
+	import { APP_TITLE } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
   LayoutDashboard,
@@ -36,11 +36,11 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       icon: LayoutDashboard,
       path: "/teacher/dashboard",
     },
-    {
-      title: "طلابي",
-      icon: Users,
-      path: "/teacher/students",
-    },
+	    {
+	      title: "طلابي",
+	      icon: Users,
+	      path: "/teacher/students/dashboard",
+	    },
     {
       title: "تسجيل الحضور",
       icon: Calendar,
@@ -68,7 +68,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
       >
         <div className="p-6 border-b border-emerald-200">
           <div className="flex flex-col items-center gap-3">
-            <img src={APP_LOGO} alt={APP_TITLE} className="w-24 h-24 object-contain" />
+	            <img src="/logo_transparent.png" alt={APP_TITLE} className="w-24 h-24 object-contain" />
             <div className="text-center">
               <h2 className="font-bold text-lg text-emerald-900">{APP_TITLE}</h2>
               <p className="text-xs text-emerald-600">لوحة المربي</p>

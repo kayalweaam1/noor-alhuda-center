@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { GRADES } from "@shared/consts";
 
 interface AddUserModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "teacher" | "student">("student");
+  const [grade, setGrade] = useState<string | undefined>(undefined);
   const [teacherType, setTeacherType] = useState<"tarbiya" | "tahfiz">("tahfiz");
 
   const createUser = trpc.users.create.useMutation({
@@ -56,6 +58,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
       email: email || undefined,
       password,
       role,
+      grade: grade || undefined, // Pass grade to the API
     });
   };
 
@@ -120,7 +123,14 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
 
           <div className="space-y-2">
             <Label htmlFor="role">الدور *</Label>
-            <Select value={role} onValueChange={(value: any) => setRole(value)}>
+            <Select value={role} onValueChange={(value: any) => {
+              setRole(value);
+              if (value === 'student' || value === 'teacher') {
+                setGrade(GRADES[0]); // Set default grade for student/teacher
+              } else {
+                setGrade(undefined);
+              }
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="اختر الدور" />
               </SelectTrigger>
@@ -132,20 +142,21 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
             </Select>
           </div>
 
-          {role === "teacher" && (
-            <div className="space-y-2">
-              <Label htmlFor="teacherType">تصنيف المربي *</Label>
-              <Select value={teacherType} onValueChange={(value: any) => setTeacherType(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر التصنيف" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tahfiz">تحفيظ</SelectItem>
-                  <SelectItem value="tarbiya">تربية</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+	          {role !== "admin" && (
+	            <div className="space-y-2">
+	              <Label htmlFor="grade">الجيل / الصف *</Label>
+	              <Select value={grade} onValueChange={(value: any) => setGrade(value)}>
+	                <SelectTrigger>
+	                  <SelectValue placeholder="اختر الجيل / الصف" />
+	                </SelectTrigger>
+	                <SelectContent>
+	                  {GRADES.map((g) => (
+	                    <SelectItem key={g} value={g}>{g}</SelectItem>
+	                  ))}
+	                </SelectContent>
+	              </Select>
+	            </div>
+	          )}
 
           <div className="flex gap-3 justify-end pt-4">
             <Button

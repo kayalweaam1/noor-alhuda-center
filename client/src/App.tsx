@@ -9,7 +9,9 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminStudents from "./pages/admin/Students";
+import StudentProfile from "./pages/StudentProfile";
 import AdminTeachers from "./pages/admin/Teachers";
+import TeacherProfile from "./pages/TeacherProfile";
 import AdminReports from "./pages/admin/Reports";
 import AdminLessons from "./pages/admin/Lessons";
 import AdminAnalytics from "./pages/admin/Analytics";
@@ -21,6 +23,7 @@ import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherLessons from "./pages/teacher/Lessons";
 import TeacherLayout from "./components/layouts/TeacherLayout";
+import TeacherStudentsPage from "./pages/teacher/Students";
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentLayout from "./components/layouts/StudentLayout";
 import AssistantDashboard from "./pages/assistant/Dashboard";
@@ -46,16 +49,26 @@ function Router() {
           <AdminUsers />
         </AdminLayout>
       </Route>
-      <Route path="/admin/students">
-        <AdminLayout>
-          <AdminStudents />
-        </AdminLayout>
-      </Route>
-      <Route path="/admin/teachers">
-        <AdminLayout>
-          <AdminTeachers />
-        </AdminLayout>
-      </Route>
+	      <Route path="/admin/students">
+	        <AdminLayout>
+	          <AdminStudents />
+	        </AdminLayout>
+	      </Route>
+	      <Route path="/admin/students/:studentId">
+	        <AdminLayout>
+	          <StudentProfile />
+	        </AdminLayout>
+	      </Route>
+	      <Route path="/admin/teachers">
+	        <AdminLayout>
+	          <AdminTeachers />
+	        </AdminLayout>
+	      </Route>
+	      <Route path="/admin/teachers/:teacherId">
+	        <AdminLayout>
+	          <TeacherProfile />
+	        </AdminLayout>
+	      </Route>
       <Route path="/admin/reports">
         <AdminLayout>
           <AdminReports />
@@ -101,11 +114,16 @@ function Router() {
           <TeacherAttendance />
         </TeacherLayout>
       </Route>
-      <Route path="/teacher/lessons">
-        <TeacherLayout>
-          <TeacherLessons />
-        </TeacherLayout>
-      </Route>
+	      <Route path="/teacher/lessons">
+	        <TeacherLayout>
+	          <TeacherLessons />
+	        </TeacherLayout>
+	      </Route>
+	      <Route path="/teacher/students/dashboard">
+	        <TeacherLayout>
+	          <TeacherStudentsPage />
+	        </TeacherLayout>
+	      </Route>
       <Route path="/teacher/settings">
         <TeacherLayout>
           <Settings />

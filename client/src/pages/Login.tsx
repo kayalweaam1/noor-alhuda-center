@@ -49,7 +49,9 @@ export default function Login() {
         : role === 'assistant'
         ? '/assistant/dashboard'
         : '/student/dashboard';
-      window.location.href = target;
+      // Use wouter's setLocation for internal navigation to preserve context
+      setLocation(target);
+      
     } catch (error: any) {
       console.error("Error logging in:", error);
       toast.error("رقم الهاتف أو كلمة المرور غير صحيحة");
@@ -67,12 +69,17 @@ export default function Login() {
       <Card className="w-full max-w-md relative z-10 border-emerald-200 shadow-2xl">
         <CardHeader className="text-center space-y-4">
 
-          <CardTitle className="text-3xl font-bold text-emerald-900">
-            مركز نور الهدى
-          </CardTitle>
-          <CardDescription className="text-lg">
-            تسجيل الدخول
-          </CardDescription>
+	          <img 
+	            src="/logo_transparent.png" 
+	            alt="مركز نور الهدى" 
+	            className="mx-auto h-24 w-auto mb-4"
+	          />
+	          <CardTitle className="text-3xl font-bold text-emerald-900">
+	            مركز نور الهدى للتربية والتحفيظ
+	          </CardTitle>
+	          <CardDescription className="text-lg">
+	            تسجيل الدخول
+	          </CardDescription>
         </CardHeader>
 
         <CardContent>
