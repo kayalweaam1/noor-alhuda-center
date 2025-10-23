@@ -1,5 +1,6 @@
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { 
   InsertUser, users, 
   teachers, InsertTeacher, Teacher,
@@ -14,18 +15,72 @@ import {
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
+// Normalize phone numbers to international format used across the app (+972...)
+function normalizePhoneNumber(rawPhone: string | undefined): string | undefined {
+  if (!rawPhone) return undefined;
+  let phone = rawPhone.trim();
+  if (phone.startsWith("0")) {
+    return "+972" + phone.substring(1);
+  }
+  if (!phone.startsWith("+")) {
+    return "+972" + phone;
+  }
+  return phone;
+}
+
 let _db: ReturnType<typeof drizzle> | null = null;
+let _pool: mysql.Pool | null = null;
+
+function parseMysqlUrl(url?: string):
+  | { host: string; port?: number; user?: string; password?: string; database?: string }
+  | undefined {
+  if (!url) return undefined;
+  try {
+    const u = new URL(url);
+    const dbName = u.pathname?.replace(/^\//, "");
+    return {
+      host: u.hostname,
+      port: u.port ? Number(u.port) : undefined,
+      user: u.username ? decodeURIComponent(u.username) : undefined,
+      password: u.password ? decodeURIComponent(u.password) : undefined,
+      database: dbName || undefined,
+    };
+  } catch {
+    return undefined;
+  }
+}
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+  if (_db) return _db;
+
+  const connectionUrl = ENV.databaseUrl || process.env.DATABASE_URL;
+  if (!connectionUrl) return null;
+
+  try {
+    if (!_pool) {
+      const opts = parseMysqlUrl(connectionUrl);
+      if (!opts?.host || !opts?.user || !opts?.database) {
+        throw new Error("Invalid DATABASE_URL for MySQL");
+      }
+
+      _pool = mysql.createPool({
+        host: opts.host,
+        port: opts.port ?? 3306,
+        user: opts.user,
+        password: opts.password,
+        database: opts.database,
+        connectionLimit: 10,
+        waitForConnections: true,
+      });
     }
+
+    _db = drizzle(_pool);
+  } catch (error) {
+    console.warn("[Database] Failed to connect:", error);
+    _db = null;
   }
+
   return _db;
 }
 
@@ -61,8 +116,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.email = user.email;
     }
     if (user.phone !== undefined) {
-      values.phone = user.phone;
-      updateSet.phone = user.phone;
+      const normalized = normalizePhoneNumber(user.phone);
+      values.phone = normalized;
+      updateSet.phone = normalized;
     }
     if (user.password !== undefined) {
       values.password = user.password;
@@ -139,7 +195,16 @@ export async function getUserByPhone(phone: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+  // First try normalized format, then fall back to the raw input for legacy rows
+  const normalized = normalizePhoneNumber(phone) ?? phone;
+  let result = await db
+    .select()
+    .from(users)
+    .where(eq(users.phone, normalized))
+    .limit(1);
+  if (result.length === 0 && normalized !== phone) {
+    result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+  }
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -398,6 +463,22 @@ export async function deleteAttendance(id: string) {
   if (!db) return;
 
   await db.delete(attendance).where(eq(attendance.id, id));
+}
+
+export async function getAttendanceRatesByStudent(): Promise<Array<{ studentId: string; totalCount: number; presentCount: number }>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select({
+      studentId: attendance.studentId,
+      totalCount: sql<number>`count(*)`,
+      presentCount: sql<number>`sum(case when ${attendance.status} = 'present' then 1 else 0 end)`,
+    })
+    .from(attendance)
+    .groupBy(attendance.studentId);
+
+  return rows as Array<{ studentId: string; totalCount: number; presentCount: number }>;
 }
 
 // ============= LESSON FUNCTIONS =============

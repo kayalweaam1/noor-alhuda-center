@@ -234,6 +234,22 @@ export const appRouter = router({
         // Update last signed in
         await db.updateUserLastSignedIn(user.id);
 
+        // Ensure teacher profile exists for teacher accounts
+        if (user.role === 'teacher') {
+          const existingTeacher = await db.getTeacherByUserId(user.id);
+          if (!existingTeacher) {
+            const teacherId = `teacher_${Date.now()}_${Math.random()
+              .toString(36)
+              .substr(2, 9)}`;
+            await db.createTeacher({
+              id: teacherId,
+              userId: user.id,
+              halaqaName: null as any,
+              specialization: null as any,
+            });
+          }
+        }
+
         // Set session
         if (ctx.req.session) {
           ctx.req.session.userId = user.id;
@@ -455,18 +471,22 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
+        password: z.string().min(6).optional(),
         halaqaName: z.string().optional(),
         specialization: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Create user first
+        // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password || '123456');
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
+          password: hashedPassword,
           role: 'teacher',
-          loginMethod: 'firebase',
+          loginMethod: 'password',
         });
 
         // Then create teacher
@@ -504,7 +524,15 @@ export const appRouter = router({
   // ============= STUDENT MANAGEMENT =============
   students: router({
     getAll: adminProcedure.query(async () => {
-      return await db.getAllStudents();
+      const list = await db.getAllStudents();
+      // Join with attendance rates for quick overview
+      const rates = await db.getAttendanceRatesByStudent();
+      const map = new Map(rates.map(r => [r.studentId, r] as const));
+      return list.map((s: any) => {
+        const r = map.get(s.id);
+        const rate = r && r.totalCount > 0 ? Math.round((r.presentCount / r.totalCount) * 100) : 0;
+        return { ...s, attendanceRate: rate };
+      });
     }),
 
     getById: adminProcedure
@@ -542,20 +570,22 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
-        password: z.string().optional(),
+        password: z.string().min(6).optional(),
         teacherId: z.string(),
         grade: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // Create user first
+        // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password || '123456');
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
-          password: input.password || '123456',
+          password: hashedPassword,
           role: 'student',
-          loginMethod: 'firebase',
+          loginMethod: 'password',
         });
 
         // Then create student
@@ -828,17 +858,21 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         phone: z.string(),
+        password: z.string().min(6).optional(),
         halaqaName: z.string(),
       }))
       .mutation(async ({ input }) => {
-        // Create user first
+        // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const { hashPassword } = await import('./_core/password');
+        const hashedPassword = await hashPassword(input.password || '123456');
         await db.upsertUser({
           id: userId,
           name: input.name,
           phone: input.phone,
+          password: hashedPassword,
           role: 'assistant',
-          loginMethod: 'firebase',
+          loginMethod: 'password',
         });
 
         // Then create assistant

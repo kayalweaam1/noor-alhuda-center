@@ -18,6 +18,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
   const [phone, setPhone] = useState("+972");
   const [halaqaName, setHalaqaName] = useState("");
   const [specialization, setSpecialization] = useState("");
+  const [password, setPassword] = useState("");
 
   const createTeacher = trpc.teachers.createWithUser.useMutation({
     onSuccess: () => {
@@ -36,6 +37,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
     setPhone("+972");
     setHalaqaName("");
     setSpecialization("");
+    setPassword("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -49,6 +51,7 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
     createTeacher.mutate({
       name,
       phone,
+      password: password || undefined,
       halaqaName: halaqaName || undefined,
       specialization: specialization || undefined,
     });
@@ -107,6 +110,18 @@ export default function AddTeacherModal({ open, onOpenChange, onSuccess }: AddTe
               onChange={(e) => setSpecialization(e.target.value)}
               placeholder="مثال: تحفيظ القرآن، التجويد"
               rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">كلمة المرور (اختياري)</Label>
+            <Input
+              id="password"
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="أدخل كلمة المرور"
+              dir="ltr"
             />
           </div>
 
