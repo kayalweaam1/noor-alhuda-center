@@ -15,8 +15,12 @@
     "db:reset": "tsx scripts/reset-db.ts",
     "db:up": "docker compose up -d mysql",
     "db:down": "docker compose down",
+<<<<<<< HEAD
     "db:logs": "docker compose logs -f mysql",
     "db:wait": "echo 'Skipping DB wait for install...'"
+=======
+    "db:logs": "docker compose logs -f mysql"
+>>>>>>> origin/master
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
@@ -124,3 +128,4 @@
     }
   }
 }
+
