@@ -37,6 +37,10 @@ COPY --from=base /app/dist ./dist
 COPY --from=base /app/node_modules ./node_modules
 COPY package.json ./
 
+# Copy drizzle configuration and schema for database migrations
+COPY drizzle.config.ts ./
+COPY drizzle ./drizzle
+
 # Expose the port the app runs on
 EXPOSE 3000
 
