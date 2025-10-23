@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "../ui/button";
+import NotificationBellEnhanced from "../NotificationBellEnhanced";
 
 interface StudentLayoutProps {
   children: React.ReactNode;
@@ -142,10 +143,7 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <button className="relative p-2 rounded-lg hover:bg-blue-50 transition-colors">
-                <Bell className="w-6 h-6 text-blue-700" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              <NotificationBellEnhanced />
             </div>
           </div>
         </header>

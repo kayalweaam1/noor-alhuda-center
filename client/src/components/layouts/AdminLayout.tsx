@@ -18,7 +18,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "../ui/button";
-import NotificationBell from "../NotificationBell";
+import NotificationBellEnhanced from "../NotificationBellEnhanced";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -174,7 +174,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <NotificationBell />
+              <NotificationBellEnhanced />
             </div>
           </div>
         </header>
