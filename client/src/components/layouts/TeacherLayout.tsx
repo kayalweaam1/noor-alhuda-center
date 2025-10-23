@@ -39,7 +39,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
     {
       title: "طلابي",
       icon: Users,
-      path: "/teacher/students",
+      path: "/teacher/my-students",
     },
     {
       title: "تسجيل الحضور",
