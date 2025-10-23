@@ -1,8 +1,11 @@
-# Use an official Node.js runtime as the base image
+# --- Build Stage ---
 FROM node:20 AS base
 
 # Set the working directory
 WORKDIR /app
+
+# Install build dependencies for native modules
+RUN apt-get update && apt-get install -y build-essential
 
 # Install pnpm globally
 RUN npm install -g pnpm
@@ -20,12 +23,12 @@ COPY . .
 RUN pnpm build
 
 # --- Production Stage ---
-FROM node:20 AS production
+FROM node:20-slim AS production
 
 # Set the working directory
 WORKDIR /app
 
-# Install pnpm globally
+# Install pnpm globally (needed for pnpm start)
 RUN npm install -g pnpm
 
 # Copy only the necessary files from the build stage
