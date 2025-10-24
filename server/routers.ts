@@ -358,8 +358,9 @@ export const appRouter = router({
         
         if (!user) {
           // Create new user
-          const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          await db.upsertUser({
+        const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        console.log('[CreateUser] Creating user:', { userId, phone: input.phone, role: input.role });
+		        await db.upsertUser({
             id: userId,
             phone: input.phone,
             role: 'student', // Default role
@@ -460,8 +461,11 @@ export const appRouter = router({
 	          loginMethod: 'password', // Changed to 'password' as it seems to be the main login method
 	        });
 
-	        // Automatic registration based on role and grade
-	        if (input.role === 'teacher') {
+        console.log('[CreateUser] User created successfully');
+
+        // Automatic registration based on role and grade
+		        if (input.role === 'teacher') {
+          console.log('[CreateUser] Creating teacher profile...');
 	          const teacherId = `teacher_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 	          await db.createTeacher({
 	            id: teacherId,
@@ -469,14 +473,16 @@ export const appRouter = router({
 	            halaqaName: input.grade, // Use grade as halaqa name for initial setup
 	            specialization: 'تحفيظ/تربية',
 	          });
-	        } else if (input.role === 'student' && input.grade) {
-	          const studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        } else if (input.role === 'student' && input.grade) {
+          console.log('[CreateUser] Creating student profile...');
+		          const studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 	          await db.createStudent({
 	            id: studentId,
 	            userId: userId,
 	            grade: input.grade,
-	            teacherId: undefined, // Teacher will be assigned later
-	          });
+            teacherId: undefined, // Teacher will be assigned later
+		          });
+          console.log('[CreateUser] Student profile created');
 	        }
 
 	        return { success: true, userId };
