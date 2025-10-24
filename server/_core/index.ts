@@ -79,6 +79,17 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Setup admin endpoint (temporary - remove after first use)
+  app.get('/setup-admin-now', async (req, res) => {
+    try {
+      const { setupAdmin } = await import('../setup-admin');
+      const result = await setupAdmin();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
   // tRPC API
   app.use(
     "/api/trpc",
