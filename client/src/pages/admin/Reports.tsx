@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { format, subDays, subMonths, startOfYear } from "date-fns";
 import { ar } from "date-fns/locale";
+import LogosHeader from "@/components/LogosHeader";
 
 export default function ReportsPage() {
   const [loading, setLoading] = useState(false);
@@ -171,8 +172,17 @@ export default function ReportsPage() {
     const dateRange = getDateRange();
     const headerInfo = `
       <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #059669;">مركز نور الهدى لتحفيظ القرآن الكريم</h1>
-        <h2>تقرير ${type === "attendance" ? "الحضور والغياب" : type === "students" ? "الطلاب" : type === "teachers" ? "المربين" : "الأداء"}</h2>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px;">
+          <div style="text-align: center;">
+            <img src="/logos/mosque-logo.jpeg" alt="مسجد النور الجديدة" style="height: 80px; object-fit: contain;" />
+            <p style="font-size: 12px; margin-top: 8px;">مسجد النور الجديدة</p>
+          </div>
+          <div style="text-align: center;">
+            <img src="/logos/noor-alhuda-logo.jpeg" alt="مركز نور الهدى" style="height: 80px; object-fit: contain;" />
+            <p style="font-size: 12px; margin-top: 8px;">مركز نور الهدى للقرآن الكريم</p>
+          </div>
+        </div>
+        <h2 style="color: #059669; margin: 20px 0;">تقرير ${type === "attendance" ? "الحضور والغياب" : type === "students" ? "الطلاب" : type === "teachers" ? "المربين" : "الأداء"}</h2>
         <p>من ${format(dateRange.start, "dd/MM/yyyy", { locale: ar })} إلى ${format(dateRange.end, "dd/MM/yyyy", { locale: ar })}</p>
       </div>
     `;
@@ -386,6 +396,9 @@ export default function ReportsPage() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Logos */}
+      <LogosHeader size="medium" showText={true} />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

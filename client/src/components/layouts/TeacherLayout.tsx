@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "../ui/button";
 import NotificationBellEnhanced from "../NotificationBellEnhanced";
+import LogosHeader from "../LogosHeader";
 
 interface TeacherLayoutProps {
   children: React.ReactNode;
@@ -68,12 +69,10 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
         } overflow-hidden`}
       >
         <div className="p-6 border-b border-emerald-200">
-          <div className="flex flex-col items-center gap-3">
-	            <img src="/logo_transparent.png" alt={APP_TITLE} className="w-24 h-24 object-contain" />
-            <div className="text-center">
-              <h2 className="font-bold text-lg text-emerald-900">{APP_TITLE}</h2>
-              <p className="text-xs text-emerald-600">لوحة المربي</p>
-            </div>
+          <LogosHeader size="small" showText={false} />
+          <div className="text-center mt-3">
+            <h2 className="font-bold text-base text-emerald-900">{APP_TITLE}</h2>
+            <p className="text-xs text-emerald-600">لوحة المربي</p>
           </div>
         </div>
 

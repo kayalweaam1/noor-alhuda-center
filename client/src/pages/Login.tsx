@@ -6,6 +6,7 @@ import { Phone, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import LogosHeader from '@/components/LogosHeader';
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -68,18 +69,10 @@ export default function Login() {
       
       <Card className="w-full max-w-md relative z-10 border-emerald-200 shadow-2xl">
         <CardHeader className="text-center space-y-4">
-
-	          <img 
-	            src="/logo_transparent.png" 
-	            alt="مركز نور الهدى" 
-	            className="mx-auto h-24 w-auto mb-4"
-	          />
-	          <CardTitle className="text-3xl font-bold text-emerald-900">
-	            مركز نور الهدى للتربية والتحفيظ
-	          </CardTitle>
-	          <CardDescription className="text-lg">
-	            تسجيل الدخول
-	          </CardDescription>
+          <LogosHeader size="medium" showText={true} />
+          <CardDescription className="text-lg">
+            تسجيل الدخول
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
