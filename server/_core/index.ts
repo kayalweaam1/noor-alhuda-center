@@ -5,6 +5,7 @@ import mysqlSessionFactory from "express-mysql-session";
 import { createServer } from "http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
+import { createTestUsers } from "../create-test-users-endpoint";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { ENV } from "./env";
@@ -88,6 +89,16 @@ async function startServer() {
       createContext,
     })
   );
+  // Create test users endpoint (for development)
+  app.get("/create-test-users-now", async (req, res) => {
+    try {
+      const result = await createTestUsers();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
