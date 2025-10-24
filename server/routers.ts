@@ -274,9 +274,17 @@ export const appRouter = router({
         }
 
         // Set session
+        console.log('[Login] Setting session for user:', { id: user.id, phone: user.phone, role: user.role });
         if (ctx.req.session) {
           ctx.req.session.userId = user.id;
           ctx.req.session.phone = user.phone || undefined;
+          console.log('[Login] Session set successfully:', {
+            userId: ctx.req.session.userId,
+            phone: ctx.req.session.phone,
+            sessionID: ctx.req.sessionID
+          });
+        } else {
+          console.error('[Login] No session object available!');
         }
 
         return {

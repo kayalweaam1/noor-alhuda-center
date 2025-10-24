@@ -13,6 +13,12 @@ export async function createContext(
   let user: User | null = null;
 
   try {
+    console.log('[Context] Session data:', {
+      phone: opts.req.session?.phone,
+      userId: opts.req.session?.userId,
+      sessionID: opts.req.sessionID
+    });
+    
     // Try phone-based session first
     const phoneSession = opts.req.session?.phone;
     if (phoneSession) {
@@ -20,6 +26,7 @@ export async function createContext(
       const dbUser = await users.getUserByPhone(phoneSession);
       if (dbUser) {
         user = dbUser;
+        console.log('[Context] User loaded from phone session:', { id: user.id, role: user.role });
       }
     }
     
@@ -29,9 +36,15 @@ export async function createContext(
       const dbUser = await users.getUser(opts.req.session.userId);
       if (dbUser) {
         user = dbUser;
+        console.log('[Context] User loaded from userId session:', { id: user.id, role: user.role });
       }
     }
+    
+    if (!user) {
+      console.log('[Context] No user found in session');
+    }
   } catch (error) {
+    console.error('[Context] Error loading user:', error);
     // Authentication is optional for public procedures.
     user = null;
   }
