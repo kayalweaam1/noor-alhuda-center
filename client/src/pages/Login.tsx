@@ -6,6 +6,7 @@ import { Phone, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useQueryClient } from "@tanstack/react-query";
 import LogosHeader from '@/components/LogosHeader';
 
 export default function Login() {
@@ -14,6 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const queryClient = useQueryClient();
   const loginMutation = trpc.auth.login.useMutation();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -41,7 +43,13 @@ export default function Login() {
       // Save user to localStorage
       localStorage.setItem('user', JSON.stringify(result.user));
       
-      // Redirect based on role (force full navigation to ensure session cookie is used)
+      // Invalidate auth.me query to force AuthContext to refetch user data
+      await queryClient.invalidateQueries({ queryKey: [['auth', 'me']] });
+      
+      // Small delay to ensure query is refetched
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Redirect based on role
       const role = result.user.role;
       const target = role === 'admin'
         ? '/admin/dashboard'
@@ -50,7 +58,7 @@ export default function Login() {
         : role === 'assistant'
         ? '/assistant/dashboard'
         : '/student/dashboard';
-      // Use wouter's setLocation for internal navigation to preserve context
+      
       setLocation(target);
       
     } catch (error: any) {
