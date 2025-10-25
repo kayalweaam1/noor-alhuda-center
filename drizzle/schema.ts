@@ -7,6 +7,7 @@ export const users = mysqlTable("users", {
   id: varchar("id", { length: 64 }).primaryKey(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  username: varchar("username", { length: 64 }).unique(), // Username for login
   phone: varchar("phone", { length: 20 }), // Phone number for OTP login
   password: varchar("password", { length: 255 }), // Password for login
   loginMethod: varchar("loginMethod", { length: 64 }),
@@ -173,4 +174,18 @@ export const appSettings = mysqlTable("appSettings", {
 
 export type AppSettings = typeof appSettings.$inferSelect;
 export type InsertAppSettings = typeof appSettings.$inferInsert;
+
+
+/**
+ * Online sessions tracking
+ */
+export const onlineSessions = mysqlTable("onlineSessions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+  lastActivity: timestamp("lastActivity").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type OnlineSession = typeof onlineSessions.$inferSelect;
+export type InsertOnlineSession = typeof onlineSessions.$inferInsert;
 

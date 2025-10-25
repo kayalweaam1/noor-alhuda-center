@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Phone, Lock, ArrowRight } from "lucide-react";
+import { User, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -11,7 +11,7 @@ import LogosHeader from '@/components/LogosHeader';
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,8 +21,8 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (phoneNumber.length < 10) {
-      toast.error("رقم الهاتف غير صحيح");
+    if (username.length < 3) {
+      toast.error("اسم المستخدم غير صحيح");
       return;
     }
 
@@ -34,7 +34,7 @@ export default function Login() {
     setLoading(true);
     try {
       const result = await loginMutation.mutateAsync({ 
-        phone: phoneNumber, 
+        username: username, 
         password: password 
       });
       
@@ -63,7 +63,7 @@ export default function Login() {
       
     } catch (error: any) {
       console.error("Error logging in:", error);
-      toast.error("رقم الهاتف أو كلمة المرور غير صحيحة");
+      toast.error("اسم المستخدم أو كلمة المرور غير صحيحة");
     } finally {
       setLoading(false);
     }
@@ -87,15 +87,15 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                رقم الهاتف
+                اسم المستخدم
               </label>
               <div className="relative">
-                <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-600" />
+                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-600" />
                 <Input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="0542632557"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="admin"
                   className="pr-12 text-lg border-emerald-200 focus:border-emerald-500"
                   required
                   dir="ltr"

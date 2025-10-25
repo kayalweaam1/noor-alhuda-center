@@ -235,25 +235,22 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Login with phone and password
+    // Login with username or phone and password
     login: publicProcedure
       .input(z.object({ 
-        phone: z.string(),
+        username: z.string(), // Can be username or phone
         password: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Normalize phone number (add +972 if missing)
-        let phone = input.phone.trim();
-        if (phone.startsWith('0')) {
-          phone = '+972' + phone.substring(1);
-        } else if (!phone.startsWith('+')) {
-          phone = '+972' + phone;
+        const identifier = input.username.trim();
+        
+        console.log('[Login] Attempting login with identifier:', identifier);
+        
+        // Try to get user by username first, then by phone
+        let user = await db.getUserByUsername(identifier);
+        if (!user) {
+          user = await db.getUserByPhone(identifier);
         }
-        
-        console.log('[Login] Attempting login with phone:', phone);
-        
-        // Get user by phone
-        const user = await db.getUserByPhone(phone);
         console.log('[Login] User found:', user ? { id: user.id, phone: user.phone, role: user.role, hasPassword: !!user.password } : 'NOT FOUND');
         
         if (!user) {

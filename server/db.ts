@@ -16,15 +16,19 @@ import {
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
-// Normalize phone numbers to international format used across the app (+972...)
+// Normalize phone numbers - remove international format, keep local format only
 function normalizePhoneNumber(rawPhone: string | undefined): string | undefined {
   if (!rawPhone) return undefined;
   let phone = rawPhone.trim();
-  if (phone.startsWith("0")) {
-    return "+972" + phone.substring(1);
+  // Remove +972 prefix if exists
+  if (phone.startsWith("+972")) {
+    phone = "0" + phone.substring(4);
+  } else if (phone.startsWith("972")) {
+    phone = "0" + phone.substring(3);
   }
-  if (!phone.startsWith("+")) {
-    return "+972" + phone;
+  // Ensure it starts with 0
+  if (!phone.startsWith("0")) {
+    phone = "0" + phone;
   }
   return phone;
 }
@@ -121,6 +125,18 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.phone = normalized;
       updateSet.phone = normalized;
     }
+    // Auto-generate username if not provided
+    if (user.username !== undefined) {
+      values.username = user.username;
+      updateSet.username = user.username;
+    } else if (!user.username && user.name) {
+      // Generate username from name (remove spaces, lowercase)
+      const baseUsername = user.name.replace(/\s+/g, '').toLowerCase();
+      values.username = baseUsername + Math.floor(Math.random() * 1000);
+    } else if (!user.username && user.phone) {
+      // Generate username from phone
+      values.username = 'user' + user.phone.replace(/[^0-9]/g, '');
+    }
     if (user.password !== undefined) {
       values.password = user.password;
       updateSet.password = user.password;
@@ -196,16 +212,24 @@ export async function getUserByPhone(phone: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  // First try normalized format, then fall back to the raw input for legacy rows
-  const normalized = normalizePhoneNumber(phone) ?? phone;
-  let result = await db
+  // Don't normalize phone anymore - use as-is
+  const result = await db
     .select()
     .from(users)
-    .where(eq(users.phone, normalized))
+    .where(eq(users.phone, phone))
     .limit(1);
-  if (result.length === 0 && normalized !== phone) {
-    result = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
-  }
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByUsername(username: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
