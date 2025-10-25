@@ -951,23 +951,40 @@ export const appRouter = router({
 
     create: teacherProcedure
       .input(z.object({
-        id: z.string(),
         studentId: z.string(),
         lessonId: z.string().optional(),
         score: z.number().min(0).max(100),
         feedback: z.string().optional(),
         evaluationType: z.string().optional(),
-        date: z.date(),
+        date: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
         const teacher = await db.getTeacherByUserId(ctx.user.id);
         if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
         
+        const evaluationId = `evaluation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
         await db.createEvaluation({
+          id: evaluationId,
           ...input,
+          date: new Date(input.date),
           teacherId: teacher.id,
         });
         return { success: true };
+      }),
+
+    getBehaviorScore: protectedProcedure
+      .input(z.object({ studentId: z.string() }))
+      .query(async ({ input }) => {
+        const evaluations = await db.getEvaluationsByStudent(input.studentId);
+        const behaviorEvals = evaluations.filter(e => e.evaluationType === 'تقييم سلوكي');
+        
+        if (behaviorEvals.length === 0) return { score: 70, count: 0 }; // Default score
+        
+        const totalScore = behaviorEvals.reduce((sum, e) => sum + e.score, 0);
+        const avgScore = Math.round(totalScore / behaviorEvals.length);
+        
+        return { score: avgScore, count: behaviorEvals.length };
       }),
 
     update: teacherProcedure

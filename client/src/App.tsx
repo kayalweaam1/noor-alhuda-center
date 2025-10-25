@@ -18,6 +18,7 @@ import AdminAnalytics from "./pages/admin/Analytics";
 import AdminAdmins from "./pages/admin/Admins";
 import AdminPayments from "./pages/admin/Payments";
 import AdminAppSettings from "./pages/admin/AppSettings";
+import AdminUserDetails from "./pages/admin/UserDetails";
 import AdminLayout from "./components/layouts/AdminLayout";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
@@ -51,6 +52,11 @@ function Router() {
       <Route path="/admin/users">
         <AdminLayout>
           <AdminUsers />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/users/:id">
+        <AdminLayout>
+          <AdminUserDetails />
         </AdminLayout>
       </Route>
 	      <Route path="/admin/students">

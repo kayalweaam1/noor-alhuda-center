@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Search, Edit, Trash2, Shield } from "lucide-react";
+import { useLocation } from "wouter";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,6 +26,7 @@ import AddUserModal from "@/components/modals/AddUserModal";
 import EditUserModal from "@/components/modals/EditUserModal";
 
 export default function UsersPage() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -123,14 +125,17 @@ export default function UsersPage() {
                 {filteredUsers?.map((user) => (
                   <TableRow key={user.id} className="hover:bg-emerald-50/50">
                     <TableCell className="font-medium">
-                      <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setLocation(`/admin/users/${user.id}`)}
+                        className="flex items-center gap-3 hover:text-emerald-600 transition-colors"
+                      >
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                           <span className="text-white font-bold text-sm">
                             {user.name?.charAt(0) || '؟'}
                           </span>
                         </div>
-                        <span>{user.name || 'غير محدد'}</span>
-                      </div>
+                        <span className="underline">{user.name || 'غير محدد'}</span>
+                      </button>
                     </TableCell>
                     <TableCell>{user.email || '-'}</TableCell>
                     <TableCell>{user.phone || '-'}</TableCell>
