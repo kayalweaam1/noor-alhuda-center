@@ -4,6 +4,7 @@ import { Users, BookOpen, TrendingUp, Calendar, AlertCircle } from "lucide-react
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import WelcomeMessage from "@/components/WelcomeMessage";
 
 export default function TeacherDashboard() {
   const [, setLocation] = useLocation();
@@ -84,6 +85,9 @@ export default function TeacherDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Welcome Message */}
+        <WelcomeMessage />
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

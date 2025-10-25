@@ -1,104 +1,43 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Settings, Type, Image as ImageIcon, Palette, Save } from "lucide-react";
+import { Settings, Save, MessageSquare } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { trpc } from "@/lib/trpc";
 
 export default function AppSettingsPage() {
-  // Load settings from localStorage
-  const [fontSize, setFontSize] = useState(() => {
-    return localStorage.getItem('app-font-size') || 'medium';
-  });
+  const [welcomeMessage, setWelcomeMessage] = useState("");
   
-  const [logoSize, setLogoSize] = useState(() => {
-    return parseInt(localStorage.getItem('app-logo-size') || '40');
-  });
-  
-  const [backgroundColor, setBackgroundColor] = useState(() => {
-    return localStorage.getItem('app-bg-color') || '#ffffff';
-  });
-  
-  const [applyToPages, setApplyToPages] = useState(() => {
-    return localStorage.getItem('app-bg-pages') || 'all';
+  // Fetch current settings
+  const { data: settings, refetch } = trpc.appSettings.get.useQuery();
+  const updateSettings = trpc.appSettings.update.useMutation({
+    onSuccess: () => {
+      toast.success("تم حفظ الإعدادات بنجاح");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("فشل في حفظ الإعدادات: " + error.message);
+    },
   });
 
-  const [logoUrl, setLogoUrl] = useState(() => {
-    return localStorage.getItem('app-logo-url') || 'https://placehold.co/40x40/3b82f6/ffffff?text=T';
-  });
-
-  // Apply settings to document
+  // Load settings when data is available
   useEffect(() => {
-    const root = document.documentElement;
-    
-    // Apply font size
-    switch(fontSize) {
-      case 'small':
-        root.style.fontSize = '14px';
-        break;
-      case 'medium':
-        root.style.fontSize = '16px';
-        break;
-      case 'large':
-        root.style.fontSize = '18px';
-        break;
-      case 'xlarge':
-        root.style.fontSize = '20px';
-        break;
+    if (settings) {
+      setWelcomeMessage(settings.welcomeMessage || "");
     }
-
-    // Apply background color
-    if (applyToPages === 'all') {
-      document.body.style.backgroundColor = backgroundColor;
-    } else if (applyToPages === 'dashboard') {
-      // Apply only to dashboard - would need more complex logic
-      document.body.style.backgroundColor = backgroundColor;
-    }
-  }, [fontSize, backgroundColor, applyToPages]);
+  }, [settings]);
 
   const handleSave = () => {
-    // Save to localStorage
-    localStorage.setItem('app-font-size', fontSize);
-    localStorage.setItem('app-logo-size', logoSize.toString());
-    localStorage.setItem('app-bg-color', backgroundColor);
-    localStorage.setItem('app-bg-pages', applyToPages);
-    localStorage.setItem('app-logo-url', logoUrl);
-    
-    toast.success("تم حفظ الإعدادات بنجاح");
-    
-    // Reload to apply changes
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    updateSettings.mutate({
+      welcomeMessage,
+    });
   };
 
   const handleReset = () => {
-    setFontSize('medium');
-    setLogoSize(40);
-    setBackgroundColor('#ffffff');
-    setApplyToPages('all');
-    setLogoUrl('https://placehold.co/40x40/3b82f6/ffffff?text=T');
-    
-    localStorage.removeItem('app-font-size');
-    localStorage.removeItem('app-logo-size');
-    localStorage.removeItem('app-bg-color');
-    localStorage.removeItem('app-bg-pages');
-    localStorage.removeItem('app-logo-url');
-    
+    setWelcomeMessage("");
     toast.success("تم إعادة تعيين الإعدادات");
-    
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
   };
 
   return (
@@ -111,202 +50,108 @@ export default function AppSettingsPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">إعدادات التطبيق</h1>
-            <p className="text-gray-600 mt-1">تخصيص مظهر وإعدادات التطبيق</p>
+            <p className="text-gray-600 mt-1">تخصيص رسائل وإعدادات التطبيق</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Font Size Settings */}
+      <div className="grid grid-cols-1 gap-6">
+        {/* Welcome Message Settings */}
         <Card className="border-emerald-200">
           <CardHeader>
             <CardTitle className="text-emerald-900 flex items-center gap-2">
-              <Type className="w-5 h-5" />
-              حجم الخط
+              <MessageSquare className="w-5 h-5" />
+              رسالة ترحيبية
             </CardTitle>
-            <CardDescription>تكبير أو تصغير الخط في كل التطبيق</CardDescription>
+            <CardDescription>
+              رسالة أو آية قرآنية تظهر في جميع صفحات المربين والطلاب
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>اختر حجم الخط</Label>
-              <Select value={fontSize} onValueChange={setFontSize}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="small">صغير (14px)</SelectItem>
-                  <SelectItem value="medium">متوسط (16px)</SelectItem>
-                  <SelectItem value="large">كبير (18px)</SelectItem>
-                  <SelectItem value="xlarge">كبير جداً (20px)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-gray-700" style={{ fontSize: fontSize === 'small' ? '14px' : fontSize === 'medium' ? '16px' : fontSize === 'large' ? '18px' : '20px' }}>
-                مثال على النص: مركز نور الهدى لتحفيظ القرآن الكريم
+              <Label htmlFor="welcomeMessage">نص الرسالة</Label>
+              <Textarea
+                id="welcomeMessage"
+                value={welcomeMessage}
+                onChange={(e) => setWelcomeMessage(e.target.value)}
+                placeholder="مثال: بسم الله الرحمن الرحيم - ﴿إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ﴾"
+                className="mt-2 min-h-[120px] text-lg leading-relaxed"
+                dir="rtl"
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                يمكنك كتابة آية قرآنية، حديث شريف، أو أي رسالة تحفيزية
               </p>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Logo Settings */}
-        <Card className="border-emerald-200">
-          <CardHeader>
-            <CardTitle className="text-emerald-900 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5" />
-              إعدادات اللوجو
-            </CardTitle>
-            <CardDescription>تغيير اللوجو والتحكم في حجمه</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>رابط اللوجو</Label>
-              <Input
-                type="url"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://example.com/logo.png"
-                className="mt-2"
-              />
-            </div>
             
-            <div>
-              <Label>حجم اللوجو: {logoSize}px</Label>
-              <Slider
-                value={[logoSize]}
-                onValueChange={(value) => setLogoSize(value[0])}
-                min={20}
-                max={100}
-                step={5}
-                className="mt-2"
-              />
-            </div>
-            
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center">
-              <img 
-                src={logoUrl} 
-                alt="Logo Preview" 
-                style={{ width: `${logoSize}px`, height: `${logoSize}px` }}
-                className="rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://placehold.co/40x40/3b82f6/ffffff?text=T';
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Background Color Settings */}
-        <Card className="border-emerald-200">
-          <CardHeader>
-            <CardTitle className="text-emerald-900 flex items-center gap-2">
-              <Palette className="w-5 h-5" />
-              لون الخلفية
-            </CardTitle>
-            <CardDescription>تغيير لون خلفية التطبيق</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>اختر اللون</Label>
-              <div className="flex gap-2 mt-2">
-                <Input
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="w-20 h-10"
-                />
-                <Input
-                  type="text"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  placeholder="#ffffff"
-                  className="flex-1"
-                />
+            {/* Preview */}
+            {welcomeMessage && (
+              <div className="mt-6">
+                <Label>معاينة الرسالة</Label>
+                <div className="mt-2 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-200 shadow-sm">
+                  <div className="text-center">
+                    <div className="inline-block">
+                      <div className="relative">
+                        {/* Decorative elements */}
+                        <div className="absolute -top-4 -right-4 text-emerald-300 text-4xl opacity-50">❝</div>
+                        <div className="absolute -bottom-4 -left-4 text-emerald-300 text-4xl opacity-50">❞</div>
+                        
+                        {/* Message text */}
+                        <p className="text-xl md:text-2xl font-semibold text-emerald-900 leading-relaxed px-8 py-4">
+                          {welcomeMessage}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Decorative border */}
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    <div className="h-px w-16 bg-gradient-to-r from-transparent to-emerald-300"></div>
+                    <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+                    <div className="h-px w-16 bg-gradient-to-l from-transparent to-emerald-300"></div>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div>
-              <Label>تطبيق على</Label>
-              <Select value={applyToPages} onValueChange={setApplyToPages}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">جميع الصفحات</SelectItem>
-                  <SelectItem value="dashboard">لوحة التحكم فقط</SelectItem>
-                  <SelectItem value="reports">صفحات التقارير فقط</SelectItem>
-                  <SelectItem value="none">لا شيء</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div 
-              className="p-4 rounded-lg border border-gray-200 h-24"
-              style={{ backgroundColor: backgroundColor }}
-            >
-              <p className="text-gray-700 font-semibold">معاينة الخلفية</p>
-            </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Quick Presets */}
         <Card className="border-emerald-200">
           <CardHeader>
-            <CardTitle className="text-emerald-900">الإعدادات السريعة</CardTitle>
-            <CardDescription>قوالب جاهزة للإعدادات</CardDescription>
+            <CardTitle className="text-emerald-900">رسائل جاهزة</CardTitle>
+            <CardDescription>اختر من الرسائل الجاهزة</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button
               variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                setFontSize('medium');
-                setBackgroundColor('#ffffff');
-                setLogoSize(40);
-              }}
+              className="w-full justify-start text-right h-auto py-3"
+              onClick={() => setWelcomeMessage("﴿إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ﴾")}
             >
-              <div className="w-4 h-4 rounded bg-white border border-gray-300 ml-2" />
-              الوضع الافتراضي (أبيض)
+              <span className="text-base">﴿إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ﴾</span>
             </Button>
             
             <Button
               variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                setFontSize('large');
-                setBackgroundColor('#f0fdf4');
-                setLogoSize(50);
-              }}
+              className="w-full justify-start text-right h-auto py-3"
+              onClick={() => setWelcomeMessage("﴿وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ﴾")}
             >
-              <div className="w-4 h-4 rounded bg-emerald-50 border border-emerald-300 ml-2" />
-              الوضع الأخضر الفاتح
+              <span className="text-base">﴿وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ﴾</span>
             </Button>
             
             <Button
               variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                setFontSize('xlarge');
-                setBackgroundColor('#f9fafb');
-                setLogoSize(60);
-              }}
+              className="w-full justify-start text-right h-auto py-3"
+              onClick={() => setWelcomeMessage("خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ")}
             >
-              <div className="w-4 h-4 rounded bg-gray-50 border border-gray-300 ml-2" />
-              وضع القراءة (خط كبير)
+              <span className="text-base">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</span>
             </Button>
             
             <Button
               variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                setFontSize('medium');
-                setBackgroundColor('#eff6ff');
-                setLogoSize(40);
-              }}
+              className="w-full justify-start text-right h-auto py-3"
+              onClick={() => setWelcomeMessage("مرحباً بكم في مركز نور الهدى لتحفيظ القرآن الكريم")}
             >
-              <div className="w-4 h-4 rounded bg-blue-50 border border-blue-300 ml-2" />
-              الوضع الأزرق الهادئ
+              <span className="text-base">مرحباً بكم في مركز نور الهدى لتحفيظ القرآن الكريم</span>
             </Button>
           </CardContent>
         </Card>
@@ -325,10 +170,11 @@ export default function AppSettingsPage() {
             </Button>
             <Button
               onClick={handleSave}
+              disabled={updateSettings.isPending}
               className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
             >
               <Save className="w-4 h-4 ml-2" />
-              حفظ الإعدادات
+              {updateSettings.isPending ? "جاري الحفظ..." : "حفظ الإعدادات"}
             </Button>
           </div>
         </CardContent>

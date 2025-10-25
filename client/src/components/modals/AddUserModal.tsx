@@ -21,7 +21,8 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "teacher" | "student">("student");
   const [grade, setGrade] = useState<string | undefined>(undefined);
-  const [teacherType, setTeacherType] = useState<"tarbiya" | "tahfiz">("tahfiz");
+  const [specialization, setSpecialization] = useState<"تربية" | "تحفيظ" | "تربية وتحفيظ">("تحفيظ");
+  const [hasPaid, setHasPaid] = useState(false);
 
   const createUser = trpc.users.create.useMutation({
     onSuccess: () => {
@@ -41,7 +42,8 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
     setEmail("");
     setPassword("");
     setRole("student");
-    setTeacherType("tahfiz");
+    setSpecialization("تحفيظ");
+    setHasPaid(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,7 +60,9 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
       email: email || undefined,
       password,
       role,
-      grade: grade || undefined, // Pass grade to the API
+      grade: grade || undefined,
+      specialization: (role === 'teacher' || role === 'student') ? specialization : undefined,
+      hasPaid: role === 'student' ? hasPaid : undefined,
     });
   };
 
@@ -157,6 +161,35 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
 	              </Select>
 	            </div>
 	          )}
+
+          {(role === "teacher" || role === "student") && (
+            <div className="space-y-2">
+              <Label htmlFor="specialization">التخصص *</Label>
+              <Select value={specialization} onValueChange={(value: any) => setSpecialization(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر التخصص" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="تربية">تربية</SelectItem>
+                  <SelectItem value="تحفيظ">تحفيظ</SelectItem>
+                  <SelectItem value="تربية وتحفيظ">تربية وتحفيظ</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {role === "student" && (
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <input
+                type="checkbox"
+                id="hasPaid"
+                checked={hasPaid}
+                onChange={(e) => setHasPaid(e.target.checked)}
+                className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+              />
+              <Label htmlFor="hasPaid" className="cursor-pointer">دفع الرسوم</Label>
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end pt-4">
             <Button
