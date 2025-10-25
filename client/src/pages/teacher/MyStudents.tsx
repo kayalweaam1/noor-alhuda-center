@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Phone, Mail, Calendar, TrendingUp, Award, BookOpen } from "lucide-react";
+import { Search, Phone, Mail, Calendar, TrendingUp, Award, BookOpen, ArrowRight } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function TeacherMyStudents() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: students } = trpc.students.list.useQuery();
+  const { data: students } = trpc.students.getByTeacher.useQuery();
   const { data: attendance } = trpc.attendance.list.useQuery();
   const { data: evaluations } = trpc.evaluations.list.useQuery();
 
@@ -38,8 +39,19 @@ export default function TeacherMyStudents() {
     student.phone?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const [, setLocation] = useLocation();
+
   return (
     <div className="container mx-auto p-6">
+      {/* Back Button */}
+      <Button
+        variant="outline"
+        onClick={() => setLocation('/teacher/dashboard')}
+        className="mb-4"
+      >
+        <ArrowRight className="w-4 h-4 ml-2" />
+        رجوع
+      </Button>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">طلابي</h1>
         <p className="text-gray-600 mt-2">قائمة الطلاب المسجلين في حلقاتك</p>

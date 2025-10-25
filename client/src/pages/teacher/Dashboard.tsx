@@ -13,6 +13,18 @@ export default function TeacherDashboard() {
     undefined,
     { enabled: !!user?.id && user?.role === 'teacher' }
   );
+  const { data: students } = trpc.students.getByTeacher.useQuery(
+    undefined,
+    { enabled: !!user?.id && user?.role === 'teacher' }
+  );
+  const { data: lessons } = trpc.lessons.getAll.useQuery(
+    undefined,
+    { enabled: !!user?.id && user?.role === 'teacher' }
+  );
+  const { data: todayAttendance } = trpc.attendance.list.useQuery(
+    undefined,
+    { enabled: !!user?.id && user?.role === 'teacher' }
+  );
 
   // Redirect if not teacher
   useEffect(() => {
@@ -33,31 +45,56 @@ export default function TeacherDashboard() {
     );
   }
 
+  // Calculate real stats
+  const studentsCount = students?.length || 0;
+  const myLessons = lessons?.filter(l => l.teacherId === teacher?.id) || [];
+  const lessonsCount = myLessons.length;
+  
+  // Get today's attendance count
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(today);
+  todayEnd.setHours(23, 59, 59, 999);
+  const todayAttendanceCount = todayAttendance?.filter((a: any) => {
+    const attDate = new Date(a.date);
+    return attDate >= today && attDate <= todayEnd && a.status === 'present';
+  }).length || 0;
+  
+  // Get next lesson time
+  const now = new Date();
+  const upcomingLessons = myLessons
+    .filter(l => new Date(l.date) > now)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const nextLesson = upcomingLessons[0];
+  const nextLessonTime = nextLesson 
+    ? new Date(nextLesson.date).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+    : '--:--';
+
   const statsCards = [
     {
       title: "طلابي",
-      value: 0, // Will be replaced with real data
+      value: studentsCount,
       icon: Users,
       color: "bg-blue-500",
       description: "عدد الطلاب في حلقتي",
     },
     {
       title: "الدروس",
-      value: 0,
+      value: lessonsCount,
       icon: BookOpen,
       color: "bg-emerald-500",
       description: "عدد الدروس المسجلة",
     },
     {
       title: "الحضور اليوم",
-      value: 0,
+      value: todayAttendanceCount,
       icon: TrendingUp,
       color: "bg-amber-500",
       description: "عدد الحاضرين اليوم",
     },
     {
       title: "الدرس القادم",
-      value: "--:--",
+      value: nextLessonTime,
       icon: Calendar,
       color: "bg-purple-500",
       description: "موعد الدرس القادم",
@@ -173,23 +210,48 @@ export default function TeacherDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-blue-900">درس الصباح</p>
-                    <p className="text-sm text-blue-700">8:00 صباحاً - 10:00 صباحاً</p>
-                    <p className="text-xs text-blue-600 mt-1">حلقة {teacher?.halaqaName || 'القرآن'}</p>
+                {myLessons
+                  .filter(l => {
+                    const lessonDate = new Date(l.date);
+                    return lessonDate >= today && lessonDate <= todayEnd;
+                  })
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .map((lesson, idx) => {
+                    const lessonTime = new Date(lesson.date);
+                    const timeStr = lessonTime.toLocaleTimeString('ar-EG', { 
+                      hour: '2-digit', 
+                      minute: '2-digit',
+                      hour12: true 
+                    });
+                    const colors = [
+                      { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', icon: 'text-blue-600', desc: 'text-blue-700' },
+                      { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900', icon: 'text-emerald-600', desc: 'text-emerald-700' },
+                      { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-900', icon: 'text-purple-600', desc: 'text-purple-700' },
+                    ];
+                    const color = colors[idx % colors.length];
+                    
+                    return (
+                      <div key={lesson.id} className={`flex items-start gap-3 p-3 ${color.bg} rounded-lg border ${color.border}`}>
+                        <Calendar className={`w-5 h-5 ${color.icon} mt-0.5`} />
+                        <div className="flex-1">
+                          <p className={`font-semibold ${color.text}`}>{lesson.title}</p>
+                          <p className={`text-sm ${color.desc}`}>{timeStr}</p>
+                          {lesson.description && (
+                            <p className={`text-xs ${color.icon} mt-1`}>{lesson.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                {myLessons.filter(l => {
+                  const lessonDate = new Date(l.date);
+                  return lessonDate >= today && lessonDate <= todayEnd;
+                }).length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <Calendar className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                    <p>لا توجد دروس مجدولة لليوم</p>
                   </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                  <Calendar className="w-5 h-5 text-emerald-600 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-emerald-900">درس المساء</p>
-                    <p className="text-sm text-emerald-700">4:00 مساءً - 6:00 مساءً</p>
-                    <p className="text-xs text-emerald-600 mt-1">حلقة {teacher?.halaqaName || 'القرآن'}</p>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

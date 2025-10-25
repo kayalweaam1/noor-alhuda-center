@@ -505,7 +505,13 @@ export const appRouter = router({
 	            halaqaName: input.grade || null,
 	            specialization: input.specialization || null,
 	          });
-        } else if (input.role === 'student' && input.grade) {
+        } else if (input.role === 'student') {
+          if (!input.grade) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: 'يجب تحديد الجيل / الصف للطالب',
+            });
+          }
           console.log('[CreateUser] Creating student profile...');
 		          const studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 	          await db.createStudent({

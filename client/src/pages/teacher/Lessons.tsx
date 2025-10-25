@@ -1,7 +1,8 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Plus, Trash2, Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { BookOpen, Plus, Trash2, Calendar, ChevronLeft, ChevronRight, Clock, ArrowRight } from "lucide-react";
+import { useLocation } from "wouter";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,7 +33,7 @@ export default function TeacherLessons() {
     time: '09:00',
   });
 
-  const createLessonMutation = trpc.lessons.create.useMutation();
+  const createLessonMutation = trpc.lessons.createByTeacher.useMutation();
   const deleteLessonMutation = trpc.lessons.delete.useMutation();
 
   // Get calendar data
@@ -129,8 +130,19 @@ export default function TeacherLessons() {
 
   const myLessons = lessons?.filter(l => l.teacherId === teacher?.id) || [];
 
+  const [, setLocation] = useLocation();
+
   return (
     <div className="p-6 space-y-6">
+      {/* Back Button */}
+      <Button
+        variant="outline"
+        onClick={() => setLocation('/teacher/dashboard')}
+        className="mb-4"
+      >
+        <ArrowRight className="w-4 h-4 ml-2" />
+        رجوع
+      </Button>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-orange-200">

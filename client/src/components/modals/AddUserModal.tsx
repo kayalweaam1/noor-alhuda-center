@@ -54,6 +54,12 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
       return;
     }
 
+    // Validate grade for students and teachers
+    if ((role === 'student' || role === 'teacher') && !grade) {
+      toast.error("يرجى اختيار الجيل / الصف");
+      return;
+    }
+
     createUser.mutate({
       name,
       phone,
