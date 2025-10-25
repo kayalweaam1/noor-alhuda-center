@@ -11,7 +11,8 @@ import {
   evaluations, InsertEvaluation, Evaluation,
   notifications, InsertNotification, Notification,
   otpCodes, InsertOtpCode, OtpCode,
-  assistantNotes, InsertAssistantNote, AssistantNote
+  assistantNotes, InsertAssistantNote, AssistantNote,
+  appSettings, InsertAppSettings, AppSettings
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1234,6 +1235,37 @@ export async function initializeDatabaseTables() {
   } catch (error) {
     console.error('[Database] Error creating tables:', error);
     throw error;
+  }
+}
+
+
+
+// ============= APP SETTINGS FUNCTIONS =============
+
+export async function getAppSettings() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select().from(appSettings).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function upsertAppSettings(settings: InsertAppSettings) {
+  const db = await getDb();
+  if (!db) return;
+
+  const existing = await getAppSettings();
+  
+  if (existing) {
+    await db.update(appSettings)
+      .set({ ...settings, updatedAt: new Date() })
+      .where(eq(appSettings.id, existing.id));
+  } else {
+    const settingsId = `settings_${Date.now()}`;
+    await db.insert(appSettings).values({
+      id: settingsId,
+      ...settings,
+    });
   }
 }
 

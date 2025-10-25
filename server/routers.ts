@@ -273,29 +273,40 @@ export const appRouter = router({
           }
         }
 
-        // Set session
+        // Set session and save it explicitly
         console.log('[Login] Setting session for user:', { id: user.id, phone: user.phone, role: user.role });
         if (ctx.req.session) {
           ctx.req.session.userId = user.id;
           ctx.req.session.phone = user.phone || undefined;
-          console.log('[Login] Session set successfully:', {
-            userId: ctx.req.session.userId,
-            phone: ctx.req.session.phone,
-            sessionID: ctx.req.sessionID
+          
+          // Save session explicitly and wait for it
+          return new Promise((resolve, reject) => {
+            ctx.req.session.save((err: any) => {
+              if (err) {
+                console.error('[Login] Failed to save session:', err);
+                reject(new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to save session' }));
+              } else {
+                console.log('[Login] Session saved successfully:', {
+                  userId: ctx.req.session.userId,
+                  phone: ctx.req.session.phone,
+                  sessionID: ctx.req.sessionID
+                });
+                resolve({
+                  success: true,
+                  user: {
+                    id: user.id,
+                    phone: user.phone,
+                    name: user.name,
+                    role: user.role,
+                  },
+                });
+              }
+            });
           });
         } else {
           console.error('[Login] No session object available!');
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Session not available' });
         }
-
-        return {
-          success: true,
-          user: {
-            id: user.id,
-            phone: user.phone,
-            name: user.name,
-            role: user.role,
-          },
-        };
       }),
 
     // Create default admin (for debugging)
@@ -443,7 +454,9 @@ export const appRouter = router({
 	        email: z.string().optional(),
 	        password: z.string(),
 	        role: z.enum(["admin", "teacher", "student"]),
-	        grade: z.string().optional(), // Added grade
+	        grade: z.string().optional(),
+	        specialization: z.enum(["تربية", "تحفيظ", "تربية وتحفيظ"]).optional(),
+	        hasPaid: z.boolean().optional(),
 	      }))
 	      .mutation(async ({ input }) => {
         // Hash password before saving
@@ -470,8 +483,8 @@ export const appRouter = router({
 	          await db.createTeacher({
 	            id: teacherId,
 	            userId: userId,
-	            halaqaName: input.grade, // Use grade as halaqa name for initial setup
-	            specialization: 'تحفيظ/تربية',
+	            halaqaName: input.grade || null,
+	            specialization: input.specialization || null,
 	          });
         } else if (input.role === 'student' && input.grade) {
           console.log('[CreateUser] Creating student profile...');
@@ -480,6 +493,8 @@ export const appRouter = router({
 	            id: studentId,
 	            userId: userId,
 	            grade: input.grade,
+	            specialization: input.specialization || null,
+	            hasPaid: input.hasPaid || false,
             teacherId: undefined, // Teacher will be assigned later
 		          });
           console.log('[CreateUser] Student profile created');
@@ -612,32 +627,30 @@ export const appRouter = router({
       return await db.getStudentsByTeacher(teacher.id);
     }),
 
-	    create: teacherProcedure
-	      .input(z.object({
-	        title: z.string(),
-	        description: z.string().optional(),
-	        date: z.date(),
-	      }))
-	      .mutation(async ({ input, ctx }) => {
-	        const teacher = await db.getTeacherByUserId(ctx.user.id);
-	        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
-
-	        await db.createLesson({
-	          ...input,
-	          teacherId: teacher.id,
-	        });
-	        return { success: true };
-	      }),
-
-    createWithUser: adminProcedure
+    createWithUser: teacherProcedure
       .input(z.object({
         name: z.string(),
         phone: z.string(),
         password: z.string().min(6).optional(),
-        teacherId: z.string(),
+        teacherId: z.string().optional(), // Optional for teachers, they'll use their own ID
         grade: z.string().optional(),
+        specialization: z.enum(["تربية", "تحفيظ", "تربية وتحفيظ"]).optional(),
+        hasPaid: z.boolean().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // If teacher is creating student, use their own ID
+        let finalTeacherId = input.teacherId;
+        if (!finalTeacherId && ctx.user.role === 'teacher') {
+          const teacher = await db.getTeacherByUserId(ctx.user.id);
+          if (!teacher) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
+          }
+          finalTeacherId = teacher.id;
+        }
+        
+        if (!finalTeacherId) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Teacher ID is required' });
+        }
         // Create user first with a real password (hashed)
         const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const { hashPassword } = await import('./_core/password');
@@ -656,8 +669,10 @@ export const appRouter = router({
         await db.createStudent({
           id: studentId,
           userId,
-          teacherId: input.teacherId,
+          teacherId: finalTeacherId,
           grade: input.grade,
+          specialization: input.specialization || null,
+          hasPaid: input.hasPaid || false,
         });
 	
 	        return { success: true, userId, studentId };
@@ -823,6 +838,25 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    createByTeacher: teacherProcedure
+      .input(z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        date: z.date(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const teacher = await db.getTeacherByUserId(ctx.user.id);
+        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher profile not found' });
+
+        const lessonId = `lesson_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        await db.createLesson({
+          id: lessonId,
+          ...input,
+          teacherId: teacher.id,
+        });
+        return { success: true };
+      }),
+
     update: teacherProcedure
       .input(z.object({
         id: z.string(),
@@ -836,9 +870,22 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    delete: adminProcedure
+    delete: teacherProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Check if teacher owns this lesson or if user is admin
+        const lesson = await db.getLesson(input.id);
+        if (!lesson) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Lesson not found' });
+        }
+        
+        if (ctx.user.role !== 'admin') {
+          const teacher = await db.getTeacherByUserId(ctx.user.id);
+          if (!teacher || lesson.teacherId !== teacher.id) {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'You can only delete your own lessons' });
+          }
+        }
+        
         await db.deleteLesson(input.id);
         return { success: true };
       }),
@@ -1050,6 +1097,22 @@ export const appRouter = router({
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input }) => {
         await db.deleteAssistantNote(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ============= APP SETTINGS =============
+  appSettings: router({
+    get: protectedProcedure.query(async () => {
+      return await db.getAppSettings();
+    }),
+
+    update: adminProcedure
+      .input(z.object({
+        welcomeMessage: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.upsertAppSettings(input);
         return { success: true };
       }),
   }),

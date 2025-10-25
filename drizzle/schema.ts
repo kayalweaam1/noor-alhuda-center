@@ -26,7 +26,7 @@ export const teachers = mysqlTable("teachers", {
   id: varchar("id", { length: 64 }).primaryKey(),
   userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
   halaqaName: varchar("halaqaName", { length: 255 }), // e.g., "حلقة الصف الثالث"
-  specialization: text("specialization"), // e.g., "تحفيظ القرآن، التجويد"
+  specialization: mysqlEnum("specialization", ["تربية", "تحفيظ", "تربية وتحفيظ"]), // التخصص
   createdAt: timestamp("createdAt").defaultNow(),
 });
 
@@ -41,6 +41,7 @@ export const students = mysqlTable("students", {
   userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
   teacherId: varchar("teacherId", { length: 64 }).references(() => teachers.id, { onDelete: "set null" }),
   grade: varchar("grade", { length: 50 }), // e.g., "الصف الثالث"
+  specialization: mysqlEnum("specialization", ["تربية", "تحفيظ", "تربية وتحفيظ"]), // التخصص
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
   hasPaid: boolean("hasPaid").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
@@ -158,4 +159,18 @@ export const assistantNotes = mysqlTable("assistantNotes", {
 
 export type AssistantNote = typeof assistantNotes.$inferSelect;
 export type InsertAssistantNote = typeof assistantNotes.$inferInsert;
+
+
+/**
+ * App settings
+ */
+export const appSettings = mysqlTable("appSettings", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  welcomeMessage: text("welcomeMessage"), // رسالة الترحيب أو آية تظهر لجميع المستخدمين
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type AppSettings = typeof appSettings.$inferSelect;
+export type InsertAppSettings = typeof appSettings.$inferInsert;
 
