@@ -20,7 +20,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "teacher" | "student">("student");
-  const [grade, setGrade] = useState<string | undefined>(undefined);
+  const [grade, setGrade] = useState<string | undefined>(GRADES[0]); // Default to first grade for student
   const [specialization, setSpecialization] = useState<"تربية" | "تحفيظ" | "تربية وتحفيظ">("تحفيظ");
   const [hasPaid, setHasPaid] = useState(false);
 
@@ -42,6 +42,7 @@ export default function AddUserModal({ open, onOpenChange, onSuccess }: AddUserM
     setEmail("");
     setPassword("");
     setRole("student");
+    setGrade(GRADES[0]); // Reset to first grade
     setSpecialization("تحفيظ");
     setHasPaid(false);
   };

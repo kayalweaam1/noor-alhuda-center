@@ -260,23 +260,121 @@ export default function TeacherDashboard() {
         {/* Recent Activity */}
         <Card className="border-emerald-200">
           <CardHeader>
-            <CardTitle className="text-emerald-900">النشاط الأخير</CardTitle>
-            <CardDescription>آخر التحديثات والإضافات</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-emerald-900">النشاط الأخير</CardTitle>
+                <CardDescription>آخر التحديثات والإضافات</CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  localStorage.removeItem('recentActivity');
+                  window.location.reload();
+                }}
+                className="text-xs"
+              >
+                تصفير
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <p className="text-sm text-gray-700">تم تسجيل حضور 15 طالب - منذ ساعتين</p>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                <p className="text-sm text-gray-700">تم إضافة درس جديد - منذ 5 ساعات</p>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                <p className="text-sm text-gray-700">تم تقييم 3 طلاب - أمس</p>
-              </div>
+              {(() => {
+                // Get recent activity from localStorage or create new
+                const getRecentActivity = () => {
+                  const stored = localStorage.getItem('recentActivity');
+                  if (stored) {
+                    return JSON.parse(stored);
+                  }
+                  return [];
+                };
+
+                const activities = getRecentActivity();
+
+                // Add new activities based on real data
+                const newActivities = [];
+
+                // Check for new attendance today
+                const todayAttendanceList = todayAttendance?.filter((a: any) => {
+                  const attDate = new Date(a.date);
+                  return attDate >= today && attDate <= todayEnd && a.status === 'present';
+                }) || [];
+
+                if (todayAttendanceList.length > 0 && !activities.some((a: any) => a.type === 'attendance' && a.date === today.toDateString())) {
+                  newActivities.push({
+                    type: 'attendance',
+                    message: `تم تسجيل حضور ${todayAttendanceList.length} طالب`,
+                    date: new Date().toISOString(),
+                    color: 'emerald'
+                  });
+                }
+
+                // Check for new lessons
+                const recentLessons = myLessons.filter(l => {
+                  const lessonDate = new Date(l.date);
+                  const hoursDiff = (new Date().getTime() - lessonDate.getTime()) / (1000 * 60 * 60);
+                  return hoursDiff >= 0 && hoursDiff <= 24;
+                });
+
+                if (recentLessons.length > 0 && !activities.some((a: any) => a.type === 'lesson' && new Date(a.date).toDateString() === new Date().toDateString())) {
+                  newActivities.push({
+                    type: 'lesson',
+                    message: `تم إضافة ${recentLessons.length} درس جديد`,
+                    date: new Date().toISOString(),
+                    color: 'blue'
+                  });
+                }
+
+                // Merge and save
+                const allActivities = [...newActivities, ...activities].slice(0, 10);
+                if (newActivities.length > 0) {
+                  localStorage.setItem('recentActivity', JSON.stringify(allActivities));
+                }
+
+                // Display activities
+                if (allActivities.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>لا يوجد نشاط حديث</p>
+                    </div>
+                  );
+                }
+
+                return allActivities.slice(0, 5).map((activity: any, idx: number) => {
+                  const activityDate = new Date(activity.date);
+                  const now = new Date();
+                  const diffMs = now.getTime() - activityDate.getTime();
+                  const diffMins = Math.floor(diffMs / (1000 * 60));
+                  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                  let timeAgo = '';
+                  if (diffMins < 60) {
+                    timeAgo = `منذ ${diffMins} دقيقة`;
+                  } else if (diffHours < 24) {
+                    timeAgo = `منذ ${diffHours} ساعة`;
+                  } else if (diffDays === 1) {
+                    timeAgo = 'أمس';
+                  } else {
+                    timeAgo = `منذ ${diffDays} يوم`;
+                  }
+
+                  const colorMap: any = {
+                    emerald: 'bg-emerald-500',
+                    blue: 'bg-blue-500',
+                    amber: 'bg-amber-500',
+                    purple: 'bg-purple-500'
+                  };
+
+                  return (
+                    <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div className={`w-2 h-2 rounded-full ${colorMap[activity.color] || 'bg-gray-500'}`}></div>
+                      <p className="text-sm text-gray-700">{activity.message} - {timeAgo}</p>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </CardContent>
         </Card>

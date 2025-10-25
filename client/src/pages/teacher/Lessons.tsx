@@ -95,7 +95,6 @@ export default function TeacherLessons() {
         title: formData.title,
         description: formData.description,
         date: lessonDate,
-        teacherId: teacher.id,
       });
       
       toast.success("تم إضافة الدرس بنجاح");
