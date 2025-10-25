@@ -791,6 +791,18 @@ export async function createDefaultAdmin() {
   }
 }
 
+export async function updateUser(userId: string, data: Partial<{
+  name: string;
+  email: string;
+  phone: string;
+  profileImage: string;
+}>) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.update(users).set(data).where(eq(users.id, userId));
+}
+
 export async function updateUserPassword(userId: string, password: string) {
   const db = await getDb();
   if (!db) return;

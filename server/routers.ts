@@ -188,6 +188,24 @@ export const appRouter = router({
       } as const;
     }),
 
+    // Update profile
+    updateProfile: protectedProcedure
+      .input(z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+        profileImage: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.updateUser(ctx.user.id, {
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          profileImage: input.profileImage,
+        });
+        return { success: true };
+      }),
+
     // Change password
     changePassword: protectedProcedure
       .input(z.object({

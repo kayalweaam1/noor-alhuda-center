@@ -33,6 +33,8 @@ import AssistantLayout from "./components/layouts/AssistantLayout";
 import Login from "./pages/Login";
 import AdminDirectLogin from "./pages/AdminDirectLogin";
 import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -135,6 +137,11 @@ function Router() {
         <TeacherLayout>
           <Settings />
         </TeacherLayout>
+      </Route>
+      <Route path="/profile">
+        <DashboardLayout>
+          <Profile />
+        </DashboardLayout>
       </Route>
       <Route path="/student/dashboard">
         <StudentLayout>
