@@ -13,6 +13,7 @@ import {
   Bell,
   BarChart3,
   Shield,
+  Key,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -78,6 +79,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: Shield,
       path: "/admin/admins",
     }] : []),
+    {
+      title: "حسابات المستخدمين",
+      icon: Key,
+      path: "/admin/user-accounts",
+    },
     {
       title: "الإعدادات",
       icon: Settings,
