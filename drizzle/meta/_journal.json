@@ -43,6 +43,13 @@
       "when": 1761365903907,
       "tag": "0005_mute_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1761416111055,
+      "tag": "0006_curly_blur",
+      "breakpoints": true
     }
   ]
 }

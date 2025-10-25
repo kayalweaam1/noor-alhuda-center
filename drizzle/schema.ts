@@ -40,7 +40,7 @@ export const students = mysqlTable("students", {
   id: varchar("id", { length: 64 }).primaryKey(),
   userId: varchar("userId", { length: 64 }).notNull().unique().references(() => users.id, { onDelete: "cascade" }),
   teacherId: varchar("teacherId", { length: 64 }).references(() => teachers.id, { onDelete: "set null" }),
-  grade: varchar("grade", { length: 50 }), // e.g., "الصف الثالث"
+  grade: varchar("grade", { length: 50 }).notNull(), // e.g., "الصف الثالث"
   specialization: mysqlEnum("specialization", ["تربية", "تحفيظ", "تربية وتحفيظ"]), // التخصص
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
   hasPaid: boolean("hasPaid").default(false).notNull(),

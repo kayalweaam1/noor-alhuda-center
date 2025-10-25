@@ -1,0 +1,1 @@
+ALTER TABLE `students` MODIFY COLUMN `grade` varchar(50) NOT NULL;

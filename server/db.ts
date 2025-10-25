@@ -301,11 +301,11 @@ export async function createStudent(student: InsertStudent) {
   const db = await getDb();
   if (!db) return;
 
-  // Convert undefined to null for optional fields
+  // Convert undefined/empty string to null for optional fields
   const studentData = {
     ...student,
-    teacherId: student.teacherId || null,
-    specialization: student.specialization || null,
+    teacherId: student.teacherId && student.teacherId.trim() !== '' ? student.teacherId : null,
+    specialization: student.specialization && student.specialization.trim() !== '' ? student.specialization : null,
   };
 
   await db.insert(students).values(studentData);
@@ -1392,6 +1392,13 @@ export async function applyMigrations() {
         )
       `);
     }
+    
+    // Make grade column NOT NULL in students table
+    console.log('[Migrations] Making grade column NOT NULL in students table...');
+    await connection.execute(`
+      ALTER TABLE students 
+      MODIFY COLUMN grade VARCHAR(50) NOT NULL
+    `);
     
     console.log('[Migrations] All migrations applied successfully');
   } catch (error) {
