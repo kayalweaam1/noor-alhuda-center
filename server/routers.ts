@@ -538,7 +538,7 @@ export const appRouter = router({
 	            grade: input.grade,
 	            specialization: input.specialization || null,
 	            hasPaid: input.hasPaid || false,
-            teacherId: undefined, // Teacher will be assigned later
+            teacherId: null, // Teacher will be assigned later
 		          });
           console.log('[CreateUser] Student profile created');
 	        }

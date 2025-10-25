@@ -301,7 +301,14 @@ export async function createStudent(student: InsertStudent) {
   const db = await getDb();
   if (!db) return;
 
-  await db.insert(students).values(student);
+  // Convert undefined to null for optional fields
+  const studentData = {
+    ...student,
+    teacherId: student.teacherId || null,
+    specialization: student.specialization || null,
+  };
+
+  await db.insert(students).values(studentData);
 }
 
 export async function getStudent(id: string) {
