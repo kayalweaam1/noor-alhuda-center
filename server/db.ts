@@ -1111,7 +1111,7 @@ export async function initializeDatabaseTables() {
           id VARCHAR(64) PRIMARY KEY,
           userId VARCHAR(64) NOT NULL UNIQUE,
           halaqaName VARCHAR(255),
-          specialization TEXT,
+          specialization ENUM('تربية', 'تحفيظ', 'تربية وتحفيظ'),
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
         )
@@ -1124,6 +1124,7 @@ export async function initializeDatabaseTables() {
           userId VARCHAR(64) NOT NULL UNIQUE,
           teacherId VARCHAR(64),
           grade VARCHAR(50),
+          specialization ENUM('تربية', 'تحفيظ', 'تربية وتحفيظ'),
           enrollmentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           hasPaid BOOLEAN DEFAULT FALSE NOT NULL,
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -1228,6 +1229,16 @@ export async function initializeDatabaseTables() {
         )
       `);
 
+      // Create appSettings table
+      await connection.execute(`
+        CREATE TABLE IF NOT EXISTS appSettings (
+          id VARCHAR(64) PRIMARY KEY,
+          welcomeMessage TEXT,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
       console.log('[Database] All tables created successfully');
     } finally {
       connection.release();
@@ -1266,6 +1277,108 @@ export async function upsertAppSettings(settings: InsertAppSettings) {
       id: settingsId,
       ...settings,
     });
+  }
+}
+
+
+
+
+// Apply migrations to existing database
+export async function applyMigrations() {
+  const pool = _pool;
+  if (!pool) {
+    console.error('[Migrations] Database pool not initialized');
+    return;
+  }
+
+  const connection = await pool.getConnection();
+  
+  try {
+    console.log('[Migrations] Starting database migrations...');
+    
+    // Check if specialization column exists in teachers table
+    const [teachersCols]: any = await connection.execute(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'teachers' 
+      AND COLUMN_NAME = 'specialization'
+    `);
+    
+    if (teachersCols.length === 0) {
+      console.log('[Migrations] Adding specialization column to teachers table...');
+      await connection.execute(`
+        ALTER TABLE teachers 
+        ADD COLUMN specialization ENUM('تربية', 'تحفيظ', 'تربية وتحفيظ')
+      `);
+    } else {
+      // Update existing column to ENUM
+      console.log('[Migrations] Updating specialization column in teachers table to ENUM...');
+      await connection.execute(`
+        ALTER TABLE teachers 
+        MODIFY COLUMN specialization ENUM('تربية', 'تحفيظ', 'تربية وتحفيظ')
+      `);
+    }
+    
+    // Check if specialization column exists in students table
+    const [studentsCols]: any = await connection.execute(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'students' 
+      AND COLUMN_NAME = 'specialization'
+    `);
+    
+    if (studentsCols.length === 0) {
+      console.log('[Migrations] Adding specialization column to students table...');
+      await connection.execute(`
+        ALTER TABLE students 
+        ADD COLUMN specialization ENUM('تربية', 'تحفيظ', 'تربية وتحفيظ')
+      `);
+    }
+    
+    // Check if hasPaid column exists in students table
+    const [hasPaidCols]: any = await connection.execute(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'students' 
+      AND COLUMN_NAME = 'hasPaid'
+    `);
+    
+    if (hasPaidCols.length === 0) {
+      console.log('[Migrations] Adding hasPaid column to students table...');
+      await connection.execute(`
+        ALTER TABLE students 
+        ADD COLUMN hasPaid BOOLEAN DEFAULT FALSE NOT NULL
+      `);
+    }
+    
+    // Check if appSettings table exists
+    const [appSettingsTables]: any = await connection.execute(`
+      SELECT TABLE_NAME 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'appSettings'
+    `);
+    
+    if (appSettingsTables.length === 0) {
+      console.log('[Migrations] Creating appSettings table...');
+      await connection.execute(`
+        CREATE TABLE appSettings (
+          id VARCHAR(64) PRIMARY KEY,
+          welcomeMessage TEXT,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+    }
+    
+    console.log('[Migrations] All migrations applied successfully');
+  } catch (error) {
+    console.error('[Migrations] Error applying migrations:', error);
+  } finally {
+    connection.release();
   }
 }
 

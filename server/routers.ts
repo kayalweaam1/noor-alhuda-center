@@ -32,6 +32,9 @@ export const appRouter = router({
         // Create all database tables first
         await db.initializeDatabaseTables();
         
+        // Apply migrations to update existing tables
+        await db.applyMigrations();
+        
         // Create default admin
         await db.createDefaultAdmin();
         
@@ -46,6 +49,22 @@ export const appRouter = router({
         return { 
           success: false, 
           message: 'Database initialization failed: ' + (error instanceof Error ? error.message : String(error))
+        };
+      }
+    }),
+
+    applyMigrations: publicProcedure.mutation(async () => {
+      try {
+        await db.applyMigrations();
+        return { 
+          success: true, 
+          message: 'Migrations applied successfully'
+        };
+      } catch (error) {
+        console.error('Migration error:', error);
+        return { 
+          success: false, 
+          message: 'Migration failed: ' + (error instanceof Error ? error.message : String(error))
         };
       }
     }),
