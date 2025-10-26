@@ -801,7 +801,7 @@ export async function deleteAssistantNote(id: string) {
 // ============= ADMIN SETUP =============
 
 export async function createDefaultAdmin() {
-  const adminPhone = '+972542632557';
+  const adminPhone = '0542632557'; // Use normalized phone without +972
   const adminUser = await getUserByPhone(adminPhone);
   
   if (!adminUser) {
@@ -811,6 +811,7 @@ export async function createDefaultAdmin() {
     await upsertUser({
       id: `user_admin_${Date.now()}`,
       name: 'المدير العام',
+      username: 'admin',
       phone: adminPhone,
       password: hashedPassword,
       role: 'admin',

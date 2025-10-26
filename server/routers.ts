@@ -79,7 +79,7 @@ export const appRouter = router({
       const hashedPassword = await hashPassword('admin123');
       
       // Update password for default admin
-      const adminUser = await db.getUserByPhone('+972542632557');
+      const adminUser = await db.getUserByPhone('0542632557');
       if (adminUser) {
         await db.updateUserPassword(adminUser.id, hashedPassword);
         return { success: true, message: 'Admin password reset successfully', phone: '+972542632557', password: 'admin123' };
@@ -125,7 +125,7 @@ export const appRouter = router({
       .input(z.object({ confirmPassword: z.string().min(4) }))
       .mutation(async ({ input, ctx }) => {
         // Only super admin (by phone) can execute this
-        const SUPER_ADMIN_PHONE = '+972542632557';
+        const SUPER_ADMIN_PHONE = '0542632557';
 
         if (!ctx.user || ctx.user.role !== 'admin' || ctx.user.phone !== SUPER_ADMIN_PHONE) {
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Super admin access required' });
