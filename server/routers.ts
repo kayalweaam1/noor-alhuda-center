@@ -961,7 +961,7 @@ export const appRouter = router({
         }
         
         return { success: true };}
-      }),
+      });
 
     update: teacherProcedure
       .input(z.object({
