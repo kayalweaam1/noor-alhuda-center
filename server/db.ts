@@ -1417,6 +1417,50 @@ export async function applyMigrations() {
       `);
     }
     
+    // Check if username column exists in users table
+    const [usernameCols]: any = await connection.execute(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'users' 
+      AND COLUMN_NAME = 'username'
+    `);
+    
+    if (usernameCols.length === 0) {
+      console.log('[Migrations] Adding username column to users table...');
+      await connection.execute(`
+        ALTER TABLE users 
+        ADD COLUMN username VARCHAR(64) UNIQUE
+      `);
+    }
+    
+    // Update users without username
+    console.log('[Migrations] Updating users without username...');
+    const [usersWithoutUsername]: any = await connection.execute(`
+      SELECT id, name, phone FROM users WHERE username IS NULL OR username = ''
+    `);
+    
+    for (const user of usersWithoutUsername) {
+      let username: string;
+      
+      if (user.phone) {
+        // Use phone number as username (remove non-digits)
+        username = user.phone.replace(/\D/g, '');
+      } else if (user.name) {
+        // Use name (remove spaces, add random number)
+        username = user.name.replace(/\s+/g, '_') + '_' + Math.floor(Math.random() * 1000);
+      } else {
+        // Fallback: use user ID
+        username = 'user_' + user.id.substring(0, 8);
+      }
+      
+      console.log(`[Migrations] Setting username for user ${user.id}: ${username}`);
+      await connection.execute(
+        'UPDATE users SET username = ? WHERE id = ?',
+        [username, user.id]
+      );
+    }
+    
     // Make grade column NOT NULL in students table
     console.log('[Migrations] Making grade column NOT NULL in students table...');
     await connection.execute(`

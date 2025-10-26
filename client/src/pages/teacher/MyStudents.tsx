@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Search, Phone, Mail, Calendar, TrendingUp, Award, BookOpen, ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
+import BehaviorProgressBar from "@/components/BehaviorProgressBar";
 
 export default function TeacherMyStudents() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -153,13 +154,16 @@ export default function TeacherMyStudents() {
                   return (
                     <TableRow key={student.id}>
                       <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                            <span className="text-emerald-600 font-semibold text-sm">
-                              {student.name.charAt(0)}
-                            </span>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <span className="text-emerald-600 font-semibold text-sm">
+                                {student.name.charAt(0)}
+                              </span>
+                            </div>
+                            {student.name}
                           </div>
-                          {student.name}
+                          <BehaviorProgressBar studentId={student.id} />
                         </div>
                       </TableCell>
                       <TableCell>
