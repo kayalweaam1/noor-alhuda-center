@@ -5,12 +5,20 @@ import { BookOpen, Calendar, Users, Clock, ChevronLeft, ChevronRight } from "luc
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { AddLessonModal } from "@/components/modals/AddLessonModal";
+import { LessonDetailsModal } from "@/components/modals/LessonDetailsModal";
 
 export default function AdminLessonsPage() {
   const { data: lessons } = trpc.lessons.getAll.useQuery();
   const { data: teachers } = trpc.teachers.getAll.useQuery();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showAddLesson, setShowAddLesson] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState<any>(null);
+  const [showLessonDetails, setShowLessonDetails] = useState(false);
+
+  const handleLessonClick = (lesson: any) => {
+    setSelectedLesson(lesson);
+    setShowLessonDetails(true);
+  };
 
   const getTeacherName = (teacherId: string) => {
     const teacher = teachers?.find(t => t.id === teacherId);
@@ -198,7 +206,8 @@ export default function AdminLessonsPage() {
                     {dayLessons.map((lesson) => (
                       <div
                         key={lesson.id}
-                        className="text-xs p-1 bg-emerald-100 border border-emerald-300 rounded"
+                        className="text-xs p-1 bg-emerald-100 border border-emerald-300 rounded cursor-pointer hover:bg-emerald-200 hover:border-emerald-400 transition-all"
+                        onClick={() => handleLessonClick(lesson)}
                       >
                         <div className="font-semibold text-emerald-900 truncate">
                           {lesson.title}
@@ -231,6 +240,14 @@ export default function AdminLessonsPage() {
 
       {/* Add Lesson Modal */}
       <AddLessonModal open={showAddLesson} onClose={() => setShowAddLesson(false)} />
+      
+      {/* Lesson Details Modal */}
+      <LessonDetailsModal 
+        open={showLessonDetails} 
+        onClose={() => setShowLessonDetails(false)}
+        lesson={selectedLesson}
+        teacherName={selectedLesson ? getTeacherName(selectedLesson.teacherId) : undefined}
+      />
     </div>
   );
 }
