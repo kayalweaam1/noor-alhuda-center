@@ -944,7 +944,7 @@ export const appRouter = router({
           id: lessonId,
           ...input,
           teacherId: teacher.id,
-        }),
+        });
         
         // Create notification for admin
         const teacherUser = await db.getUser(ctx.user.id);
@@ -960,7 +960,7 @@ export const appRouter = router({
           });
         }
         
-        return { success: true };}
+        return { success: true };
       });
 
     update: teacherProcedure
