@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, User, Phone, Mail, Calendar, GraduationCap, DollarSign, CheckCircle, XCircle, Upload } from "lucide-react";
+import { ArrowLeft, User, Phone, Mail, Calendar, GraduationCap, CircleDollarSign, CheckCircle, XCircle, Upload } from "lucide-react";
 import { Link, useRoute } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -160,7 +160,7 @@ export default function StudentProfile() {
               {/* Payment Amount */}
               <div className="p-4 bg-gray-50 rounded-lg border mb-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <DollarSign className="w-6 h-6 text-emerald-600" />
+                  <CircleDollarSign className="w-6 h-6 text-emerald-600" />
                   <p className="text-lg font-semibold text-gray-800">المبلغ المستحق:</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -188,7 +188,7 @@ export default function StudentProfile() {
               {/* Payment Status */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
                 <div className="flex items-center gap-3">
-                  <DollarSign className="w-6 h-6 text-blue-600" />
+                  <CircleDollarSign className="w-6 h-6 text-blue-600" />
                   <p className="text-lg font-semibold text-gray-800">حالة الرسوم:</p>
                 </div>
                 <Button

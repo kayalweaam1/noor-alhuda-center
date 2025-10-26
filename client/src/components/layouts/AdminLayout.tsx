@@ -14,6 +14,7 @@ import {
   BarChart3,
   Shield,
   Key,
+  CircleDollarSign,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -76,7 +77,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     },
     {
       title: "التقرير المالي",
-      icon: DollarSign,
+      icon: CircleDollarSign,
       path: "/admin/payments-summary",
     },
     ...(isSuperAdmin ? [{
