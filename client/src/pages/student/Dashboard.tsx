@@ -39,6 +39,14 @@ export default function StudentDashboard() {
     { studentId: studentIdForQuery },
     { enabled: !!student?.id }
   );
+  
+  // Get lessons data
+  const { data: lessons = [] } = trpc.lessons.getByTeacher.useQuery(
+    undefined,
+    { enabled: !!student?.teacherId }
+  );
+  
+  const completedLessons = lessons.filter((l: any) => l.completed).length;
   const attendanceRate = attendanceRecords.length > 0
     ? Math.round(
         (attendanceRecords.filter((r: any) => r.status === 'present').length /
@@ -209,8 +217,8 @@ export default function StudentDashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-gray-900 mb-2">24</div>
-              <CardDescription className="text-gray-600">درس مكتمل</CardDescription>
+              <div className="text-4xl font-bold text-gray-900 mb-2">{lessons.length || 0}</div>
+              <CardDescription className="text-gray-600">درس مسجل</CardDescription>
             </CardContent>
           </Card>
 
