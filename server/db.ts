@@ -1521,3 +1521,105 @@ export async function applyMigrations() {
   }
 }
 
+
+
+// ============= DATA RESET FUNCTIONS =============
+
+/**
+ * Reset all center data (attendance, evaluations, lessons, assistant notes)
+ * Keeps users, teachers, students, and assistants
+ */
+export async function resetAllData() {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    console.log('[Reset] Starting full data reset...');
+    
+    // Delete attendance records
+    await connection.execute('DELETE FROM attendance');
+    console.log('[Reset] Deleted all attendance records');
+    
+    // Delete evaluations
+    await connection.execute('DELETE FROM evaluations');
+    console.log('[Reset] Deleted all evaluations');
+    
+    // Delete lessons
+    await connection.execute('DELETE FROM lessons');
+    console.log('[Reset] Deleted all lessons');
+    
+    // Delete assistant notes
+    await connection.execute('DELETE FROM assistant_notes');
+    console.log('[Reset] Deleted all assistant notes');
+    
+    // Delete notifications
+    await connection.execute('DELETE FROM notifications');
+    console.log('[Reset] Deleted all notifications');
+    
+    console.log('[Reset] Full data reset completed successfully');
+  } catch (error) {
+    console.error('[Reset] Error resetting data:', error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+/**
+ * Reset specific student data (attendance, evaluations)
+ */
+export async function resetStudentData(studentId: string) {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    console.log(`[Reset] Resetting data for student ${studentId}...`);
+    
+    // Delete student's attendance records
+    await connection.execute('DELETE FROM attendance WHERE studentId = ?', [studentId]);
+    console.log('[Reset] Deleted student attendance records');
+    
+    // Delete student's evaluations
+    await connection.execute('DELETE FROM evaluations WHERE studentId = ?', [studentId]);
+    console.log('[Reset] Deleted student evaluations');
+    
+    console.log(`[Reset] Student ${studentId} data reset completed`);
+  } catch (error) {
+    console.error('[Reset] Error resetting student data:', error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+/**
+ * Reset specific teacher data (lessons, evaluations, assistant notes)
+ */
+export async function resetTeacherData(teacherId: string) {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    console.log(`[Reset] Resetting data for teacher ${teacherId}...`);
+    
+    // Delete teacher's lessons
+    await connection.execute('DELETE FROM lessons WHERE teacherId = ?', [teacherId]);
+    console.log('[Reset] Deleted teacher lessons');
+    
+    // Delete evaluations by this teacher
+    await connection.execute('DELETE FROM evaluations WHERE teacherId = ?', [teacherId]);
+    console.log('[Reset] Deleted teacher evaluations');
+    
+    // Delete assistant notes for this teacher
+    await connection.execute('DELETE FROM assistant_notes WHERE teacherId = ?', [teacherId]);
+    console.log('[Reset] Deleted teacher assistant notes');
+    
+    console.log(`[Reset] Teacher ${teacherId} data reset completed`);
+  } catch (error) {
+    console.error('[Reset] Error resetting teacher data:', error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+

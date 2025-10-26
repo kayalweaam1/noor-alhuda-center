@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Settings, Save, MessageSquare } from "lucide-react";
+import { Settings, Save, MessageSquare, Trash2, AlertTriangle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,16 @@ export default function AppSettingsPage() {
     },
     onError: (error) => {
       toast.error("فشل في حفظ الإعدادات: " + error.message);
+    },
+  });
+
+  // Data reset mutations
+  const resetAllMutation = trpc.dataReset.resetAll.useMutation({
+    onSuccess: () => {
+      toast.success("تم تصفير جميع بيانات المركز بنجاح");
+    },
+    onError: (error) => {
+      toast.error("فشل في تصفير البيانات: " + error.message);
     },
   });
 
@@ -156,6 +166,60 @@ export default function AppSettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Data Reset Section */}
+      <Card className="border-red-200 bg-red-50/30">
+        <CardHeader>
+          <CardTitle className="text-red-900 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
+            تصفير البيانات
+          </CardTitle>
+          <CardDescription className="text-red-700">
+            حذف جميع البيانات (الحضور، التقييمات، الدروس) مع الاحتفاظ بالمستخدمين والطلاب والمربين
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-white rounded-lg p-4 border border-red-200">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="font-semibold text-red-900 mb-2">تحذير هام</h4>
+                <p className="text-sm text-red-700 mb-3">
+                  عند الضغط على زر "تصفير جميع البيانات"، سيتم حذف:
+                </p>
+                <ul className="text-sm text-red-700 list-disc list-inside space-y-1 mr-4">
+                  <li>جميع سجلات الحضور والغياب</li>
+                  <li>جميع التقييمات والدرجات</li>
+                  <li>جميع الدروس المسجلة</li>
+                  <li>جميع ملاحظات المساعدين</li>
+                  <li>جميع الإشعارات</li>
+                </ul>
+                <p className="text-sm text-red-700 mt-3 font-semibold">
+                  سيتم الاحتفاظ ب: المستخدمين، الطلاب، المربين، والمساعدين
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-center">
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (confirm('هل أنت متأكد من تصفير جميع بيانات المركز؟ \n\nهذا الإجراء لا يمكن التراجع عنه!')) {
+                  if (confirm('تأكيد نهائي: هل تريد حقاً حذف جميع البيانات؟')) {
+                    resetAllMutation.mutate();
+                  }
+                }
+              }}
+              disabled={resetAllMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <Trash2 className="w-4 h-4 ml-2" />
+              {resetAllMutation.isPending ? "جاري التصفير..." : "تصفير جميع البيانات"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Action Buttons */}
       <Card className="border-emerald-200">

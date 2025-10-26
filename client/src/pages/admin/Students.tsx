@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Search, Edit, Trash2, Eye, TrendingUp, TrendingDown } from "lucide-react";
+import { UserPlus, Search, Edit, Trash2, Eye, TrendingUp, TrendingDown, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,6 +31,15 @@ export default function StudentsPage() {
   const [, setLocation] = useLocation();
   const { data: students, refetch } = trpc.students.getAll.useQuery();
   const deleteStudentMutation = trpc.students.delete.useMutation();
+  const resetStudentMutation = trpc.dataReset.resetStudent.useMutation({
+    onSuccess: () => {
+      toast.success('تم تصفير بيانات الطالب بنجاح');
+      refetch();
+    },
+    onError: (error) => {
+      toast.error('فشل في تصفير بيانات الطالب: ' + error.message);
+    },
+  });
 
   // Grade order for sorting
   const gradeOrder = [
@@ -57,9 +66,13 @@ export default function StudentsPage() {
       toast.success("تم حذف الطالب بنجاح");
       refetch();
     } catch (error: any) {
-      const message = error?.message || 'فشل حذف الطالب';
-      toast.error(message.includes('لا يمكنك حذف حسابك') ? message : 'فشل حذف الطالب');
+      toast.error("فشل في حذف الطالب: " + error.message);
     }
+  };
+
+  const handleResetStudent = async (studentId: string, studentName: string) => {
+    if (!confirm(`هل أنت متأكد من تصفير بيانات الطالب "${studentName}"؟\n\nسيتم حذف جميع سجلات الحضور والتقييمات لهذا الطالب.`)) return;
+    resetStudentMutation.mutate({ studentId });
   };
 
   const getAttendanceRate = (student: any) => {
@@ -254,6 +267,15 @@ export default function StudentsPage() {
                             }}
                           >
                             <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-amber-200 text-amber-600 hover:bg-amber-50"
+                            onClick={() => handleResetStudent(student.id, student.userName || 'غير محدد')}
+                            title="تصفير بيانات الطالب"
+                          >
+                            <RotateCcw className="w-4 h-4" />
                           </Button>
                           <Button
                             size="sm"

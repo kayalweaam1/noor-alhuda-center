@@ -1210,6 +1210,33 @@ export const appRouter = router({
       return await db.getStatistics();
     }),
   }),
+
+  // ============= DATA RESET (ADMIN ONLY) =============
+  dataReset: router({
+    // Reset all center data
+    resetAll: adminProcedure
+      .mutation(async () => {
+        // Delete all data except users with admin role
+        await db.resetAllData();
+        return { success: true, message: 'تم تصفير جميع بيانات المركز بنجاح' };
+      }),
+
+    // Reset specific student data
+    resetStudent: adminProcedure
+      .input(z.object({ studentId: z.string() }))
+      .mutation(async ({ input }) => {
+        await db.resetStudentData(input.studentId);
+        return { success: true, message: 'تم تصفير بيانات الطالب بنجاح' };
+      }),
+
+    // Reset specific teacher data
+    resetTeacher: adminProcedure
+      .input(z.object({ teacherId: z.string() }))
+      .mutation(async ({ input }) => {
+        await db.resetTeacherData(input.teacherId);
+        return { success: true, message: 'تم تصفير بيانات المربي بنجاح' };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
