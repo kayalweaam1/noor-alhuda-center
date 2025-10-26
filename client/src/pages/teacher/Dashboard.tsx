@@ -17,9 +17,9 @@ export default function TeacherDashboard() {
     undefined,
     { enabled: !!user?.id && user?.role === 'teacher' }
   );
-  const { data: lessons } = trpc.lessons.getAll.useQuery(
+  const { data: lessons } = trpc.lessons.getByTeacher.useQuery(
     undefined,
-    { enabled: !!user?.id && user?.role === 'teacher' }
+    { enabled: !!teacher?.id }
   );
   const { data: todayAttendance } = trpc.attendance.list.useQuery(
     undefined,

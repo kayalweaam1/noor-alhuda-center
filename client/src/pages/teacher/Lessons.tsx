@@ -22,7 +22,10 @@ export default function TeacherLessons() {
     undefined,
     { enabled: !!user?.id && user?.role === 'teacher' }
   );
-  const { data: lessons, refetch } = trpc.lessons.getAll.useQuery();
+  const { data: lessons, refetch } = trpc.lessons.getByTeacher.useQuery(
+    undefined,
+    { enabled: !!teacher?.id }
+  );
   
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -276,9 +279,10 @@ export default function TeacherLessons() {
                         </div>
                         <button
                           onClick={() => handleDelete(lesson.id)}
-                          className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 bg-red-500 text-white p-1 rounded text-xs"
+                          className="absolute -top-1 -left-1 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs w-5 h-5 flex items-center justify-center shadow-md"
+                          title="حذف الدرس"
                         >
-                          ×
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
                     ))}

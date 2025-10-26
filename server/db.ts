@@ -371,7 +371,23 @@ export async function getStudentByUserId(userId: string) {
   if (!db) return undefined;
 
   const result = await db.select().from(students).where(eq(students.userId, userId)).limit(1);
-  return result.length > 0 ? result[0] : undefined;
+  if (result.length === 0) return undefined;
+  
+  const student = result[0];
+  
+  // Get teacher name if teacherId exists
+  if (student.teacherId) {
+    const teacher = await getTeacher(student.teacherId);
+    if (teacher) {
+      const teacherUser = await getUser(teacher.userId);
+      return {
+        ...student,
+        teacherName: teacherUser?.name || 'غير محدد'
+      };
+    }
+  }
+  
+  return student;
 }
 
 export async function getAllStudents() {
@@ -833,7 +849,7 @@ export async function createDefaultAdmin() {
     
     await upsertUser({
       id: `user_admin_${Date.now()}`,
-      name: 'المدير العام',
+      name: 'وئام كيال',
       username: 'admin',
       phone: adminPhone,
       password: hashedPassword,
@@ -897,7 +913,7 @@ export async function resetDatabaseForAdmin(phoneRaw: string, plainPassword: str
 
   await upsertUser({
     id: `user_admin_${Date.now()}`,
-    name: 'المدير العام',
+    name: 'وئام كيال',
     phone,
     password: hashedPassword,
     role: 'admin',
