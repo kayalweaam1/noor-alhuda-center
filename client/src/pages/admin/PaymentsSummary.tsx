@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Users, CheckCircle, XCircle, TrendingUp } from "lucide-react";
+import { CircleDollarSign, Users, CheckCircle, XCircle, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function PaymentsSummary() {
@@ -30,7 +30,7 @@ export default function PaymentsSummary() {
       <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
-            <DollarSign className="w-8 h-8 text-white" />
+            <CircleDollarSign className="w-8 h-8 text-white" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-emerald-900">ملخص الدفعات</h1>
@@ -46,7 +46,7 @@ export default function PaymentsSummary() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg text-gray-700">المبلغ الإجمالي</CardTitle>
               <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-white" />
+                <CircleDollarSign className="w-6 h-6 text-white" />
               </div>
             </div>
           </CardHeader>

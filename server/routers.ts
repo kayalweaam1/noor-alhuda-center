@@ -945,7 +945,22 @@ export const appRouter = router({
           ...input,
           teacherId: teacher.id,
         });
-        return { success: true };
+        
+        // Create notification for admin
+        const teacherUser = await db.getUser(ctx.user.id);
+        const admins = await db.getAllUsers();
+        const adminUsers = admins.filter(u => u.role === 'admin');
+        
+        for (const admin of adminUsers) {
+          await db.createNotification({
+            userId: admin.id,
+            title: 'درس جديد',
+            message: `قام المربي ${teacherUser?.name || 'غير محدد'} بإضافة درس جديد: ${input.title}`,
+            type: 'lesson_added',
+          });
+        }
+        
+        return { success: true };}
       }),
 
     update: teacherProcedure

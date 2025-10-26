@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, CheckCircle, XCircle, DollarSign, Download } from "lucide-react";
+import { Search, CheckCircle, XCircle, CircleDollarSign, Download } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -88,7 +88,7 @@ export default function PaymentsPage() {
         <Card className="border-emerald-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <DollarSign className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+              <CircleDollarSign className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
               <p className="text-sm text-emerald-700 mb-2">إجمالي الطلاب</p>
               <p className="text-3xl font-bold text-emerald-900">{students?.length || 0}</p>
             </div>
@@ -118,7 +118,7 @@ export default function PaymentsPage() {
         <Card className="border-blue-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <DollarSign className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <CircleDollarSign className="w-8 h-8 text-blue-600 mx-auto mb-2" />
               <p className="text-sm text-blue-700 mb-2">المبلغ الإجمالي</p>
               <p className="text-3xl font-bold text-blue-900">{totalAmount} ₪</p>
             </div>
