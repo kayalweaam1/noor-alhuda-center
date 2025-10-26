@@ -17,7 +17,8 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+972");
   const [teacherId, setTeacherId] = useState("");
-  const [halaqaClass, setHalaqaClass] = useState("");
+  const [grade, setGrade] = useState("");
+  const [specialization, setSpecialization] = useState<"تربية" | "تحفيظ" | "تربية وتحفيظ" | "">("");
   const [password, setPassword] = useState("");
 
   const { data: teachers } = trpc.teachers.getAll.useQuery();
@@ -37,14 +38,15 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
     setName("");
     setPhone("+972");
     setTeacherId("");
-    setHalaqaClass("");
+    setGrade("");
+    setSpecialization("");
     setPassword("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !phone || !teacherId) {
+    if (!name || !phone || !teacherId || !grade || !specialization) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
@@ -54,7 +56,8 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
       phone,
       password: password || undefined,
       teacherId,
-      grade: halaqaClass || undefined,
+      grade: grade || undefined,
+      specialization: specialization || undefined,
     });
   };
 
@@ -122,13 +125,38 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="class">الحلقة/الصف</Label>
-            <Input
-              id="class"
-              value={halaqaClass}
-              onChange={(e) => setHalaqaClass(e.target.value)}
-              placeholder="مثال: الحلقة الأولى"
-            />
+            <Label htmlFor="grade">الصف (الجيل) *</Label>
+            <Select value={grade} onValueChange={setGrade} required>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر الصف" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="الثالث">الثالث</SelectItem>
+                <SelectItem value="الرابع">الرابع</SelectItem>
+                <SelectItem value="الخامس">الخامس</SelectItem>
+                <SelectItem value="السادس">السادس</SelectItem>
+                <SelectItem value="السابع">السابع</SelectItem>
+                <SelectItem value="الثامن">الثامن</SelectItem>
+                <SelectItem value="التاسع">التاسع</SelectItem>
+                <SelectItem value="العاشر">العاشر</SelectItem>
+                <SelectItem value="الحادي عشر">الحادي عشر</SelectItem>
+                <SelectItem value="الثاني عشر">الثاني عشر</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="specialization">التخصص *</Label>
+            <Select value={specialization} onValueChange={(value: any) => setSpecialization(value)} required>
+              <SelectTrigger>
+                <SelectValue placeholder="اختر التخصص" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="تربية">تربية</SelectItem>
+                <SelectItem value="تحفيظ">تحفيظ</SelectItem>
+                <SelectItem value="تربية وتحفيظ">تربية وتحفيظ</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-3 justify-end pt-4">

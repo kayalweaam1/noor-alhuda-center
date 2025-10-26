@@ -32,9 +32,23 @@ export default function StudentsPage() {
   const { data: students, refetch } = trpc.students.getAll.useQuery();
   const deleteStudentMutation = trpc.students.delete.useMutation();
 
-  const filteredStudents = students?.filter((student) =>
-    student.userName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Grade order for sorting
+  const gradeOrder = [
+    'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن',
+    'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر'
+  ];
+
+  const filteredStudents = students
+    ?.filter((student) =>
+      student.userName?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      const gradeA = gradeOrder.indexOf(a.grade || '');
+      const gradeB = gradeOrder.indexOf(b.grade || '');
+      if (gradeA === -1) return 1;
+      if (gradeB === -1) return -1;
+      return gradeA - gradeB;
+    });
 
   const handleDelete = async (studentId: string) => {
     if (!confirm("هل أنت متأكد من حذف هذا الطالب؟")) return;
@@ -167,7 +181,8 @@ export default function StudentsPage() {
               <TableHeader>
                 <TableRow className="bg-emerald-50">
                   <TableHead className="text-right font-bold text-emerald-900">الطالب</TableHead>
-                  <TableHead className="text-right font-bold text-emerald-900">الحلقة</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">الصف</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">التخصص</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">المربي</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">نسبة الحضور</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">الأداء</TableHead>
@@ -198,7 +213,20 @@ export default function StudentsPage() {
                           {student.grade || 'غير محدد'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{'غير محدد'}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="outline" 
+                          className={
+                            student.specialization === 'تربية' ? 'border-blue-300 text-blue-700' :
+                            student.specialization === 'تحفيظ' ? 'border-purple-300 text-purple-700' :
+                            student.specialization === 'تربية وتحفيظ' ? 'border-amber-300 text-amber-700' :
+                            'border-gray-300'
+                          }
+                        >
+                          {student.specialization || 'غير محدد'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{student.teacherName || 'غير محدد'}</TableCell>
                       <TableCell>
                         <BehaviorBar score={attendanceRate} size="sm" showLabel={false} />
                       </TableCell>

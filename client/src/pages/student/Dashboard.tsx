@@ -101,6 +101,12 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50" dir="rtl">
+      {/* Welcome Message */}
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-2 px-6 text-center">
+        <p className="text-sm font-medium">
+          مرحباً بك في مركز نور الهدى للقرآن الكريم - نتمنى لك يوماً مباركاً وموفقاً
+        </p>
+      </div>
       <div className="p-6 space-y-6">
         {/* Welcome Section with Profile */}
         <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">

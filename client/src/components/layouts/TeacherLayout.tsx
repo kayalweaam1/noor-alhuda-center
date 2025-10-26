@@ -128,6 +128,13 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
           sidebarOpen ? "mr-64" : "mr-0"
         }`}
       >
+        {/* Welcome Message */}
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-2 px-6 text-center">
+          <p className="text-sm font-medium">
+            مرحباً بك في مركز نور الهدى للقرآن الكريم - نتمنى لك يوماً مباركاً وموفقاً
+          </p>
+        </div>
+        
         {/* Top Header */}
         <header className="bg-white border-b border-emerald-200 shadow-sm sticky top-0 z-40">
           <div className="px-6 py-4 flex items-center justify-between">
