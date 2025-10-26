@@ -748,30 +748,37 @@ export const appRouter = router({
 	        return { success: true, userId, studentId };
 	      }),
 
-	    updatePaymentStatus: teacherProcedure
-	      .input(z.object({
-	        studentId: z.string(),
-	        hasPaid: z.boolean(),
-	      }))
-	      .mutation(async ({ input, ctx }) => {
-	        // Check if the teacher is authorized to update this student's status
-	        const student = await db.getStudent(input.studentId);
-	        if (!student) {
-	          throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
-	        }
+    updatePaymentStatus: protectedProcedure
+      .input(z.object({
+        studentId: z.string(),
+        hasPaid: z.boolean(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Check if the user is authorized to update this student's status
+        const student = await db.getStudent(input.studentId);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
+        }
 
-	        const teacher = await db.getTeacherByUserId(ctx.user.id);
-	        if (!teacher) {
-	          throw new TRPCError({ code: 'FORBIDDEN', message: 'Teacher profile not found' });
-	        }
+        // Admin can update any student
+        if (ctx.user.role === 'admin') {
+          await db.updateStudentPaymentStatus(input.studentId, input.hasPaid);
+          return { success: true };
+        }
 
-	        if (student.teacherId !== teacher.id && ctx.user.role !== 'admin') {
-	          throw new TRPCError({ code: 'FORBIDDEN', message: 'Unauthorized to update this student' });
-	        }
+        // Teacher can only update their own students
+        const teacher = await db.getTeacherByUserId(ctx.user.id);
+        if (!teacher) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Teacher profile not found' });
+        }
 
-	        await db.updateStudentPaymentStatus(input.studentId, input.hasPaid);
-	        return { success: true };
-	      }),
+        if (student.teacherId !== teacher.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Unauthorized to update this student' });
+        }
+
+        await db.updateStudentPaymentStatus(input.studentId, input.hasPaid);
+        return { success: true };
+      }),
 
     update: adminProcedure
       .input(z.object({

@@ -546,11 +546,17 @@ export default function ReportsPage() {
                   <SelectValue placeholder="اختر الحلقة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">جميع الحلقات</SelectItem>
-                  <SelectItem value="حلقة الصباح">حلقة الصباح</SelectItem>
-                  <SelectItem value="حلقة المساء">حلقة المساء</SelectItem>
-                  <SelectItem value="حلقة الأطفال">حلقة الأطفال</SelectItem>
-                  <SelectItem value="حلقة النساء">حلقة النساء</SelectItem>
+                  <SelectItem value="all">جميع الصفوف</SelectItem>
+                  <SelectItem value="الثالث">الصف الثالث</SelectItem>
+                  <SelectItem value="الرابع">الصف الرابع</SelectItem>
+                  <SelectItem value="الخامس">الصف الخامس</SelectItem>
+                  <SelectItem value="السادس">الصف السادس</SelectItem>
+                  <SelectItem value="السابع">الصف السابع</SelectItem>
+                  <SelectItem value="الثامن">الصف الثامن</SelectItem>
+                  <SelectItem value="التاسع">الصف التاسع</SelectItem>
+                  <SelectItem value="العاشر">الصف العاشر</SelectItem>
+                  <SelectItem value="الحادي عشر">الصف الحادي عشر</SelectItem>
+                  <SelectItem value="الثاني عشر">الصف الثاني عشر</SelectItem>
                 </SelectContent>
               </Select>
             </div>

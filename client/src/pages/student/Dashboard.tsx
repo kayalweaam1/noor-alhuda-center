@@ -123,6 +123,11 @@ export default function StudentDashboard() {
               <p className="text-blue-700 mt-1">
                 حلقة {student?.grade || 'القرآن الكريم'}
               </p>
+              {student?.teacherName && (
+                <p className="text-emerald-700 mt-1 font-medium">
+                  المربي: {student.teacherName}
+                </p>
+              )}
               <div className="flex items-center gap-4 mt-3">
                 <Badge className="bg-blue-500">طالب</Badge>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
