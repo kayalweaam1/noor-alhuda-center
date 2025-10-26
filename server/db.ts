@@ -1136,6 +1136,49 @@ export async function updateStudentPaymentStatus(studentId: string, hasPaid: boo
   await db.update(students).set({ hasPaid }).where(eq(students.id, studentId));
 }
 
+export async function updateStudentPaymentAmount(studentId: string, paymentAmount: number) {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    await connection.execute(
+      'UPDATE students SET paymentAmount = ? WHERE id = ?',
+      [paymentAmount, studentId]
+    );
+  } finally {
+    connection.release();
+  }
+}
+
+export async function getTotalPayments() {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    const [rows]: any = await connection.execute(`
+      SELECT 
+        COUNT(*) as totalStudents,
+        SUM(CASE WHEN hasPaid = 1 THEN 1 ELSE 0 END) as paidStudents,
+        SUM(CASE WHEN hasPaid = 0 THEN 1 ELSE 0 END) as unpaidStudents,
+        SUM(paymentAmount) as totalAmount,
+        SUM(CASE WHEN hasPaid = 1 THEN paymentAmount ELSE 0 END) as paidAmount,
+        SUM(CASE WHEN hasPaid = 0 THEN paymentAmount ELSE 0 END) as unpaidAmount
+      FROM students
+    `);
+    
+    return rows[0] || {
+      totalStudents: 0,
+      paidStudents: 0,
+      unpaidStudents: 0,
+      totalAmount: 0,
+      paidAmount: 0,
+      unpaidAmount: 0
+    };
+  } finally {
+    connection.release();
+  }
+}
+
 
 
 
@@ -1512,6 +1555,23 @@ export async function applyMigrations() {
       ALTER TABLE students 
       MODIFY COLUMN grade VARCHAR(50) NOT NULL
     `);
+    
+    // Check if paymentAmount column exists in students table
+    const [paymentAmountCols]: any = await connection.execute(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'students' 
+      AND COLUMN_NAME = 'paymentAmount'
+    `);
+    
+    if (paymentAmountCols.length === 0) {
+      console.log('[Migrations] Adding paymentAmount column to students table...');
+      await connection.execute(`
+        ALTER TABLE students 
+        ADD COLUMN paymentAmount DECIMAL(10, 2) DEFAULT 0.00
+      `);
+    }
     
     console.log('[Migrations] All migrations applied successfully');
   } catch (error) {

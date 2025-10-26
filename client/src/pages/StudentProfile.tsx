@@ -36,6 +36,18 @@ export default function StudentProfile() {
     }
   });
 
+  const updatePaymentAmountMutation = trpc.students.updatePaymentAmount.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث المبلغ بنجاح");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error("فشل تحديث المبلغ: " + error.message);
+    }
+  });
+
+  const [paymentAmount, setPaymentAmount] = useState<number>(0);
+
   if (isLoading) return <div className="p-6 text-center">جاري تحميل بيانات الطالب...</div>;
   if (error) return <div className="p-6 text-center text-red-600">حدث خطأ: {error.message}</div>;
   if (!student) return <div className="p-6 text-center">لم يتم العثور على الطالب</div>;
@@ -144,6 +156,36 @@ export default function StudentProfile() {
               </div>
 
               <h3 className="text-xl font-bold text-gray-800 border-b pb-2 pt-4">حالة الدفع</h3>
+              
+              {/* Payment Amount */}
+              <div className="p-4 bg-gray-50 rounded-lg border mb-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <DollarSign className="w-6 h-6 text-emerald-600" />
+                  <p className="text-lg font-semibold text-gray-800">المبلغ المستحق:</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="أدخل المبلغ"
+                    defaultValue={student.paymentAmount || 0}
+                    onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                  />
+                  <span className="text-lg font-semibold text-gray-700">₪</span>
+                  <Button
+                    onClick={() => updatePaymentAmountMutation.mutate({
+                      studentId: student.id,
+                      paymentAmount: paymentAmount || Number((document.querySelector('input[type="number"]') as HTMLInputElement)?.value || 0)
+                    })}
+                    disabled={updatePaymentAmountMutation.isPending}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    حفظ المبلغ
+                  </Button>
+                </div>
+              </div>
+
+              {/* Payment Status */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
                 <div className="flex items-center gap-3">
                   <DollarSign className="w-6 h-6 text-blue-600" />

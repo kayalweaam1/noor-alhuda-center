@@ -780,6 +780,20 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    updatePaymentAmount: adminProcedure
+      .input(z.object({
+        studentId: z.string(),
+        paymentAmount: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateStudentPaymentAmount(input.studentId, input.paymentAmount);
+        return { success: true };
+      }),
+
+    getTotalPayments: adminProcedure.query(async () => {
+      return await db.getTotalPayments();
+    }),
+
     update: adminProcedure
       .input(z.object({
         id: z.string(),

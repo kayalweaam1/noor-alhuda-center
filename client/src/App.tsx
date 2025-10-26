@@ -17,6 +17,7 @@ import AdminLessons from "./pages/admin/Lessons";
 import AdminAnalytics from "./pages/admin/Analytics";
 import AdminAdmins from "./pages/admin/Admins";
 import AdminPayments from "./pages/admin/Payments";
+import AdminPaymentsSummary from "./pages/admin/PaymentsSummary";
 import AdminAppSettings from "./pages/admin/AppSettings";
 import AdminUserDetails from "./pages/admin/UserDetails";
 import AdminUserAccounts from "./pages/admin/UserAccounts";
@@ -111,6 +112,11 @@ function Router() {
       <Route path="/admin/payments">
         <AdminLayout>
           <AdminPayments />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/payments-summary">
+        <AdminLayout>
+          <AdminPaymentsSummary />
         </AdminLayout>
       </Route>
       <Route path="/admin/app-settings">

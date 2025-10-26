@@ -74,6 +74,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: BarChart3,
       path: "/admin/analytics",
     },
+    {
+      title: "التقرير المالي",
+      icon: DollarSign,
+      path: "/admin/payments-summary",
+    },
     ...(isSuperAdmin ? [{
       title: "إدارة المدراء",
       icon: Shield,
