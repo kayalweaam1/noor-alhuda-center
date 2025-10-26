@@ -36,6 +36,7 @@ import StudentEvaluations from "./pages/student/Evaluations";
 import StudentLayout from "./components/layouts/StudentLayout";
 import AssistantDashboard from "./pages/assistant/Dashboard";
 import AssistantLayout from "./components/layouts/AssistantLayout";
+import Splash from "./pages/Splash";
 import Login from "./pages/Login";
 import AdminDirectLogin from "./pages/AdminDirectLogin";
 import Settings from "./pages/Settings";
@@ -46,7 +47,8 @@ function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Splash} />
+      <Route path={"/home"} component={Home} />
       <Route path={"/login"} component={Login} />
       <Route path={"/admin-direct"} component={AdminDirectLogin} />
       <Route path="/admin/dashboard">
