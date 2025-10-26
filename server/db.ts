@@ -127,15 +127,38 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
     // Auto-generate username if not provided
     if (user.username !== undefined) {
+      // Check if username is already taken by another user
+      const existingUser = await getUserByUsername(user.username);
+      if (existingUser && existingUser.id !== user.id) {
+        throw new Error(`Username '${user.username}' is already taken`);
+      }
       values.username = user.username;
       updateSet.username = user.username;
     } else if (!user.username && user.name) {
-      // Generate username from name (remove spaces, lowercase)
-      const baseUsername = user.name.replace(/\s+/g, '').toLowerCase();
-      values.username = baseUsername + Math.floor(Math.random() * 1000);
+      // Generate unique username from name
+      let attempt = 0;
+      let isUnique = false;
+      let generatedUsername = '';
+      
+      while (!isUnique && attempt < 10) {
+        const baseUsername = user.name.trim().split(/\s+/)[0]; // First word only
+        const randomSuffix = Math.floor(Math.random() * 1000);
+        generatedUsername = baseUsername + randomSuffix;
+        
+        const existingUser = await getUserByUsername(generatedUsername);
+        if (!existingUser || existingUser.id === user.id) {
+          isUnique = true;
+        } else {
+          attempt++;
+        }
+      }
+      
+      values.username = generatedUsername;
     } else if (!user.username && user.phone) {
-      // Generate username from phone
-      values.username = 'user' + user.phone.replace(/[^0-9]/g, '');
+      // Generate username from phone (normalized)
+      const cleanPhone = user.phone.replace(/\D/g, '');
+      const normalizedPhone = cleanPhone.startsWith('972') ? '0' + cleanPhone.substring(3) : cleanPhone;
+      values.username = normalizedPhone;
     }
     if (user.password !== undefined) {
       values.password = user.password;
@@ -1438,24 +1461,45 @@ export async function applyMigrations() {
     // Update users without username
     console.log('[Migrations] Updating users without username...');
     const [usersWithoutUsername]: any = await connection.execute(`
-      SELECT id, name, phone FROM users WHERE username IS NULL OR username = ''
+      SELECT id, name, phone, role FROM users WHERE username IS NULL OR username = ''
     `);
     
     for (const user of usersWithoutUsername) {
       let username: string;
+      let isUnique = false;
+      let attempt = 0;
       
-      if (user.phone) {
-        // Use phone number as username (remove non-digits)
-        username = user.phone.replace(/\D/g, '');
-      } else if (user.name) {
-        // Use name (remove spaces, add random number)
-        username = user.name.replace(/\s+/g, '_') + '_' + Math.floor(Math.random() * 1000);
-      } else {
-        // Fallback: use user ID
-        username = 'user_' + user.id.substring(0, 8);
+      while (!isUnique && attempt < 10) {
+        if (user.phone) {
+          // Use phone number as username (remove non-digits and +972 prefix)
+          const cleanPhone = user.phone.replace(/\D/g, '');
+          username = cleanPhone.startsWith('972') ? '0' + cleanPhone.substring(3) : cleanPhone;
+        } else if (user.name) {
+          // Use name (transliterate Arabic to Latin if needed, remove spaces)
+          const cleanName = user.name.trim().split(/\s+/)[0]; // First word only
+          const randomSuffix = Math.floor(Math.random() * 1000);
+          username = cleanName + randomSuffix;
+        } else {
+          // Fallback: use user ID
+          username = 'user_' + user.id.substring(user.id.length - 8);
+        }
+        
+        // Check if username is unique
+        const [existing]: any = await connection.execute(
+          'SELECT id FROM users WHERE username = ? AND id != ?',
+          [username, user.id]
+        );
+        
+        if (existing.length === 0) {
+          isUnique = true;
+        } else {
+          attempt++;
+          // Add random suffix if not unique
+          username = username + '_' + attempt;
+        }
       }
       
-      console.log(`[Migrations] Setting username for user ${user.id}: ${username}`);
+      console.log(`[Migrations] Setting username for user ${user.id} (${user.name}): ${username}`);
       await connection.execute(
         'UPDATE users SET username = ? WHERE id = ?',
         [username, user.id]

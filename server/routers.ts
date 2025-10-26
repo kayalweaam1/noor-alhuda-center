@@ -206,11 +206,41 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    // Update username
+    updateUsername: protectedProcedure
+      .input(z.object({
+        newUsername: z.string()
+          .min(3, 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل')
+          .max(32, 'اسم المستخدم يجب ألا يتجاوز 32 حرفاً')
+          .regex(
+            /^[a-zA-Z0-9\u0600-\u06FF][a-zA-Z0-9\u0600-\u06FF_-]*$/,
+            'اسم المستخدم يجب أن يبدأ بحرف أو رقم ويمكن أن يحتوي على أحرف وأرقام و _ و -'
+          ),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Check if username is already taken
+        const existingUser = await db.getUserByUsername(input.newUsername);
+        if (existingUser && existingUser.id !== ctx.user.id) {
+          throw new TRPCError({ 
+            code: 'BAD_REQUEST', 
+            message: `اسم المستخدم '${input.newUsername}' مستخدم بالفعل` 
+          });
+        }
+        
+        // Update username using upsertUser
+        await db.upsertUser({
+          id: ctx.user.id,
+          username: input.newUsername,
+        });
+        
+        return { success: true, username: input.newUsername };
+      }),
+
     // Change password
     changePassword: protectedProcedure
-      .input(z.object({
-        currentPassword: z.string(),
-        newPassword: z.string().min(6),
+      .input(z.object({ 
+        currentPassword: z.string().min(1, 'كلمة المرور الحالية مطلوبة'),
+        newPassword: z.string().min(6, 'كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل'),
       }))
       .mutation(async ({ input, ctx }) => {
         const user = await db.getUser(ctx.user.id);
@@ -238,8 +268,8 @@ export const appRouter = router({
     // Login with username or phone and password
     login: publicProcedure
       .input(z.object({ 
-        username: z.string(), // Can be username or phone
-        password: z.string(),
+        username: z.string().min(1, 'اسم المستخدم أو رقم الهاتف مطلوب'), // Can be username or phone
+        password: z.string().min(1, 'كلمة المرور مطلوبة'),
       }))
       .mutation(async ({ input, ctx }) => {
         const identifier = input.username.trim();
