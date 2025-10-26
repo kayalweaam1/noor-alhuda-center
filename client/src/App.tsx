@@ -29,6 +29,9 @@ import TeacherMyStudents from "./pages/teacher/MyStudents";
 import TeacherLayout from "./components/layouts/TeacherLayout";
 import TeacherStudentsPage from "./pages/teacher/Students";
 import StudentDashboard from "./pages/student/Dashboard";
+import StudentAttendance from "./pages/student/Attendance";
+import StudentLessons from "./pages/student/Lessons";
+import StudentEvaluations from "./pages/student/Evaluations";
 import StudentLayout from "./components/layouts/StudentLayout";
 import AssistantDashboard from "./pages/assistant/Dashboard";
 import AssistantLayout from "./components/layouts/AssistantLayout";
@@ -158,6 +161,21 @@ function Router() {
       <Route path="/student/dashboard">
         <StudentLayout>
           <StudentDashboard />
+        </StudentLayout>
+      </Route>
+      <Route path="/student/attendance">
+        <StudentLayout>
+          <StudentAttendance />
+        </StudentLayout>
+      </Route>
+      <Route path="/student/lessons">
+        <StudentLayout>
+          <StudentLessons />
+        </StudentLayout>
+      </Route>
+      <Route path="/student/evaluations">
+        <StudentLayout>
+          <StudentEvaluations />
         </StudentLayout>
       </Route>
       <Route path="/student/settings">
