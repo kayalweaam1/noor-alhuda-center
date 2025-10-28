@@ -741,7 +741,7 @@ export const appRouter = router({
           userId,
           teacherId: finalTeacherId,
           grade: input.grade,
-          specialization: input.specialization || null,
+          specialization: input.specialization || 'تربية',
           hasPaid: input.hasPaid || false,
         });
 	
