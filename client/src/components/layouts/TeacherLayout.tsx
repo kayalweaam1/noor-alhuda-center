@@ -131,7 +131,7 @@ export default function TeacherLayout({ children }: TeacherLayoutProps) {
         {/* Welcome Message */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-2 px-6 text-center">
           <p className="text-sm font-medium">
-            مرحباً بك في مركز نور الهدى للقرآن الكريم - نتمنى لك يوماً مباركاً وموفقاً
+            مرحباً بكم في مركز نور الهدى للتربية والتحفيظ
           </p>
         </div>
         

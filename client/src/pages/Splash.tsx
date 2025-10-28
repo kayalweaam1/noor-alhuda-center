@@ -5,10 +5,10 @@ export default function Splash() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Redirect to login after 3 seconds
+    // Redirect to login after 4 seconds
     const timer = setTimeout(() => {
       setLocation('/login');
-    }, 3000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, [setLocation]);
