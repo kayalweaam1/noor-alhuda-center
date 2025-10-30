@@ -162,6 +162,7 @@ export default function PaymentsPage() {
               <TableHeader>
                 <TableRow className="bg-emerald-50">
                   <TableHead className="text-right font-bold text-emerald-900">الطالب</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">المربي</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">الحلقة</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">رقم الهاتف</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">المبلغ</TableHead>
@@ -184,6 +185,12 @@ export default function PaymentsPage() {
                           <div>
                             <p className="font-semibold">{student.userName || 'غير محدد'}</p>
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-emerald-600" />
+                          <span className="text-sm">{student.teacherName || 'غير محدد'}</span>
                         </div>
                       </TableCell>
                       <TableCell>

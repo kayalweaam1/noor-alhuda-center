@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Edit, Eye, DollarSign, CheckCircle, XCircle } from "lucide-react";
+import { Search, Edit, Eye, CircleDollarSign, CheckCircle, XCircle } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";

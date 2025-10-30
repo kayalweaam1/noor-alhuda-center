@@ -399,15 +399,19 @@ export async function getAllStudents() {
     userId: students.userId,
     teacherId: students.teacherId,
     grade: students.grade,
+    specialization: students.specialization,
     enrollmentDate: students.enrollmentDate,
     hasPaid: students.hasPaid,
     createdAt: students.createdAt,
     userName: users.name,
     userPhone: users.phone,
     userEmail: users.email,
+    teacherName: sql<string>`teacher_user.name`,
   })
   .from(students)
   .leftJoin(users, eq(students.userId, users.id))
+  .leftJoin(teachers, eq(students.teacherId, teachers.id))
+  .leftJoin(sql`users AS teacher_user`, eq(sql`teachers.userId`, sql`teacher_user.id`))
   .orderBy(desc(students.createdAt));
 }
 
@@ -420,6 +424,7 @@ export async function getStudentsByTeacher(teacherId: string) {
     userId: students.userId,
     teacherId: students.teacherId,
     grade: students.grade,
+    specialization: students.specialization,
     enrollmentDate: students.enrollmentDate,
     hasPaid: students.hasPaid,
     createdAt: students.createdAt,
@@ -427,9 +432,12 @@ export async function getStudentsByTeacher(teacherId: string) {
     userPhone: users.phone,
     userEmail: users.email,
     userProfileImage: users.profileImage,
+    teacherName: sql<string>`teacher_user.name`,
   })
   .from(students)
   .leftJoin(users, eq(students.userId, users.id))
+  .leftJoin(teachers, eq(students.teacherId, teachers.id))
+  .leftJoin(sql`users AS teacher_user`, eq(sql`teachers.userId`, sql`teacher_user.id`))
   .where(eq(students.teacherId, teacherId))
   .orderBy(desc(students.createdAt));
 }
