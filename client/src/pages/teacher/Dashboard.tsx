@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Users, BookOpen, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
