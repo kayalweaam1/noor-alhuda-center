@@ -11,7 +11,10 @@ export default function TeacherAttendance() {
     undefined,
     { enabled: !!user?.id && user?.role === 'teacher' }
   );
-  const { data: students } = trpc.students.getAll.useQuery();
+  const { data: students } = trpc.students.getByTeacher.useQuery(
+    undefined,
+    { enabled: !!user?.id && user?.role === 'teacher' }
+  );
   
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [attendance, setAttendance] = useState<Record<string, boolean>>({});
@@ -48,7 +51,7 @@ export default function TeacherAttendance() {
     }
   };
 
-  const myStudents = students?.filter(s => s.teacherId === teacher?.id) || [];
+  const myStudents = students || [];
 
   return (
     <div className="p-6 space-y-6">
