@@ -16,7 +16,10 @@ const uploadFile = async (file: File, studentId: string) => {
 };
 
 export default function StudentProfile() {
-  const [match, params] = useRoute("/admin/students/:studentId");
+  const [adminMatch, adminParams] = useRoute("/admin/students/:studentId");
+  const [teacherMatch, teacherParams] = useRoute("/teacher/students/:studentId");
+  const match = adminMatch || teacherMatch;
+  const params = adminParams || teacherParams;
   const studentId = params?.studentId;
   const [isUploading, setIsUploading] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -78,9 +81,11 @@ export default function StudentProfile() {
     }
   };
 
+  const backUrl = teacherMatch ? "/teacher/students/dashboard" : "/admin/students";
+
   return (
     <div className="p-6 space-y-6" dir="rtl">
-      <Link href="/admin/students">
+      <Link href={backUrl}>
         <Button variant="outline" className="mb-4">
           <ArrowLeft className="w-4 h-4 ml-2" />
           العودة إلى قائمة الطلاب
@@ -151,7 +156,7 @@ export default function StudentProfile() {
                 </div>
                 <div className="flex items-center gap-3">
                   <GraduationCap className="w-5 h-5 text-emerald-600" />
-                  <p className="text-gray-700">جيل المربي: {student.teacherGrade || 'غير محدد'}</p>
+                  <p className="text-gray-700">التخصص: {student.specialization || 'غير محدد'}</p>
                 </div>
               </div>
 
