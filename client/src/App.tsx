@@ -151,11 +151,16 @@ function Router() {
 	          <TeacherEvaluations />
 	        </TeacherLayout>
 	      </Route>
-	      <Route path="/teacher/students/dashboard">
-	        <TeacherLayout>
-	          <TeacherStudentsPage />
-	        </TeacherLayout>
-	      </Route>
+      <Route path="/teacher/students/dashboard">
+        <TeacherLayout>
+          <TeacherStudentsPage />
+        </TeacherLayout>
+      </Route>
+      <Route path="/teacher/students/:studentId">
+        <TeacherLayout>
+          <StudentProfile />
+        </TeacherLayout>
+      </Route>
       <Route path="/teacher/settings">
         <TeacherLayout>
           <Settings />
