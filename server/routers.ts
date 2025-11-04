@@ -678,12 +678,32 @@ export const appRouter = router({
       });
     }),
 
-    getById: adminProcedure
+    getById: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .query(async ({ input }) => {
+      .query(async ({ input, ctx }) => {
         const student = await db.getStudent(input.id);
         if (!student) return null;
-        return student;
+        
+        // Allow admin to see all students
+        if (ctx.user.role === 'admin') {
+          return student;
+        }
+        
+        // Allow teacher to see only their students
+        if (ctx.user.role === 'teacher') {
+          const teacher = await db.getTeacherByUserId(ctx.user.id);
+          if (teacher && student.teacherId === teacher.id) {
+            return student;
+          }
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'You can only view your own students' });
+        }
+        
+        // Allow student to see only their own profile
+        if (ctx.user.role === 'student' && student.userId === ctx.user.id) {
+          return student;
+        }
+        
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Access denied' });
       }),
 
     getMyProfile: protectedProcedure.query(async ({ ctx }) => {
