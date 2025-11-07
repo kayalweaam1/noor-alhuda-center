@@ -43,6 +43,9 @@ export const students = mysqlTable("students", {
   teacherId: varchar("teacherId", { length: 64 }).references(() => teachers.id, { onDelete: "set null" }),
   grade: varchar("grade", { length: 50 }).notNull(), // e.g., "الصف الثالث"
   specialization: mysqlEnum("specialization", ["تربية", "تحفيظ", "تربية وتحفيظ"]), // التخصص
+  guardianName: varchar("guardianName", { length: 255 }), // اسم ولي الأمر
+  guardianPhone: varchar("guardianPhone", { length: 20 }), // رقم هاتف ولي الأمر
+  guardianRelation: varchar("guardianRelation", { length: 50 }), // صلة القرابة (أب، أم، أخ، إلخ)
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
   hasPaid: boolean("hasPaid").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),

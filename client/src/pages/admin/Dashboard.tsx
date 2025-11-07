@@ -156,6 +156,7 @@ export default function AdminDashboard() {
       icon: Users,
       color: "bg-blue-500",
       description: "عدد الطلاب المسجلين",
+      link: "/admin/students",
     },
     {
       title: "المربين",
@@ -163,6 +164,7 @@ export default function AdminDashboard() {
       icon: GraduationCap,
       color: "bg-emerald-500",
       description: "عدد المربين النشطين",
+      link: "/admin/teachers",
     },
     {
       title: "الدروس",
@@ -170,6 +172,7 @@ export default function AdminDashboard() {
       icon: BookOpen,
       color: "bg-amber-500",
       description: "إجمالي الدروس المسجلة",
+      link: "/admin/lessons",
     },
     {
       title: "المستخدمين",
@@ -177,6 +180,7 @@ export default function AdminDashboard() {
       icon: TrendingUp,
       color: "bg-purple-500",
       description: "إجمالي المستخدمين",
+      link: "/admin/users",
     },
   ];
 
@@ -206,30 +210,42 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statsCards.map((stat, index) => {
             const Icon = stat.icon;
+            const CardWrapper = stat.link ? 'a' : 'div';
             return (
-              <Card
+              <CardWrapper
                 key={index}
-                className="border-emerald-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                href={stat.link}
+                onClick={(e: any) => {
+                  if (stat.link) {
+                    e.preventDefault();
+                    setLocation(stat.link);
+                  }
+                }}
+                className="block"
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg text-gray-700">
-                      {stat.title}
-                    </CardTitle>
-                    <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
-                      <Icon className="w-6 h-6 text-white" />
+                <Card
+                  className="border-emerald-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg text-gray-700">
+                        {stat.title}
+                      </CardTitle>
+                      <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
-                    {stat.value}
-                  </div>
-                  <CardDescription className="text-gray-600">
-                    {stat.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-gray-900 mb-2">
+                      {stat.value}
+                    </div>
+                    <CardDescription className="text-gray-600">
+                      {stat.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </CardWrapper>
             );
           })}
         </div>

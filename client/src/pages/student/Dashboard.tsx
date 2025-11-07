@@ -136,6 +136,17 @@ export default function StudentDashboard() {
                   المربي: {student.teacherName}
                 </p>
               )}
+              {student?.guardianName && (
+                <p className="text-gray-700 mt-1">
+                  ولي الأمر: {student.guardianName}
+                  {student.guardianRelation && ` (${student.guardianRelation})`}
+                </p>
+              )}
+              {student?.guardianPhone && (
+                <p className="text-gray-600 mt-1 text-sm">
+                  هاتف ولي الأمر: {student.guardianPhone}
+                </p>
+              )}
               <div className="flex items-center gap-4 mt-3">
                 <Badge className="bg-blue-500">طالب</Badge>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
