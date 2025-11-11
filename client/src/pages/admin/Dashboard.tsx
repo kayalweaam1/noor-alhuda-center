@@ -250,6 +250,58 @@ export default function AdminDashboard() {
           })}
         </div>
 
+        {/* Grade Distribution Chart */}
+        <Card className="border-emerald-200">
+          <CardHeader>
+            <CardTitle className="text-emerald-900">توزيع الطلاب حسب الحلقات</CardTitle>
+            <CardDescription>نسب مئوية لتوزيع الطلاب حسب الصفوف</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              // Calculate grade distribution
+              const gradeDistribution: Record<string, number> = {};
+              let totalStudents = 0;
+              
+              students?.forEach(student => {
+                if (student.grade && student.grade !== 'غير محدد' && student.grade !== '0') {
+                  gradeDistribution[student.grade] = (gradeDistribution[student.grade] || 0) + 1;
+                  totalStudents++;
+                }
+              });
+              
+              const grades = Object.keys(gradeDistribution).sort();
+              const colors = [
+                'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
+                'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500',
+                'bg-orange-500', 'bg-cyan-500'
+              ];
+              
+              return (
+                <div className="space-y-4">
+                  <div className="text-center mb-4">
+                    <p className="text-2xl font-bold text-emerald-900">إجمالي الطلاب: {totalStudents}</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {grades.map((grade, index) => {
+                      const count = gradeDistribution[grade];
+                      const percentage = totalStudents > 0 ? ((count / totalStudents) * 100).toFixed(1) : '0';
+                      return (
+                        <div key={grade} className="text-center p-4 bg-gray-50 rounded-lg border">
+                          <div className={`w-16 h-16 mx-auto rounded-full ${colors[index % colors.length]} flex items-center justify-center text-white font-bold text-xl mb-2`}>
+                            {count}
+                          </div>
+                          <p className="font-semibold text-gray-800">{grade}</p>
+                          <p className="text-2xl font-bold text-emerald-600">{percentage}%</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
         {/* Admin Control Panel - Archive and Delete */}
         {user.phone === '+972542632557' && (
           <Card className="border-red-200 bg-red-50">

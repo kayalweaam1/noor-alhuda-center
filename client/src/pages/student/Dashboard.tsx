@@ -115,6 +115,17 @@ export default function StudentDashboard() {
           مرحبا بكم في مركز نور الهدى للتربية والتحفيظ
         </p>
       </div>
+      
+      {/* Quranic Verse */}
+      <div className="mx-6 mt-6 bg-gradient-to-r from-amber-50 to-yellow-50 border-r-4 border-amber-500 rounded-lg p-4 shadow-sm">
+        <p className="text-center text-xl font-semibold text-amber-900 leading-relaxed">
+          ﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾
+        </p>
+        <p className="text-center text-sm text-amber-700 mt-2">
+          سورة طه - آية 114
+        </p>
+      </div>
+      
       <div className="p-6 space-y-6">
         {/* Welcome Section with Profile */}
         <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-6">
