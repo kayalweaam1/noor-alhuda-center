@@ -36,6 +36,20 @@ export default function TeacherStudentsPage() {
     }
   });
 
+  // Mutation to update payment amount
+  const updatePaymentAmountMutation = trpc.students.updatePaymentAmount.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث المبلغ بنجاح");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error("فشل تحديث المبلغ: " + error.message);
+    }
+  });
+
+  const [editingPaymentId, setEditingPaymentId] = useState<string | null>(null);
+  const [paymentAmounts, setPaymentAmounts] = useState<Record<string, number>>({});
+
   const filteredStudents = students?.filter((student) =>
     student.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     student.grade?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -95,6 +109,7 @@ export default function TeacherStudentsPage() {
                   <TableHead className="text-right font-bold text-emerald-900">نسبة الحضور</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">الأداء</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">حالة الدفع</TableHead>
+                  <TableHead className="text-right font-bold text-emerald-900">المبلغ المدفوع</TableHead>
                   <TableHead className="text-right font-bold text-emerald-900">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
@@ -149,6 +164,58 @@ export default function TeacherStudentsPage() {
                             </>
                           )}
                         </Button>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {editingPaymentId === student.id ? (
+                            <>
+                              <Input
+                                type="number"
+                                className="w-24 h-8 text-sm"
+                                placeholder="المبلغ"
+                                defaultValue={student.paymentAmount || 0}
+                                onChange={(e) => setPaymentAmounts(prev => ({
+                                  ...prev,
+                                  [student.id]: Number(e.target.value)
+                                }))}
+                                autoFocus
+                              />
+                              <span className="text-sm font-semibold">₪</span>
+                              <Button
+                                size="sm"
+                                className="h-8 bg-emerald-600 hover:bg-emerald-700"
+                                onClick={() => {
+                                  const amount = paymentAmounts[student.id] ?? student.paymentAmount ?? 0;
+                                  updatePaymentAmountMutation.mutate({
+                                    studentId: student.id,
+                                    paymentAmount: amount
+                                  });
+                                  setEditingPaymentId(null);
+                                }}
+                              >
+                                حفظ
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8"
+                                onClick={() => setEditingPaymentId(null)}
+                              >
+                                إلغاء
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                              onClick={() => setEditingPaymentId(student.id)}
+                            >
+                              <CircleDollarSign className="w-4 h-4 ml-1" />
+                              {student.paymentAmount ? `${student.paymentAmount} ₪` : 'تحديد المبلغ'}
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

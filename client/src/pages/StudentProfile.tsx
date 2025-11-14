@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 
-// Placeholder for file upload utility
-const uploadFile = async (file: File, studentId: string) => {
-  // Mock upload for now, implementation depends on backend storage
-  console.log(`Uploading file for student ${studentId}: ${file.name}`);
-  // In a real app, this would call an API endpoint to upload the file
-  return `/uploads/students/${studentId}/profile.jpg`; 
+// Convert file to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
 };
 
 export default function StudentProfile() {
@@ -28,15 +30,21 @@ export default function StudentProfile() {
     { id: studentId! },
     { enabled: !!studentId }
   );
-
   const updatePaymentMutation = trpc.students.updatePaymentStatus.useMutation({
     onSuccess: () => {
       toast.success("تم تحديث حالة الدفع بنجاح");
       refetch();
     },
-    onError: (error: any) => {
-      toast.error("فشل تحديث حالة الدفع: " + error.message);
-    }
+  });
+
+  const updateProfileImageMutation = trpc.students.updateProfileImage.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث الصورة الشخصية بنجاح");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "فشل في تحديث الصورة");
+    },
   });
 
   const updatePaymentAmountMutation = trpc.students.updatePaymentAmount.useMutation({
@@ -54,6 +62,11 @@ export default function StudentProfile() {
   if (isLoading) return <div className="p-6 text-center">جاري تحميل بيانات الطالب...</div>;
   if (error) return <div className="p-6 text-center text-red-600">حدث خطأ: {error.message}</div>;
   if (!student) return <div className="p-6 text-center">لم يتم العثور على الطالب</div>;
+  
+  // Initialize payment amount after student is loaded
+  if (paymentAmount === 0 && student.paymentAmount) {
+    setPaymentAmount(student.paymentAmount);
+  }
 
   const handlePaymentToggle = () => {
     updatePaymentMutation.mutate({
@@ -66,16 +79,25 @@ export default function StudentProfile() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("حجم الصورة كبير جداً. الحد الأقصى 5MB");
+      return;
+    }
+
     setIsUploading(true);
     try {
-      // Assuming a backend API exists to handle the file upload and update the student's profile picture URL
-      // For now, we'll just mock the URL update
-      const mockUrl = await uploadFile(file, student.id);
-      setProfileImageUrl(mockUrl); // Update local state for immediate display
-      // In a real app, you would call a mutation here to update the DB
-      toast.success("تم رفع صورة الملف الشخصي بنجاح");
-    } catch (e) {
-      toast.error("فشل في رفع الصورة");
+      const base64 = await fileToBase64(file);
+      setProfileImageUrl(base64); // Update local state for immediate display
+      
+      // Save to database
+      await updateProfileImageMutation.mutateAsync({
+        studentId: student.id,
+        profileImage: base64,
+      });
+    } catch (e: any) {
+      toast.error(e.message || "فشل في رفع الصورة");
+      setProfileImageUrl(null); // Reset on error
     } finally {
       setIsUploading(false);
     }
@@ -178,14 +200,20 @@ export default function StudentProfile() {
                   />
                   <span className="text-lg font-semibold text-gray-700">₪</span>
                   <Button
-                    onClick={() => updatePaymentAmountMutation.mutate({
-                      studentId: student.id,
-                      paymentAmount: paymentAmount || Number((document.querySelector('input[type="number"]') as HTMLInputElement)?.value || 0)
-                    })}
+                    onClick={() => {
+                      if (paymentAmount < 0) {
+                        toast.error("المبلغ يجب أن يكون أكبر من أو يساوي صفر");
+                        return;
+                      }
+                      updatePaymentAmountMutation.mutate({
+                        studentId: student.id,
+                        paymentAmount: paymentAmount
+                      });
+                    }}
                     disabled={updatePaymentAmountMutation.isPending}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    حفظ المبلغ
+                    {updatePaymentAmountMutation.isPending ? "جاري الحفظ..." : "حفظ المبلغ"}
                   </Button>
                 </div>
               </div>

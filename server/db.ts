@@ -1174,6 +1174,36 @@ export async function updateStudentPaymentAmount(studentId: string, paymentAmoun
   }
 }
 
+export async function updateStudentProfileImage(studentId: string, profileImage: string) {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    // Update the users table with the new profile image
+    await connection.execute(
+      'UPDATE users SET profileImage = ? WHERE id = (SELECT userId FROM students WHERE id = ?)',
+      [profileImage, studentId]
+    );
+  } finally {
+    connection.release();
+  }
+}
+
+export async function updateTeacherProfileImage(teacherId: string, profileImage: string) {
+  const connection = await getConnection();
+  if (!connection) throw new Error('Database connection failed');
+
+  try {
+    // Update the users table with the new profile image
+    await connection.execute(
+      'UPDATE users SET profileImage = ? WHERE id = (SELECT userId FROM teachers WHERE id = ?)',
+      [profileImage, teacherId]
+    );
+  } finally {
+    connection.release();
+  }
+}
+
 export async function getTotalPayments() {
   const connection = await getConnection();
   if (!connection) throw new Error('Database connection failed');

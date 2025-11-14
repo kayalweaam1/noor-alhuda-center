@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 
-// Placeholder for file upload utility
-const uploadFile = async (file: File, teacherId: string) => {
-  // Mock upload for now, implementation depends on backend storage
-  console.log(`Uploading file for teacher ${teacherId}: ${file.name}`);
-  // In a real app, this would call an API endpoint to upload the file
-  return `/uploads/teachers/${teacherId}/profile.jpg`; 
+// Convert file to base64
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
 };
 
 export default function TeacherProfile() {
@@ -32,6 +34,16 @@ export default function TeacherProfile() {
     { enabled: !!teacherId }
   );
 
+  const updateProfileImageMutation = trpc.teachers.updateProfileImage.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث الصورة الشخصية بنجاح");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "فشل في تحديث الصورة");
+    },
+  });
+
   if (isLoading) return <div className="p-6 text-center">جاري تحميل بيانات المربي...</div>;
   if (error) return <div className="p-6 text-center text-red-600">حدث خطأ: {error.message}</div>;
   if (!teacher) return <div className="p-6 text-center">لم يتم العثور على المربي</div>;
@@ -40,14 +52,25 @@ export default function TeacherProfile() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("حجم الصورة كبير جداً. الحد الأقصى 5MB");
+      return;
+    }
+
     setIsUploading(true);
     try {
-      const mockUrl = await uploadFile(file, teacher.id);
-      setProfileImageUrl(mockUrl); 
-      // In a real app, you would call a mutation here to update the DB
-      toast.success("تم رفع صورة الملف الشخصي بنجاح");
-    } catch (e) {
-      toast.error("فشل في رفع الصورة");
+      const base64 = await fileToBase64(file);
+      setProfileImageUrl(base64);
+      
+      // Save to database
+      await updateProfileImageMutation.mutateAsync({
+        teacherId: teacher.id,
+        profileImage: base64,
+      });
+    } catch (e: any) {
+      toast.error(e.message || "فشل في رفع الصورة");
+      setProfileImageUrl(null);
     } finally {
       setIsUploading(false);
     }

@@ -662,6 +662,29 @@ export const appRouter = router({
         await db.deleteTeacher(input.id);
         return { success: true };
       }),
+
+    updateProfileImage: protectedProcedure
+      .input(z.object({
+        teacherId: z.string(),
+        profileImage: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const teacher = await db.getTeacher(input.teacherId);
+        if (!teacher) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher not found' });
+        }
+
+        // Admin can update any teacher, or teacher can update themselves
+        if (ctx.user.role !== 'admin') {
+          const myTeacher = await db.getTeacherByUserId(ctx.user.id);
+          if (!myTeacher || myTeacher.id !== input.teacherId) {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'Unauthorized' });
+          }
+        }
+
+        await db.updateTeacherProfileImage(input.teacherId, input.profileImage);
+        return { success: true };
+      }),
   }),
 
   // ============= STUDENT MANAGEMENT =============
@@ -807,6 +830,37 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         await db.updateStudentPaymentAmount(input.studentId, input.paymentAmount);
+        return { success: true };
+      }),
+
+    updateProfileImage: protectedProcedure
+      .input(z.object({
+        studentId: z.string(),
+        profileImage: z.string(), // Base64 encoded image or URL
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const student = await db.getStudent(input.studentId);
+        if (!student) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Student not found' });
+        }
+
+        // Admin can update any student
+        if (ctx.user.role === 'admin') {
+          await db.updateStudentProfileImage(input.studentId, input.profileImage);
+          return { success: true };
+        }
+
+        // Teacher can only update their own students
+        const teacher = await db.getTeacherByUserId(ctx.user.id);
+        if (!teacher) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Teacher profile not found' });
+        }
+
+        if (student.teacherId !== teacher.id) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Unauthorized to update this student' });
+        }
+
+        await db.updateStudentProfileImage(input.studentId, input.profileImage);
         return { success: true };
       }),
 
