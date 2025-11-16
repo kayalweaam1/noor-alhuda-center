@@ -309,6 +309,28 @@ export async function getTeacherByUserId(userId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getTeacherById(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select({
+    id: teachers.id,
+    userId: teachers.userId,
+    halaqaName: teachers.halaqaName,
+    specialization: teachers.specialization,
+    teacherName: sql<string>`${users.name}`,
+    phone: users.phone,
+    email: users.email,
+    profileImage: users.profileImage,
+  })
+  .from(teachers)
+  .leftJoin(users, eq(teachers.userId, users.id))
+  .where(eq(teachers.id, id))
+  .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];

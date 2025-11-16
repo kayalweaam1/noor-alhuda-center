@@ -598,6 +598,23 @@ export const appRouter = router({
       return await db.getTeacherByUserId(ctx.user.id);
     }),
 
+    getById: protectedProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const teacher = await db.getTeacherById(input.id);
+        if (!teacher) throw new TRPCError({ code: 'NOT_FOUND', message: 'Teacher not found' });
+        
+        // Admin can see any teacher, teachers can only see themselves
+        if (ctx.user.role !== 'admin') {
+          const myTeacher = await db.getTeacherByUserId(ctx.user.id);
+          if (!myTeacher || myTeacher.id !== input.id) {
+            throw new TRPCError({ code: 'FORBIDDEN', message: 'Access denied' });
+          }
+        }
+        
+        return teacher;
+      }),
+
     create: adminProcedure
       .input(z.object({
         id: z.string(),
