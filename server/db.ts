@@ -424,6 +424,7 @@ export async function getAllStudents() {
     specialization: students.specialization,
     enrollmentDate: students.enrollmentDate,
     hasPaid: students.hasPaid,
+    paymentAmount: students.paymentAmount,
     createdAt: students.createdAt,
     userName: users.name,
     userPhone: users.phone,
@@ -449,6 +450,7 @@ export async function getStudentsByTeacher(teacherId: string) {
     specialization: students.specialization,
     enrollmentDate: students.enrollmentDate,
     hasPaid: students.hasPaid,
+    paymentAmount: students.paymentAmount,
     createdAt: students.createdAt,
     userName: users.name,
     userPhone: users.phone,
@@ -1183,8 +1185,8 @@ export async function updateStudentPaymentStatus(studentId: string, hasPaid: boo
 }
 
 export async function updateStudentPaymentAmount(studentId: string, paymentAmount: number) {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     await connection.execute(
@@ -1197,8 +1199,8 @@ export async function updateStudentPaymentAmount(studentId: string, paymentAmoun
 }
 
 export async function updateStudentProfileImage(studentId: string, profileImage: string) {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     // Update the users table with the new profile image
@@ -1212,8 +1214,8 @@ export async function updateStudentProfileImage(studentId: string, profileImage:
 }
 
 export async function updateTeacherProfileImage(teacherId: string, profileImage: string) {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     // Update the users table with the new profile image
@@ -1227,8 +1229,8 @@ export async function updateTeacherProfileImage(teacherId: string, profileImage:
 }
 
 export async function getTotalPayments() {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     const [rows]: any = await connection.execute(`
@@ -1666,8 +1668,8 @@ export async function applyMigrations() {
  * Keeps users, teachers, students, and assistants
  */
 export async function resetAllData() {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     console.log('[Reset] Starting full data reset...');
@@ -1705,8 +1707,8 @@ export async function resetAllData() {
  * Reset specific student data (attendance, evaluations)
  */
 export async function resetStudentData(studentId: string) {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     console.log(`[Reset] Resetting data for student ${studentId}...`);
@@ -1732,8 +1734,8 @@ export async function resetStudentData(studentId: string) {
  * Reset specific teacher data (lessons, evaluations, assistant notes)
  */
 export async function resetTeacherData(teacherId: string) {
-  const connection = await getConnection();
-  if (!connection) throw new Error('Database connection failed');
+  if (!_pool) throw new Error('Database pool not initialized');
+  const connection = await _pool.getConnection();
 
   try {
     console.log(`[Reset] Resetting data for teacher ${teacherId}...`);

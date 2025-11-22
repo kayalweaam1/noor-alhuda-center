@@ -757,6 +757,12 @@ export const appRouter = router({
       return await db.getStudentsByTeacher(teacher.id);
     }),
 
+    getByTeacherId: protectedProcedure
+      .input(z.object({ teacherId: z.string() }))
+      .query(async ({ input }) => {
+        return await db.getStudentsByTeacher(input.teacherId);
+      }),
+
     createWithUser: teacherProcedure
       .input(z.object({
         name: z.string(),

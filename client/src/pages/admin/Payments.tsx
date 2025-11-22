@@ -44,8 +44,12 @@ export default function PaymentsPage() {
   }, [students, paidCount]);
 
   const totalAmount = useMemo(() => {
-    return paidCount * 100; // Assuming 100 per student
-  }, [paidCount]);
+    if (!students) return 0;
+    return students.reduce((sum, student) => {
+      const isPaid = paymentStatus[student.id] || student.hasPaid || false;
+      return sum + (isPaid ? (student.paymentAmount || 0) : 0);
+    }, 0);
+  }, [students, paymentStatus]);
 
   const exportPaymentReport = () => {
     if (!students || students.length === 0) {
@@ -53,13 +57,16 @@ export default function PaymentsPage() {
       return;
     }
 
-    const data = students.map(student => ({
-      name: student.userName || "غير محدد",
-      phone: student.userPhone || "-",
-      grade: student.grade || "غير محدد",
-      paid: paymentStatus[student.id] ? "مدفوع" : "غير مدفوع",
-      amount: paymentStatus[student.id] ? "100" : "0"
-    }));
+    const data = students.map(student => {
+      const isPaid = paymentStatus[student.id] || student.hasPaid || false;
+      return {
+        name: student.userName || "غير محدد",
+        phone: student.userPhone || "-",
+        grade: student.grade || "غير محدد",
+        paid: isPaid ? "مدفوع" : "غير مدفوع",
+        amount: isPaid ? String(student.paymentAmount || 0) : "0"
+      };
+    });
 
     const headers = ["الاسم", "الهاتف", "الحلقة", "الحالة", "المبلغ"];
     const csvContent = [
@@ -199,7 +206,7 @@ export default function PaymentsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>{student.userPhone || '-'}</TableCell>
-                      <TableCell className="font-bold">100 ₪</TableCell>
+                      <TableCell className="font-bold">{student.paymentAmount || 0} ₪</TableCell>
                       <TableCell>
                         {isPaid ? (
                           <Badge className="bg-green-500">

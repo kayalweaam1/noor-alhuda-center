@@ -46,6 +46,7 @@ export const students = mysqlTable("students", {
   // Guardian fields will be added in future migration
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
   hasPaid: boolean("hasPaid").default(false).notNull(),
+  paymentAmount: int("paymentAmount").default(0).notNull(), // المبلغ المدفوع
   createdAt: timestamp("createdAt").defaultNow(),
 });
 
