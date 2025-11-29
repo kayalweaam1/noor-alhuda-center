@@ -1,4 +1,4 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean } from "drizzle-orm/mysql-core";
+import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean, index } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -46,9 +46,11 @@ export const students = mysqlTable("students", {
   // Guardian fields will be added in future migration
   enrollmentDate: timestamp("enrollmentDate").defaultNow(),
   hasPaid: boolean("hasPaid").default(false).notNull(),
-  paymentAmount: int("paymentAmount").default(0).notNull(), // المبلغ المدفوع
+  paymentAmount: int("paymentAmount").default(0).notNull(), // المبلغ المدفوع (يجب أن يكون >= 0)
   createdAt: timestamp("createdAt").defaultNow(),
-});
+}, (table) => ({
+  teacherIdIdx: index("teacherId_idx").on(table.teacherId), // Index for faster queries by teacher
+}));
 
 export type Student = typeof students.$inferSelect;
 export type InsertStudent = typeof students.$inferInsert;

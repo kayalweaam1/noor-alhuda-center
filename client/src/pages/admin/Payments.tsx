@@ -10,11 +10,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, CheckCircle, XCircle, CircleDollarSign, Download } from "lucide-react";
+import { Search, CheckCircle, XCircle, CircleDollarSign, Download, Edit } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function PaymentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,6 +31,40 @@ export default function PaymentsPage() {
   
   // Mock payment status - in real app, this would come from database
   const [paymentStatus, setPaymentStatus] = useState<Record<string, boolean>>({});
+  
+  // Edit payment amount dialog
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [newPaymentAmount, setNewPaymentAmount] = useState<number>(0);
+  
+  const updatePaymentAmountMutation = trpc.students.updatePaymentAmount.useMutation({
+    onSuccess: () => {
+      toast.success("تم تحديث المبلغ بنجاح");
+      refetch();
+      setEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "فشل في تحديث المبلغ");
+    },
+  });
+  
+  const openEditDialog = (student: any) => {
+    setSelectedStudent(student);
+    setNewPaymentAmount(student.paymentAmount || 0);
+    setEditDialogOpen(true);
+  };
+  
+  const handleUpdatePaymentAmount = () => {
+    if (!selectedStudent) return;
+    if (newPaymentAmount < 0) {
+      toast.error("المبلغ يجب أن يكون أكبر من أو يساوي 0");
+      return;
+    }
+    updatePaymentAmountMutation.mutate({
+      studentId: selectedStudent.id,
+      paymentAmount: newPaymentAmount,
+    });
+  };
 
   const filteredStudents = students?.filter((student) =>
     student.userName?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -206,7 +249,20 @@ export default function PaymentsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>{student.userPhone || '-'}</TableCell>
-                      <TableCell className="font-bold">{student.paymentAmount || 0} ₪</TableCell>
+                      <TableCell className="font-bold">
+                        <div className="flex items-center gap-2">
+                          <span>{student.paymentAmount || 0} ₪</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-emerald-100"
+                            onClick={() => openEditDialog(student)}
+                            title="تعديل المبلغ"
+                          >
+                            <Edit className="w-3 h-3 text-emerald-600" />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {isPaid ? (
                           <Badge className="bg-green-500">
@@ -247,6 +303,48 @@ export default function PaymentsPage() {
           )}
         </CardContent>
       </Card>
+      
+      {/* Edit Payment Amount Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>تعديل مبلغ الطالب</DialogTitle>
+            <DialogDescription>
+              تعديل مبلغ الدفع للطالب: {selectedStudent?.userName}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="paymentAmount" className="text-right">
+                المبلغ (₪)
+              </Label>
+              <Input
+                id="paymentAmount"
+                type="number"
+                min="0"
+                value={newPaymentAmount}
+                onChange={(e) => setNewPaymentAmount(Number(e.target.value))}
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditDialogOpen(false)}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleUpdatePaymentAmount}
+              disabled={updatePaymentAmountMutation.isPending}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {updatePaymentAmountMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -765,13 +765,14 @@ export const appRouter = router({
 
     createWithUser: teacherProcedure
       .input(z.object({
-        name: z.string(),
-        phone: z.string(),
-        password: z.string().min(6).optional(),
+        name: z.string().min(1, "الاسم مطلوب"),
+        phone: z.string().min(1, "رقم الهاتف مطلوب"),
+        password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").optional(),
         teacherId: z.string().optional(), // Optional for teachers, they'll use their own ID
-        grade: z.string().optional(),
+        grade: z.string().min(1, "الصف مطلوب"),
         specialization: z.enum(["تربية", "تحفيظ", "تربية وتحفيظ"]).optional(),
         hasPaid: z.boolean().optional(),
+        paymentAmount: z.number().min(0, "المبلغ يجب أن يكون أكبر من أو يساوي 0").optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         // If teacher is creating student, use their own ID
@@ -809,6 +810,7 @@ export const appRouter = router({
           grade: input.grade,
           specialization: input.specialization || 'تربية',
           hasPaid: input.hasPaid || false,
+          paymentAmount: input.paymentAmount || 200, // Default payment amount
         });
 	
 	        return { success: true, userId, studentId };
@@ -849,7 +851,7 @@ export const appRouter = router({
     updatePaymentAmount: adminProcedure
       .input(z.object({
         studentId: z.string(),
-        paymentAmount: z.number(),
+        paymentAmount: z.number().min(0, "المبلغ يجب أن يكون أكبر من أو يساوي 0"),
       }))
       .mutation(async ({ input }) => {
         await db.updateStudentPaymentAmount(input.studentId, input.paymentAmount);

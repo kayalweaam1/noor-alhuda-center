@@ -15,6 +15,7 @@ import {
   Shield,
   Key,
   CircleDollarSign,
+  Calendar,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -79,6 +80,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       title: "التقرير المالي",
       icon: CircleDollarSign,
       path: "/admin/payments-summary",
+    },
+    {
+      title: "التقرير الشهري",
+      icon: Calendar,
+      path: "/admin/monthly-report",
+    },
+    {
+      title: "إشعارات الدفع",
+      icon: Bell,
+      path: "/admin/payment-notifications",
     },
     ...(isSuperAdmin ? [{
       title: "إدارة المدراء",

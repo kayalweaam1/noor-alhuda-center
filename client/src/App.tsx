@@ -18,6 +18,8 @@ import AdminAnalytics from "./pages/admin/Analytics";
 import AdminAdmins from "./pages/admin/Admins";
 import AdminPayments from "./pages/admin/Payments";
 import AdminPaymentsSummary from "./pages/admin/PaymentsSummary";
+import AdminMonthlyReport from "./pages/admin/MonthlyReport";
+import AdminPaymentNotifications from "./pages/admin/PaymentNotifications";
 import AdminAppSettings from "./pages/admin/AppSettings";
 import AdminUserDetails from "./pages/admin/UserDetails";
 import AdminUserAccounts from "./pages/admin/UserAccounts";
@@ -119,6 +121,16 @@ function Router() {
       <Route path="/admin/payments-summary">
         <AdminLayout>
           <AdminPaymentsSummary />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/monthly-report">
+        <AdminLayout>
+          <AdminMonthlyReport />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/payment-notifications">
+        <AdminLayout>
+          <AdminPaymentNotifications />
         </AdminLayout>
       </Route>
       <Route path="/admin/app-settings">

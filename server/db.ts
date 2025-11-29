@@ -1647,8 +1647,49 @@ export async function applyMigrations() {
       console.log('[Migrations] Adding paymentAmount column to students table...');
       await connection.execute(`
         ALTER TABLE students 
-        ADD COLUMN paymentAmount DECIMAL(10, 2) DEFAULT 0.00
+        ADD COLUMN paymentAmount INT DEFAULT 0 NOT NULL
       `);
+    }
+    
+    // Check if teacherId index exists
+    const [teacherIdIndex]: any = await connection.execute(`
+      SELECT INDEX_NAME 
+      FROM INFORMATION_SCHEMA.STATISTICS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'students' 
+      AND INDEX_NAME = 'teacherId_idx'
+    `);
+    
+    if (teacherIdIndex.length === 0) {
+      console.log('[Migrations] Adding index on students.teacherId...');
+      await connection.execute(`
+        CREATE INDEX teacherId_idx ON students(teacherId)
+      `);
+    }
+    
+    // Check if paymentAmount check constraint exists (MySQL 8.0.16+)
+    try {
+      const [constraints]: any = await connection.execute(`
+        SELECT CONSTRAINT_NAME 
+        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = 'students' 
+        AND CONSTRAINT_NAME = 'chk_payment_amount_positive'
+      `);
+      
+      if (constraints.length === 0) {
+        console.log('[Migrations] Adding check constraint on students.paymentAmount...');
+        await connection.execute(`
+          ALTER TABLE students 
+          ADD CONSTRAINT chk_payment_amount_positive 
+          CHECK (paymentAmount >= 0)
+        `);
+      }
+    } catch (error: any) {
+      // MySQL version might not support check constraints
+      if (error.code !== 'ER_CHECK_CONSTRAINT_DUP_NAME') {
+        console.log('[Migrations] Check constraints not supported or already exists');
+      }
     }
     
     console.log('[Migrations] All migrations applied successfully');
