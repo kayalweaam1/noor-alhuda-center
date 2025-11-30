@@ -150,7 +150,7 @@ export default function TeachersPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-blue-600" />
-                        <span className="font-semibold">0</span>
+                        <span className="font-semibold">{teacher.studentCount || 0}</span>
                       </div>
                     </TableCell>
                     <TableCell>{teacher.userPhone || '-'}</TableCell>
