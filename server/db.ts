@@ -344,9 +344,12 @@ export async function getAllTeachers() {
     userName: users.name,
     userPhone: users.phone,
     userEmail: users.email,
+    studentCount: sql<number>`COUNT(DISTINCT ${students.id})`
   })
   .from(teachers)
   .leftJoin(users, eq(teachers.userId, users.id))
+  .leftJoin(students, eq(students.teacherId, teachers.id))
+  .groupBy(teachers.id, teachers.userId, teachers.halaqaName, teachers.specialization, teachers.createdAt, users.name, users.phone, users.email)
   .orderBy(desc(teachers.createdAt));
 }
 
