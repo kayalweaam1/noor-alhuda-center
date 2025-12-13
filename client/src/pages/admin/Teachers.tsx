@@ -26,7 +26,7 @@ export default function TeachersPage() {
   const deleteTeacherMutation = trpc.teachers.delete.useMutation();
 
   const filteredTeachers = teachers?.filter((teacher) =>
-    teacher.userName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    teacher.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     teacher.specialization?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -133,12 +133,12 @@ export default function TeachersPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                           <span className="text-white font-bold text-sm">
-                            {teacher.userName?.charAt(0) || 'م'}
+                            {teacher.name?.charAt(0) || 'م'}
                           </span>
                         </div>
                         <div>
-                          <p className="font-semibold">{teacher.userName || 'غير محدد'}</p>
-                          <p className="text-xs text-gray-500">{teacher.userEmail || '-'}</p>
+                          <p className="font-semibold">{teacher.name || 'غير محدد'}</p>
+                          <p className="text-xs text-gray-500">{teacher.email || '-'}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -153,7 +153,7 @@ export default function TeachersPage() {
                         <span className="font-semibold">{teacher.studentCount || 0}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{teacher.userPhone || '-'}</TableCell>
+                    <TableCell>{teacher.phone || '-'}</TableCell>
                     <TableCell>
                       {teacher.createdAt ? new Date(teacher.createdAt).toLocaleDateString('ar-SA') : '-'}
                     </TableCell>

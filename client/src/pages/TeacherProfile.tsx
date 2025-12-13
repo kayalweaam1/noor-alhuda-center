@@ -89,7 +89,7 @@ export default function TeacherProfile() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-3xl text-emerald-900">{teacher.userName}</CardTitle>
+              <CardTitle className="text-3xl text-emerald-900">{teacher.name}</CardTitle>
               <CardDescription>الملف الشخصي للمربي</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -106,8 +106,8 @@ export default function TeacherProfile() {
             <div className="col-span-1 flex flex-col items-center gap-4 border-l border-gray-100 pl-6">
               <div className="relative">
                 <img
-                  src={profileImageUrl || teacher.profilePictureUrl || "https://ui-avatars.com/api/?name=" + teacher.userName + "&background=10b981&color=fff&size=128&font-size=0.5&bold=true"}
-                  alt={teacher.userName || "المربي"}
+                  src={profileImageUrl || teacher.profilePictureUrl || "https://ui-avatars.com/api/?name=" + teacher.name + "&background=10b981&color=fff&size=128&font-size=0.5&bold=true"}
+                  alt={teacher.name || "المربي"}
                   className="w-32 h-32 rounded-full object-cover border-4 border-emerald-200 shadow-lg"
                 />
                 <label htmlFor="profile-upload" className="absolute bottom-0 left-0 p-2 bg-emerald-600 rounded-full cursor-pointer hover:bg-emerald-700 transition-colors">
@@ -131,11 +131,11 @@ export default function TeacherProfile() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-emerald-600" />
-                  <p className="text-gray-700">{teacher.userPhone || 'لا يوجد رقم'}</p>
+                  <p className="text-gray-700">{teacher.phone || 'لا يوجد رقم'}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-emerald-600" />
-                  <p className="text-gray-700">{teacher.userEmail || 'لا يوجد بريد إلكتروني'}</p>
+                  <p className="text-gray-700">{teacher.email || 'لا يوجد بريد إلكتروني'}</p>
                 </div>
               </div>
 
@@ -169,9 +169,9 @@ export default function TeacherProfile() {
                 <div key={student.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">{student.userName?.charAt(0) || 'ط'}</span>
+                      <span className="text-white text-sm font-bold">{student.name?.charAt(0) || 'ط'}</span>
                     </div>
-                    <p className="font-semibold text-gray-800">{student.userName}</p>
+                    <p className="font-semibold text-gray-800">{student.name}</p>
                   </div>
                   <Badge variant="outline" className="border-blue-300">
                     الجيل: {student.grade}
