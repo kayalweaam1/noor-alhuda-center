@@ -269,7 +269,15 @@ export default function AdminDashboard() {
                 }
               });
               
-              const grades = Object.keys(gradeDistribution).sort();
+              // Sort grades in proper order
+              const gradeOrder = ['الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر'];
+              const grades = Object.keys(gradeDistribution).sort((a, b) => {
+                const indexA = gradeOrder.indexOf(a);
+                const indexB = gradeOrder.indexOf(b);
+                if (indexA === -1) return 1; // Unknown grades go to end
+                if (indexB === -1) return -1;
+                return indexA - indexB;
+              });
               const colors = [
                 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
                 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500',

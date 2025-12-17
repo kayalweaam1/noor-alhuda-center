@@ -27,8 +27,10 @@ export default function AnalyticsPage() {
     ? (attendance.filter(a => a.status === 'present').length / attendance.length) * 100
     : 0;
 
-  const avgBehavior = 75; // Default behavior score
+  // Calculate average behavior from students (if behavior data exists)
+  const avgBehavior = 0; // TODO: Add behavior tracking to students table
 
+  // Calculate average scores from evaluations (score is out of 100)
   const avgMemorization = evaluations && evaluations.length > 0
     ? evaluations.reduce((sum, e) => sum + (e.score || 0), 0) / evaluations.length
     : 0;
@@ -37,16 +39,16 @@ export default function AnalyticsPage() {
     ? evaluations.reduce((sum, e) => sum + (e.score || 0), 0) / evaluations.length
     : 0;
 
-  const avgTajweed = avgRecitation; // Using same score
+  const avgTajweed = avgRecitation; // Using same score (TODO: Add separate tajweed field)
 
   // Calculate attendance by status
   const presentCount = attendance?.filter(a => a.status === 'present').length || 0;
   const absentCount = attendance?.filter(a => a.status === 'absent').length || 0;
   const lateCount = 0; // Late status not in schema
 
-  // Calculate students by halaqa
+  // Calculate students by grade (halaqa)
   const halaqas = students?.reduce((acc, s) => {
-    const halaqa = 'الحلقة الأولى'; // Default halaqa
+    const halaqa = s.grade || 'غير محدد'; // Use grade as halaqa
     acc[halaqa] = (acc[halaqa] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
@@ -121,12 +123,12 @@ export default function AnalyticsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">السلوك</span>
-                <span className="text-sm font-bold text-purple-600">{avgBehavior.toFixed(1)}/10</span>
+                <span className="text-sm font-bold text-purple-600">{avgBehavior.toFixed(1)}/100</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
                   className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${(avgBehavior / 10) * 100}%` }}
+                  style={{ width: `${avgBehavior}%` }}
                 ></div>
               </div>
             </div>
@@ -135,12 +137,12 @@ export default function AnalyticsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">الحفظ</span>
-                <span className="text-sm font-bold text-blue-600">{avgMemorization.toFixed(1)}/10</span>
+                <span className="text-sm font-bold text-blue-600">{avgMemorization.toFixed(1)}/100</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
                   className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${(avgMemorization / 10) * 100}%` }}
+                  style={{ width: `${avgMemorization}%` }}
                 ></div>
               </div>
             </div>
@@ -149,12 +151,12 @@ export default function AnalyticsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">التلاوة</span>
-                <span className="text-sm font-bold text-emerald-600">{avgRecitation.toFixed(1)}/10</span>
+                <span className="text-sm font-bold text-emerald-600">{avgRecitation.toFixed(1)}/100</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
                   className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${(avgRecitation / 10) * 100}%` }}
+                  style={{ width: `${avgRecitation}%` }}
                 ></div>
               </div>
             </div>
@@ -163,12 +165,12 @@ export default function AnalyticsPage() {
             <div>
               <div className="flex justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">التجويد</span>
-                <span className="text-sm font-bold text-orange-600">{avgTajweed.toFixed(1)}/10</span>
+                <span className="text-sm font-bold text-orange-600">{avgTajweed.toFixed(1)}/100</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
                   className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${(avgTajweed / 10) * 100}%` }}
+                  style={{ width: `${avgTajweed}%` }}
                 ></div>
               </div>
             </div>
