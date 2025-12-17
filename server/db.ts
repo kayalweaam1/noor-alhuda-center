@@ -318,7 +318,8 @@ export async function getTeacherById(id: string) {
     userId: teachers.userId,
     halaqaName: teachers.halaqaName,
     specialization: teachers.specialization,
-    teacherName: sql<string>`${users.name}`,
+    createdAt: teachers.createdAt,
+    name: users.name,
     phone: users.phone,
     email: users.email,
     profileImage: users.profileImage,
@@ -341,9 +342,9 @@ export async function getAllTeachers() {
     halaqaName: teachers.halaqaName,
     specialization: teachers.specialization,
     createdAt: teachers.createdAt,
-    userName: users.name,
-    userPhone: users.phone,
-    userEmail: users.email,
+    name: users.name,
+    phone: users.phone,
+    email: users.email,
     studentCount: sql<number>`COUNT(DISTINCT ${students.id})`
   })
   .from(teachers)
@@ -429,9 +430,9 @@ export async function getAllStudents() {
     hasPaid: students.hasPaid,
     paymentAmount: students.paymentAmount,
     createdAt: students.createdAt,
-    userName: users.name,
-    userPhone: users.phone,
-    userEmail: users.email,
+    name: users.name,
+    phone: users.phone,
+    email: users.email,
     teacherName: sql<string>`teacher_user.name`,
   })
   .from(students)
@@ -455,10 +456,10 @@ export async function getStudentsByTeacher(teacherId: string) {
     hasPaid: students.hasPaid,
     paymentAmount: students.paymentAmount,
     createdAt: students.createdAt,
-    userName: users.name,
-    userPhone: users.phone,
-    userEmail: users.email,
-    userProfileImage: users.profileImage,
+    name: users.name,
+    phone: users.phone,
+    email: users.email,
+    profileImage: users.profileImage,
     teacherName: sql<string>`teacher_user.name`,
   })
   .from(students)
@@ -782,7 +783,7 @@ export async function getAssistantByUserId(userId: string) {
       userId: assistants.userId,
       halaqaName: assistants.halaqaName,
       createdAt: assistants.createdAt,
-      userName: users.name,
+      name: users.name,
     })
     .from(assistants)
     .leftJoin(users, eq(assistants.userId, users.id))
@@ -801,9 +802,9 @@ export async function getAllAssistants() {
     userId: assistants.userId,
     halaqaName: assistants.halaqaName,
     createdAt: assistants.createdAt,
-    userName: users.name,
-    userPhone: users.phone,
-    userEmail: users.email,
+    name: users.name,
+    phone: users.phone,
+    email: users.email,
   })
   .from(assistants)
   .leftJoin(users, eq(assistants.userId, users.id))
@@ -1056,9 +1057,9 @@ export async function getAssistantsByHalaqa(halaqaName: string) {
     userId: assistants.userId,
     halaqaName: assistants.halaqaName,
     createdAt: assistants.createdAt,
-    userName: users.name,
-    userPhone: users.phone,
-    userEmail: users.email,
+    name: users.name,
+    phone: users.phone,
+    email: users.email,
   })
   .from(assistants)
   .leftJoin(users, eq(assistants.userId, users.id))

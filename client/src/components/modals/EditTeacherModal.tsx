@@ -23,8 +23,8 @@ export default function EditTeacherModal({ open, onOpenChange, teacher, onSucces
   // Update form when teacher changes
   useEffect(() => {
     if (teacher) {
-      setName(teacher.userName || "");
-      setPhone(teacher.userPhone || "");
+      setName(teacher.name || "");
+      setPhone(teacher.phone || "");
       setHalaqaName(teacher.halaqaName || "");
       setSpecialization(teacher.specialization || "");
     }

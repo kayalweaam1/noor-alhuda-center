@@ -49,7 +49,7 @@ export default function StudentsPage() {
 
   const filteredStudents = students
     ?.filter((student) =>
-      student.userName?.toLowerCase().includes(searchQuery.toLowerCase())
+      student.name?.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
       const gradeA = gradeOrder.indexOf(a.grade || '');
@@ -212,12 +212,12 @@ export default function StudentsPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
                             <span className="text-white font-bold text-sm">
-                              {student.userName?.charAt(0) || 'ط'}
+                              {student.name?.charAt(0) || 'ط'}
                             </span>
                           </div>
                           <div>
-                            <p className="font-semibold">{student.userName || 'غير محدد'}</p>
-                            <p className="text-xs text-gray-500">{student.userPhone || '-'}</p>
+                            <p className="font-semibold">{student.name || 'غير محدد'}</p>
+                            <p className="text-xs text-gray-500">{student.phone || '-'}</p>
                           </div>
                         </div>
                       </TableCell>
@@ -272,7 +272,7 @@ export default function StudentsPage() {
                             size="sm"
                             variant="outline"
                             className="border-amber-200 text-amber-600 hover:bg-amber-50"
-                            onClick={() => handleResetStudent(student.id, student.userName || 'غير محدد')}
+                            onClick={() => handleResetStudent(student.id, student.name || 'غير محدد')}
                             title="تصفير بيانات الطالب"
                           >
                             <RotateCcw className="w-4 h-4" />

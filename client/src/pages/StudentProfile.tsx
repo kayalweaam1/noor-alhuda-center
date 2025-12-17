@@ -118,7 +118,7 @@ export default function StudentProfile() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-3xl text-blue-900">{student.userName}</CardTitle>
+              <CardTitle className="text-3xl text-blue-900">{student.name}</CardTitle>
               <CardDescription>الملف الشخصي للطالب</CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -135,8 +135,8 @@ export default function StudentProfile() {
             <div className="col-span-1 flex flex-col items-center gap-4 border-l border-gray-100 pl-6">
               <div className="relative">
                 <img
-                  src={profileImageUrl || student.profilePictureUrl || "https://ui-avatars.com/api/?name=" + student.userName + "&background=007bff&color=fff&size=128&font-size=0.5&bold=true"}
-                  alt={student.userName || "الطالب"}
+                  src={profileImageUrl || student.profilePictureUrl || "https://ui-avatars.com/api/?name=" + student.name + "&background=007bff&color=fff&size=128&font-size=0.5&bold=true"}
+                  alt={student.name || "الطالب"}
                   className="w-32 h-32 rounded-full object-cover border-4 border-blue-200 shadow-lg"
                 />
                 <label htmlFor="profile-upload" className="absolute bottom-0 left-0 p-2 bg-blue-600 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">

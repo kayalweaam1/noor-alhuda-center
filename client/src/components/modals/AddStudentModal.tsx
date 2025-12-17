@@ -105,7 +105,7 @@ export default function AddStudentModal({ open, onOpenChange, onSuccess }: AddSt
               <SelectContent>
                 {teachers?.map((teacher) => (
                   <SelectItem key={teacher.id} value={teacher.id}>
-                    {teacher.userName || teacher.id}
+                    {teacher.name || teacher.id}
                   </SelectItem>
                 ))}
               </SelectContent>

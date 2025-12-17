@@ -106,7 +106,7 @@ export function AddLessonModal({ open, onClose }: AddLessonModalProps) {
               <SelectContent>
                 {teachers?.map((teacher) => (
                   <SelectItem key={teacher.id} value={teacher.id}>
-                    {teacher.userName || teacher.userPhone || teacher.id}
+                    {teacher.name || teacher.phone || teacher.id}
                   </SelectItem>
                 ))}
               </SelectContent>

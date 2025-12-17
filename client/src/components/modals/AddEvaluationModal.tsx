@@ -81,7 +81,7 @@ export function AddEvaluationModal({ open, onClose }: AddEvaluationModalProps) {
               <SelectContent>
                 {students?.map((student) => (
                   <SelectItem key={student.id} value={student.id}>
-                    {student.userName || student.userPhone || student.id}
+                    {student.name || student.phone || student.id}
                   </SelectItem>
                 ))}
               </SelectContent>
