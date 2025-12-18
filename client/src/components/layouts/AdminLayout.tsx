@@ -16,6 +16,7 @@ import {
   Key,
   CircleDollarSign,
   Calendar,
+  Wrench,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -101,6 +102,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: Key,
       path: "/admin/user-accounts",
     },
+    ...(isSuperAdmin ? [{
+      title: "إصلاح البيانات",
+      icon: Wrench,
+      path: "/admin/data-fix",
+    }] : []),
     {
       title: "الإعدادات",
       icon: Settings,

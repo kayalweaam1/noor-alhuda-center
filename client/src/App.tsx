@@ -15,6 +15,7 @@ import TeacherProfile from "./pages/TeacherProfile";
 import AdminReports from "./pages/admin/Reports";
 import AdminLessons from "./pages/admin/Lessons";
 import AdminAnalytics from "./pages/admin/Analytics";
+import AdminDataFix from "./pages/admin/DataFix";
 import AdminAdmins from "./pages/admin/Admins";
 import AdminPayments from "./pages/admin/Payments";
 import AdminPaymentsSummary from "./pages/admin/PaymentsSummary";
@@ -101,6 +102,11 @@ function Router() {
       <Route path="/admin/analytics">
         <AdminLayout>
           <AdminAnalytics />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/data-fix">
+        <AdminLayout>
+          <AdminDataFix />
         </AdminLayout>
       </Route>
       <Route path="/admin/admins">
