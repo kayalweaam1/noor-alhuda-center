@@ -388,7 +388,29 @@ export async function getStudent(id: string) {
   const db = await getDb();
   if (!db) return undefined;
 
-  const result = await db.select().from(students).where(eq(students.id, id)).limit(1);
+  const result = await db.select({
+    id: students.id,
+    userId: students.userId,
+    teacherId: students.teacherId,
+    grade: students.grade,
+    specialization: students.specialization,
+    enrollmentDate: students.enrollmentDate,
+    hasPaid: students.hasPaid,
+    paymentAmount: students.paymentAmount,
+    createdAt: students.createdAt,
+    name: users.name,
+    phone: users.phone,
+    email: users.email,
+    profileImage: users.profileImage,
+    teacherName: sql<string>`teacher_user.name`,
+  })
+  .from(students)
+  .leftJoin(users, eq(students.userId, users.id))
+  .leftJoin(teachers, eq(students.teacherId, teachers.id))
+  .leftJoin(sql`users AS teacher_user`, eq(sql`teachers.userId`, sql`teacher_user.id`))
+  .where(eq(students.id, id))
+  .limit(1);
+  
   return result.length > 0 ? result[0] : undefined;
 }
 

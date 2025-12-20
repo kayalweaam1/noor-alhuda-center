@@ -135,7 +135,7 @@ export default function StudentProfile() {
             <div className="col-span-1 flex flex-col items-center gap-4 border-l border-gray-100 pl-6">
               <div className="relative">
                 <img
-                  src={profileImageUrl || student.profilePictureUrl || "https://ui-avatars.com/api/?name=" + student.name + "&background=007bff&color=fff&size=128&font-size=0.5&bold=true"}
+                  src={profileImageUrl || student.profileImage || "https://ui-avatars.com/api/?name=" + student.name + "&background=007bff&color=fff&size=128&font-size=0.5&bold=true"}
                   alt={student.name || "الطالب"}
                   className="w-32 h-32 rounded-full object-cover border-4 border-blue-200 shadow-lg"
                 />
@@ -160,11 +160,11 @@ export default function StudentProfile() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-blue-600" />
-                  <p className="text-gray-700">{student.userPhone || 'لا يوجد رقم'}</p>
+                  <p className="text-gray-700">{student.phone || 'لا يوجد رقم'}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-blue-600" />
-                  <p className="text-gray-700">{student.userEmail || 'لا يوجد بريد إلكتروني'}</p>
+                  <p className="text-gray-700">{student.email || 'لا يوجد بريد إلكتروني'}</p>
                 </div>
               </div>
 

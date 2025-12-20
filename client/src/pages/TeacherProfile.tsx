@@ -106,7 +106,7 @@ export default function TeacherProfile() {
             <div className="col-span-1 flex flex-col items-center gap-4 border-l border-gray-100 pl-6">
               <div className="relative">
                 <img
-                  src={profileImageUrl || teacher.profilePictureUrl || "https://ui-avatars.com/api/?name=" + teacher.name + "&background=10b981&color=fff&size=128&font-size=0.5&bold=true"}
+                  src={profileImageUrl || teacher.profileImage || "https://ui-avatars.com/api/?name=" + teacher.name + "&background=10b981&color=fff&size=128&font-size=0.5&bold=true"}
                   alt={teacher.name || "المربي"}
                   className="w-32 h-32 rounded-full object-cover border-4 border-emerald-200 shadow-lg"
                 />
